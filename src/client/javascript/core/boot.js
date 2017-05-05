@@ -57,6 +57,7 @@
 
   let _connectionInstance;
   let _storageInstance;
+  let _authInstance;
 
   /////////////////////////////////////////////////////////////////////////////
   // GLOBAL EVENTS
@@ -350,9 +351,7 @@
     var ctype = conf.Type === 'standalone' ? 'http' : conf.Type;
 
     _connectionInstance = new (require('core/connections/' + ctype + '.js'));
-
-    var authenticator = new OSjs.Auth[conf.Authenticator]();
-
+    _authInstance = new (require('core/auth/' + conf.Authenticator + '.js'));
     _storageInstance = new (require('core/storage/' + conf.Storage + '.js'));
 
     OSjs.API.setLocale(OSjs.API.getConfig('Locale'));
@@ -364,7 +363,7 @@
         callback(err);
       } else {
         _storageInstance.init(function() {
-          authenticator.init(function(err) {
+          _authInstance.init(function(err) {
             if ( !err ) {
               inited = true;
             }
@@ -897,6 +896,18 @@
    */
   OSjs.Core.getStorage = function Core_getStorage() {
     return _storageInstance;
+  };
+
+  /**
+   * Get running 'Authenticator' instance
+   *
+   * @function getAuthenticator
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.Authenticator}
+   */
+  OSjs.Core.getAuthenticator = function Core_getAuthenticator() {
+    return _authInstance;
   };
 
 })();
