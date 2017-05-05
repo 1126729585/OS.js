@@ -27,94 +27,88 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(Utils, API, Process) {
-  'use strict';
 
-  /**
-   * Look at the 'ProcessEvent' for more.
-   * The predefined events are as follows:
-   *
-   * <pre><code>
-   *  init        When application was inited              => (settings, metadata, scheme)
-   * </code></pre>
-   * @typedef ApplicationEvent
-   */
+'use strict';
 
-  /////////////////////////////////////////////////////////////////////////////
-  // APPLICATION
-  /////////////////////////////////////////////////////////////////////////////
+const Process = require('core/process.js');
 
-  /**
-   * Application Class
-   *
-   * The 'Process arguments' is a JSON object with the arguments the
-   * Applications was launched with. Just like 'argv'
-   *
-   * <pre><b>
-   * YOU CANNOT CANNOT USE THIS VIA 'new' KEYWORD.
-   * </b></pre>
-   *
-   * @summary Class used for basis as an Application.
-   *
-   * @param   {String}            name        Process name
-   * @param   {Object}            args        Process arguments
-   * @param   {Metadata}          metadata    Application metadata
-   * @param   {Object}            [settings]  Application settings
-   *
-   * @link https://os-js.org/manual/package/application/
-   *
-   * @abstract
-   * @constructor
-   * @memberof OSjs.Core
-   * @extends OSjs.Core.Process
-   */
-  function Application(name, args, metadata, settings) {
+/**
+ * Look at the 'ProcessEvent' for more.
+ * The predefined events are as follows:
+ *
+ * <pre><code>
+ *  init        When application was inited              => (settings, metadata, scheme)
+ * </code></pre>
+ * @typedef ApplicationEvent
+ */
+
+/////////////////////////////////////////////////////////////////////////////
+// APPLICATION
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Application Class
+ *
+ * The 'Process arguments' is a JSON object with the arguments the
+ * Applications was launched with. Just like 'argv'
+ *
+ * <pre><b>
+ * YOU CANNOT CANNOT USE THIS VIA 'new' KEYWORD.
+ * </b></pre>
+ *
+ * @summary Class used for basis as an Application.
+ *
+ * @param   {String}            name        Process name
+ * @param   {Object}            args        Process arguments
+ * @param   {Metadata}          metadata    Application metadata
+ * @param   {Object}            [settings]  Application settings
+ *
+ * @link https://os-js.org/manual/package/application/
+ *
+ * @abstract
+ * @constructor
+ * @memberof OSjs.Core
+ * @extends OSjs.Core.Process
+ */
+class Application extends Process {
+
+  constructor(name, args, metadata, settings) {
     console.group('Application::constructor()', arguments);
+
+    super(...arguments);
 
     /**
      * If Application was inited
-     * @name __inited
-     * @memberof OSjs.Core.Application#
      * @type {Boolean}
      */
     this.__inited     = false;
 
     /**
      * Registered main window
-     * @name __mainwindow
-     * @memberof OSjs.Core.Application#
      * @type {OSjs.Core.Window}
      */
     this.__mainwindow = null;
 
     /**
      * Scheme reference
-     * @name __scheme
-     * @memberof OSjs.Core.Application#
      * @type {OSjs.GUI.Scheme}
      */
     this.__scheme     = null;
 
     /**
      * Registered Windows
-     * @name __windows
-     * @memberof OSjs.Core.Application#
      * @type {OSjs.Core.Window[]}
      */
     this.__windows    = [];
 
     /**
      * Registered Settings
-     * @name __settings
-     * @memberof OSjs.Core.Application#
      * @type {Object}
      */
     this.__settings   = {};
 
     /**
      * If is in the process of destroying
-     * @name __destroying
-     * @memberof OSjs.Core.Application#
      * @type {Boolean}
      */
     this.__destroying = false;
@@ -127,34 +121,25 @@
       this.__settings = OSjs.Core.getSettingsManager().instance(name, {});
     }
 
-    Process.apply(this, arguments);
-
     console.groupEnd();
   }
 
-  Application.prototype = Object.create(Process.prototype);
-  Application.constructor = Process;
-
   /**
    * Initialize the Application
-   *
-   * @function init
-   * @memberof OSjs.Core.Application#
    *
    * @param   {Object}            settings      Settings JSON
    * @param   {Metadata}          metadata      Metadata JSON
    * @param   {OSjs.GUI.Scheme}   [scheme]      GUI Scheme instance
    */
-  Application.prototype.init = function(settings, metadata, scheme) {
+  init(settings, metadata, scheme) {
 
-    var wm = OSjs.Core.getWindowManager();
-    var self = this;
+    const wm = OSjs.Core.getWindowManager();
 
-    function focusLastWindow() {
-      var last;
+    const focusLastWindow = () => {
+      let last;
 
       if ( wm ) {
-        self.__windows.forEach(function(win, i) {
+        this.__windows.forEach(function(win, i) {
           if ( win ) {
             wm.addWindow(win);
             last = win;
@@ -165,7 +150,7 @@
       if ( last ) {
         last._focus();
       }
-    }
+    };
 
     if ( !this.__inited ) {
       console.debug('Application::init()', this.__pname);
@@ -182,17 +167,14 @@
 
       focusLastWindow();
     }
-  };
+  }
 
   /**
    * Destroy the application
    *
    * @override
-   * @function destroy
-   * @memberof OSjs.Core.Application#
-   * @see OSjs.Core.Process#destroy
    */
-  Application.prototype.destroy = function(sourceWid) {
+  destroy(sourceWid) {
     if ( this.__destroying || this.__destroyed ) { // From 'process.js'
       return true;
     }
@@ -219,19 +201,17 @@
     }
     this.__scheme = null;
 
-    var result = Process.prototype.destroy.apply(this, arguments);
+    const result = super.destroy(...arguments);
     console.groupEnd();
     return result;
-  };
+  }
 
   /**
    * Application has received a message
    *
    * @override
-   * @function _onMessage
-   * @memberof OSjs.Core.Application#
    */
-  Application.prototype._onMessage = function(msg, obj, args) {
+  _onMessage(msg, obj, args) {
     if ( this.__destroying || this.__destroyed ) {
       return false;
     }
@@ -248,8 +228,8 @@
       }
     }
 
-    return Process.prototype._onMessage.apply(this, arguments);
-  };
+    return super._onMessage(...arguments);
+  }
 
   /**
    * Default method for loading a Scheme file
@@ -262,8 +242,8 @@
    * @param   {String}        s       Scheme filename
    * @param   {Function}      cb      Callback => fn(scheme)
    */
-  Application.prototype._loadScheme = function(s, cb) {
-    var scheme = OSjs.GUI.createScheme(this._getResource(s));
+  _loadScheme(s, cb) {
+    const scheme = OSjs.GUI.createScheme(this._getResource(s));
     scheme.load(function __onApplicationLoadScheme(error, result) {
       if ( error ) {
         console.error('Application::_loadScheme()', error);
@@ -271,15 +251,12 @@
       cb(scheme);
     });
     this._setScheme(scheme);
-  };
+  }
 
   /**
    * Add a window to the application
    *
    * This will automatically add it to the WindowManager and show it to you
-   *
-   * @function _addWindow
-   * @memberof OSjs.Core.Application#
    *
    * @param   {OSjs.Core.Window}  w           The Window
    * @param   {Function}          [cb]        Callback for when window was successfully inited
@@ -287,7 +264,7 @@
    *
    * @return  {OSjs.Core.Window}
    */
-  Application.prototype._addWindow = function(w, cb, setmain) {
+  _addWindow(w, cb, setmain) {
     if ( !(w instanceof OSjs.Core.Window) ) {
       throw new TypeError('Application::_addWindow() expects Core.Window');
     }
@@ -299,7 +276,7 @@
       this.__mainwindow = w._name;
     }
 
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( this.__inited ) {
       if ( wm ) {
         wm.addWindow(w);
@@ -315,31 +292,27 @@
     (cb || function() {})(w, wm);
 
     return w;
-  };
+  }
 
   /**
    * Removes given Window
-   *
-   * @function _removeWindow
-   * @memberof OSjs.Core.Application#
    *
    * @param   {OSjs.Core.Window}      w     The Windo
    *
    * @return  {Boolean}
    */
-  Application.prototype._removeWindow = function(w) {
+  _removeWindow(w) {
     if ( !(w instanceof OSjs.Core.Window) ) {
       throw new TypeError('Application::_removeWindow() expects Core.Window');
     }
 
-    var self = this;
-    return this.__windows.some(function(win, i) {
+    return this.__windows.some((win, i) => {
       if ( win ) {
         if ( win._wid === w._wid ) {
           console.debug('Application::_removeWindow()', w._wid);
           win.destroy();
 
-          self.__windows.splice(i, 1);
+          this.__windows.splice(i, 1);
 
           return true;
         }
@@ -347,7 +320,7 @@
 
       return true;
     });
-  };
+  }
 
   /**
    * Gets a Window by X
@@ -357,21 +330,18 @@
    *
    * If you specify 'null' it will try to return the 'main' window.
    *
-   * @function _getWindow
-   * @memberof OSjs.Core.Application#
-   *
    * @param   {String}    value      The value
    * @param   {Mixed}     key        The key to check for
    *
    * @return  {OSjs.Core.Window} Or null on error or nothing
    */
-  Application.prototype._getWindow = function(value, key) {
+  _getWindow(value, key) {
     key = key || 'name';
     if ( value === null ) {
       value = this.__mainwindow;
     }
 
-    var result = key === 'tag' ? [] : null;
+    let result = key === 'tag' ? [] : null;
     this.__windows.every(function(win, i) {
       if ( win ) {
         if ( win['_' + key] === value ) {
@@ -387,88 +357,72 @@
     });
 
     return result;
-  };
+  }
 
   /**
    * Get a Window by Name
    *
-   * @function _getWindowByName
-   * @memberof OSjs.Core.Application#
    * @see OSjs.Core.Application#_getWindow
    *
    * @param {String}  name      Window Name
    *
    * @return {OSjs.Core.Window}
    */
-  Application.prototype._getWindowByName = function(name) {
+  _getWindowByName(name) {
     return this._getWindow(name);
-  };
+  }
 
   /**
    * Get Windows(!) by Tag
    *
-   * @function _getWindowByTag
-   * @memberof OSjs.Core.Application#
    * @see OSjs.Core.Application#_getWindow
    *
    * @param {String}  tag       Tag name
    *
    * @return {OSjs.Core.Window[]}
    */
-  Application.prototype._getWindowsByTag = function(tag) {
+  _getWindowsByTag(tag) {
     return this._getWindow(tag, 'tag');
-  };
+  }
 
   /**
    * Get a list of all windows
    *
-   * @function _getWindows
-   * @memberof OSjs.Core.Application#
-   *
    * @return {OSjs.Core.Window[]}
    */
-  Application.prototype._getWindows = function() {
+  _getWindows() {
     return this.__windows;
-  };
+  }
 
   /**
    * Get the "main" window
    *
-   * @function _getMainWindow
-   * @memberof OSjs.Core.Application#
-   *
    * @return {OSjs.Core.Window}
    */
-  Application.prototype._getMainWindow = function() {
+  _getMainWindow() {
     return this._getWindow(this.__mainwindow, 'name');
-  };
+  }
 
   /**
    * Get the sessions JSON
-   *
-   * @function _getSettings
-   * @memberof OSjs.Core.Application#
    *
    * @param   {String}    k       The settings key
    *
    * @return  {Object}    the current settings
    */
-  Application.prototype._getSetting = function(k) {
+  _getSetting(k) {
     return this.__settings.get(k);
-  };
+  }
 
   /**
    * Get the current application session data
    *
-   * @function _getSessionData
-   * @memberof OSjs.Core.Application#
-   *
    * @return  {Object}    the current session data
    */
-  Application.prototype._getSessionData = function() {
-    var args = this.__args;
-    var wins = this.__windows;
-    var data = {name: this.__pname, args: args, windows: []};
+  _getSessionData() {
+    const args = this.__args;
+    const wins = this.__windows;
+    const data = {name: this.__pname, args: args, windows: []};
 
     wins.forEach(function(win, i) {
       if ( win && win._properties.allow_session ) {
@@ -482,30 +436,25 @@
     });
 
     return data;
-  };
+  }
 
   /**
    * Gets the scheme instance
    *
-   * @function _getScheme
-   * @memberof OSjs.Core.Application#
    * @return OSjs.GUI.Scheme
    */
-  Application.prototype._getScheme = function() {
+  _getScheme() {
     return this.__scheme;
-  };
+  }
 
   /**
    * Set a setting
-   *
-   * @function _setSetting
-   * @memberof OSjs.Core.Application#
    *
    * @param   {String}              k             Key
    * @param   {String}              v             Value
    * @param   {Boolean|Function}    [save=true]   Save given setting(s) (can be a callback function)
    */
-  Application.prototype._setSetting = function(k, v, save) {
+  _setSetting(k, v, save) {
     if ( typeof save === 'undefined' ) {
       save = true;
     }
@@ -513,25 +462,25 @@
       save = arguments[3];
     }
     this.__settings.set(k, v, save);
-  };
+  }
 
   /**
    * Sets the scheme instance
    *
-   * @function _setScheme
-   * @memberof OSjs.Core.Application#
    * @see OSjs.GUI.Scheme
    *
    * @param   {OSjs.GUI.Scheme}      s       Scheme Ref
    */
-  Application.prototype._setScheme = function(s) {
+  _setScheme(s) {
     this.__scheme = s;
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Core.Application = Object.seal(Application);
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-})(OSjs.Utils, OSjs.API, OSjs.Core.Process);
+module.exports = Application;
+
+OSjs.Core.Application = Object.seal(Application);
