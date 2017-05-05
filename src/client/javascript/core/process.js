@@ -75,152 +75,6 @@ function _kill(pid) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// API METHODS
-/////////////////////////////////////////////////////////////////////////////
-
-/**
- * Kills all processes
- *
- * @param   {(String|RegExp)}     match     Kill all matching this
- *
- * @function killAll
- * @memberof OSjs.API
- */
-function doKillAllProcesses(match) {
-  if ( match ) {
-    let isMatching;
-    if ( match instanceof RegExp && _PROCS ) {
-      isMatching = function(p) {
-        return p.__pname && p.__pname.match(match);
-      };
-    } else if ( typeof match === 'string' ) {
-      isMatching = function(p) {
-        return p.__pname === match;
-      };
-    }
-
-    if ( isMatching ) {
-      _PROCS.forEach(function(p) {
-        if ( p && isMatching(p) ) {
-          _kill(p.__pid);
-        }
-      });
-    }
-    return;
-  }
-
-  _PROCS.forEach(function(proc, i) {
-    if ( proc ) {
-      proc.destroy(true);
-    }
-    _PROCS[i] = null;
-  });
-  _PROCS = [];
-}
-
-/**
- * Kills a process
- *
- * @param   {Number}  pid       Process ID
- *
- * @return  {Boolean}           Success or not
- *
- * @function kill
- * @memberof OSjs.API
- */
-function doKillProcess(pid) {
-  return _kill(pid);
-}
-
-/**
- * Sends a message to all processes
- *
- * Example: VFS uses this to signal file changes etc.
- *
- * @param   {String}                    msg             Message name
- * @param   {Object}                    obj             Message object
- * @param   {Object}                    opts            Options
- * @param   {Process|Window|Number}    [opts.source]    Source Process, Window or ID
- * @param   {String|Function}          [opts.filter]    Filter by string or fn(process)
- *
- * @see OSjs.Core.Process#_onMessage
- *
- * @function message
- * @memberof OSjs.API
- */
-function doProcessMessage(msg, obj, opts) {
-  opts = opts || {};
-
-  console.debug('doProcessMessage', msg, opts);
-
-  let filter = opts.filter || function() {
-    return true;
-  };
-
-  if ( typeof filter === 'string' ) {
-    const s = filter;
-    filter = function(p) {
-      return p.__pname === s;
-    };
-  }
-
-  _PROCS.forEach(function(p, i) {
-    if ( p && (p instanceof OSjs.Core.Application || p instanceof OSjs.Core.Process) ) {
-      if ( filter(p) ) {
-        p._onMessage(msg, obj, opts);
-      }
-    }
-  });
-}
-
-/**
- * Get a process by name
- *
- * @param   {String}    name    Process Name (or by number)
- * @param   {Boolean}   first   Return the first found
- *
- * @return  {(OSjs.Core.Process[]|OSjs.Core.Process)}  Array of Processes or a Process depending on arguments
- *
- * @function getProcess
- * @memberof OSjs.API
- */
-function doGetProcess(name, first) {
-  let result = first ? null : [];
-
-  if ( typeof name === 'number' ) {
-    return _PROCS[name];
-  }
-
-  _PROCS.every(function(p, i) {
-    if ( p ) {
-      if ( p.__pname === name ) {
-        if ( first ) {
-          result = p;
-          return false;
-        }
-        result.push(p);
-      }
-    }
-
-    return true;
-  });
-
-  return result;
-}
-
-/**
- * Get all processes
- *
- * @function getProcesses
- * @memberof OSjs.API
- *
- * @return  {OSjs.Core.Process[]}
- */
-function doGetProcesses() {
-  return _PROCS;
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // PROCESS
 /////////////////////////////////////////////////////////////////////////////
 
@@ -435,7 +289,7 @@ class Process {
         return;
       }
       callback(err, res);
-    }
+    };
 
     this._emit('api', [method]);
 
@@ -493,6 +347,139 @@ class Process {
     this.__args[k] = v;
   }
 
+  /**
+   * Kills a process
+   *
+   * @param   {Number}  pid       Process ID
+   *
+   * @return  {Boolean}           Success or not
+   */
+  static kill(pid) {
+    return _kill(pid);
+  }
+
+  /**
+   * Kills all processes
+   *
+   * @param   {(String|RegExp)}     match     Kill all matching this
+   */
+  static killAll(match) {
+    if ( match ) {
+      let isMatching;
+      if ( match instanceof RegExp && _PROCS ) {
+        isMatching = function(p) {
+          return p.__pname && p.__pname.match(match);
+        };
+      } else if ( typeof match === 'string' ) {
+        isMatching = function(p) {
+          return p.__pname === match;
+        };
+      }
+
+      if ( isMatching ) {
+        _PROCS.forEach(function(p) {
+          if ( p && isMatching(p) ) {
+            _kill(p.__pid);
+          }
+        });
+      }
+      return;
+    }
+
+    _PROCS.forEach(function(proc, i) {
+      if ( proc ) {
+        proc.destroy(true);
+      }
+      _PROCS[i] = null;
+    });
+    _PROCS = [];
+  }
+
+  /**
+   * Sends a message to all processes
+   *
+   * Example: VFS uses this to signal file changes etc.
+   *
+   * @param   {String}                    msg             Message name
+   * @param   {Object}                    obj             Message object
+   * @param   {Object}                    opts            Options
+   * @param   {Process|Window|Number}    [opts.source]    Source Process, Window or ID
+   * @param   {String|Function}          [opts.filter]    Filter by string or fn(process)
+   *
+   * @see OSjs.Core.Process#_onMessage
+   *
+   * @function message
+   * @memberof OSjs.API
+   */
+  static message(msg, obj, opts) {
+    opts = opts || {};
+
+    console.debug('doProcessMessage', msg, opts);
+
+    let filter = opts.filter || function() {
+      return true;
+    };
+
+    if ( typeof filter === 'string' ) {
+      const s = filter;
+      filter = function(p) {
+        return p.__pname === s;
+      };
+    }
+
+    _PROCS.forEach(function(p, i) {
+      if ( p && (p instanceof OSjs.Core.Application || p instanceof OSjs.Core.Process) ) {
+        if ( filter(p) ) {
+          p._onMessage(msg, obj, opts);
+        }
+      }
+    });
+  }
+
+  /**
+   * Get a process by name
+   *
+   * @param   {String}    name    Process Name (or by number)
+   * @param   {Boolean}   first   Return the first found
+   *
+   * @return  {(OSjs.Core.Process[]|OSjs.Core.Process)}  Array of Processes or a Process depending on arguments
+   */
+  static getProcess(name, first) {
+    let result = first ? null : [];
+
+    if ( typeof name === 'number' ) {
+      return _PROCS[name];
+    }
+
+    _PROCS.every(function(p, i) {
+      if ( p ) {
+        if ( p.__pname === name ) {
+          if ( first ) {
+            result = p;
+            return false;
+          }
+          result.push(p);
+        }
+      }
+
+      return true;
+    });
+
+    return result;
+  }
+
+  /**
+   * Get all processes
+   *
+   * @function getProcesses
+   * @memberof OSjs.API
+   *
+   * @return  {OSjs.Core.Process[]}
+   */
+  static getProcesses() {
+    return _PROCS;
+  }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -502,9 +489,3 @@ class Process {
 module.exports = Process;
 
 OSjs.Core.Process          = Object.seal(Process);
-
-OSjs.API.killAll           = doKillAllProcesses;
-OSjs.API.kill              = doKillProcess;
-OSjs.API.message           = doProcessMessage;
-OSjs.API.getProcess        = doGetProcess;
-OSjs.API.getProcesses      = doGetProcesses;

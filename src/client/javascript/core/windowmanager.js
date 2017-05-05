@@ -32,6 +32,7 @@
 // FIXME
 const API = OSjs.API;
 const Utils = OSjs.Utils;
+const Window = OSjs.Core.Window;
 
 const Process = require('core/process.js');
 
@@ -398,7 +399,6 @@ function createWindowBehaviour(win, wm) {
 /////////////////////////////////////////////////////////////////////////////
 // WINDOW MANAGER
 /////////////////////////////////////////////////////////////////////////////
-
 
 /**
  * WindowManager Process Class

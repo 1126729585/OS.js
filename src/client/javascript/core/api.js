@@ -30,6 +30,8 @@
 (function(Utils, API) {
   'use strict';
 
+  const Process = require('core/process.js');
+
   /**
    * @namespace API
    * @memberof OSjs
@@ -1919,5 +1921,13 @@
   OSjs.Core.getMetadata = OSjs.Core.getMetadata || function() {
     return {};
   };
+
+
+  // FIXME
+  OSjs.API.killAll           = Process.killAll;
+  OSjs.API.kill              = Process.kill;
+  OSjs.API.message           = Process.message;
+  OSjs.API.getProcess        = Process.getProcess;
+  OSjs.API.getProcesses      = Process.getProcesses;
 
 })(OSjs.Utils, OSjs.API);
