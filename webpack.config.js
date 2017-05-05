@@ -10,7 +10,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const getAbsolute = (iter) => _path.join(__dirname, iter);
 
-const debug = true;
+const debug = false;
 
 function getFiltered(i, debug) {
   if ( i.match(/^dev:/) && !debug ) {

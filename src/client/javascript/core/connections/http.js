@@ -30,10 +30,11 @@
 'use strict';
 
 // FIXME
-const VFS = OSjs.VFS;
 const API = OSjs.API;
+const VFS = OSjs.VFS;
 const Utils = OSjs.Utils;
-const Connection = OSjs.Core.Connection;
+
+const Connection = require('core/connection.js');
 
 class HttpConnection extends Connection {
 
