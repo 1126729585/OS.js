@@ -47,9 +47,6 @@ let _LNEWY = 0;
  * Holds information about current behaviour
  */
 function BehaviourState(wm, win, action, mousePosition) {
-  var self = this;
-
-  this.wm = wm;
   this.win = win;
   this.$element = win._$element;
   this.$top = win._$top;
@@ -89,19 +86,19 @@ function BehaviourState(wm, win, action, mousePosition) {
   this.minHeight  = win._properties.min_height;
 
   var windowRects = [];
-  wm.getWindows().forEach(function(w) {
+  wm.getWindows().forEach((w) => {
     if ( w && w._wid !== win._wid ) {
       var pos = w._position;
       var dim = w._dimension;
       var rect = {
-        left: pos.x - self.theme.borderSize,
-        top: pos.y - self.theme.borderSize,
-        width: dim.w + (self.theme.borderSize * 2),
-        height: dim.h + (self.theme.borderSize * 2) + self.theme.topMargin
+        left: pos.x - this.theme.borderSize,
+        top: pos.y - this.theme.borderSize,
+        width: dim.w + (this.theme.borderSize * 2),
+        height: dim.h + (this.theme.borderSize * 2) + this.theme.topMargin
       };
 
       rect.right = rect.left + rect.width;
-      rect.bottom = (pos.y + dim.h) + self.theme.topMargin + self.theme.borderSize;//rect.top + rect.height;
+      rect.bottom = (pos.y + dim.h) + this.theme.topMargin + this.theme.borderSize;//rect.top + rect.height;
 
       windowRects.push(rect);
     }
@@ -309,7 +306,7 @@ function createWindowBehaviour(win, wm) {
    * When mouse is moved
    */
   function onMouseMove(ev, action, win, mousePosition) {
-    if ( !this.wm.getMouseLocked() || !action || !current ) {
+    if ( !wm.getMouseLocked() || !action || !current ) {
       return;
     }
 
@@ -350,7 +347,7 @@ function createWindowBehaviour(win, wm) {
       return;
     }
 
-    current = new BehaviourState(this, win, action, mousePosition);
+    current = new BehaviourState(wm, win, action, mousePosition);
     newRect = {};
 
     win._focus();
@@ -385,12 +382,12 @@ function createWindowBehaviour(win, wm) {
    * Register a window
    */
   if ( win._properties.allow_move ) {
-    Utils.$bind(win._$top, 'mousedown', function(ev, pos) {
+    Utils.$bind(win._$top, 'mousedown', (ev, pos) => {
       onMouseDown(ev, 'move', win, pos);
     }, true);
   }
   if ( win._properties.allow_resize ) {
-    Utils.$bind(win._$resize, 'mousedown', function(ev, pos) {
+    Utils.$bind(win._$resize, 'mousedown', (ev, pos) => {
       onMouseDown(ev, 'resize', win, pos);
     });
   }
@@ -574,7 +571,6 @@ class WindowManager extends Process {
       console.error('WindowManager::addWindow()', '=>', 'Window::init()', e, e.stack);
     }
 
-    //attachWindowEvents(w, this);
     createWindowBehaviour(w, this);
 
     this._windows.push(w);
