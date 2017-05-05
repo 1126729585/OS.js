@@ -38,7 +38,7 @@ const Connection = require('core/connection.js');
 
 class WSConnection extends Connection {
   constructor() {
-    super.apply(this, arguments);
+    super(...arguments);
 
     var port = API.getConfig('Connection.WSPort');
     var path = API.getConfig('Connection.WSPath') || '';
@@ -69,7 +69,7 @@ class WSConnection extends Connection {
     this.wsqueue = {};
 
     return super.destroy.apply(this, arguments);
-  };
+  }
 
   init(callback) {
     this.destroying = false;
@@ -134,7 +134,7 @@ class WSConnection extends Connection {
     this.ws = null;
 
     setTimeout(() => {
-      this._connect(true, function(err) {
+      this._connect(true, (err) => {
         if ( err ) {
           this._onclose((reconnecting || 0) + 1);
         } else {

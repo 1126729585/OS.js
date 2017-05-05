@@ -55,6 +55,9 @@
   var signingOut = false;
   var instanceOptions = {};
 
+  let _connectionInstance;
+  let _storageInstance;
+
   /////////////////////////////////////////////////////////////////////////////
   // GLOBAL EVENTS
   /////////////////////////////////////////////////////////////////////////////
@@ -346,20 +349,21 @@
     var conf = OSjs.API.getConfig('Connection');
     var ctype = conf.Type === 'standalone' ? 'http' : conf.Type;
 
-    const connection = new (require('core/connections/' + ctype + '.js'));
+    _connectionInstance = new (require('core/connections/' + ctype + '.js'));
 
     var authenticator = new OSjs.Auth[conf.Authenticator]();
-    var storage = new OSjs.Storage[conf.Storage]();
+
+    _storageInstance = new (require('core/storage/' + conf.Storage + '.js'));
 
     OSjs.API.setLocale(OSjs.API.getConfig('Locale'));
 
-    connection.init(function(err) {
+    _connectionInstance.init(function(err) {
       console.groupEnd();
 
       if ( err ) {
         callback(err);
       } else {
-        storage.init(function() {
+        _storageInstance.init(function() {
           authenticator.init(function(err) {
             if ( !err ) {
               inited = true;
@@ -869,6 +873,30 @@
     isShuttingDown: function() {
       return signingOut;
     }
+  };
+
+  /**
+   * Get running 'Connection' instance
+   *
+   * @function getConnection
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.Connection}
+   */
+  OSjs.Core.getConnection = function Core_getConnection() {
+    return _connectionInstance;
+  };
+
+  /**
+   * Get running 'Storage' instance
+   *
+   * @function getStorage
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.Storage}
+   */
+  OSjs.Core.getStorage = function Core_getStorage() {
+    return _storageInstance;
   };
 
 })();

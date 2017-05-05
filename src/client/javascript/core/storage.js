@@ -28,88 +28,71 @@
  * @licence Simplified BSD License
  */
 
-(function(API, Utils) {
-  'use strict';
+'use strict';
 
-  var _storageInstance;
+// FIXME
+const API = OSjs.API;
+const Utils = OSjs.Utils;
 
-  /**
-   * Storage Base Class
-   *
-   * @abstract
-   * @constructor Storage
-   * @memberof OSjs.Core
-   */
-  function Storage() {
+/**
+ * Storage Base Class
+ *
+ * @abstract
+ * @constructor Storage
+ * @memberof OSjs.Core
+ */
+class Storage {
+  constructor() {
     this.saveTimeout = null;
-
-    /*eslint consistent-this: "off"*/
-    _storageInstance = this;
   }
 
   /**
    * Initializes the Storage
    *
-   * @function init
-   * @memberof OSjs.Core.Storage#
-   *
    * @param   {CallbackHandler}      callback        Callback function
    */
-  Storage.prototype.init = function(callback) {
+  init(callback) {
     callback(null, true);
-  };
+  }
 
   /**
    * Destroys the Storage
-   *
-   * @function destroy
-   * @memberof OSjs.Core.Storage#
    */
-  Storage.prototype.destroy = function() {
-  };
+  destroy() {
+  }
 
   /**
    * Internal for saving settings
-   *
-   * @function _settings
-   * @memberof OSjs.Core.Storage#
    *
    * @param   {String}               [pool]          Settings pool
    * @param   {Object}               storage         Settings storage data
    * @param   {CallbackHandler}      callback        Callback function
    */
-  Storage.prototype._settings = function(pool, storage, callback) {
+  _settings(pool, storage, callback) {
     API.call('settings', {pool: pool, settings: Utils.cloneObject(storage)}, callback);
-  };
+  }
 
   /**
    * Default method to save given settings pool
-   *
-   * @function saveSettings
-   * @memberof OSjs.Core.Storage#
    *
    * @param   {String}           [pool]        Pool Name
    * @param   {Mixed}            storage       Storage data
    * @param   {CallbackHandler}  callback      Callback function
    */
-  Storage.prototype.saveSettings = function(pool, storage, callback) {
-    var self = this;
+  saveSettings(pool, storage, callback) {
     clearTimeout(this.saveTimeout);
-    this.saveTimeout = setTimeout(function() {
+    this.saveTimeout = setTimeout(() => {
       self._settings(pool, storage, callback);
-      clearTimeout(self.saveTimeout);
+      clearTimeout(this.saveTimeout);
     }, 250);
   };
 
   /**
    * Default method for saving current sessions
    *
-   * @function saveSession
-   * @memberof OSjs.Core.Storage#
-   *
    * @param   {CallbackHandler}  callback      Callback function
    */
-  Storage.prototype.saveSession = function(callback) {
+  saveSession(callback) {
     var data = [];
     API.getProcesses().forEach(function(proc, i) {
       if ( proc && (proc instanceof OSjs.Core.Application) ) {
@@ -117,17 +100,14 @@
       }
     });
     OSjs.Core.getSettingsManager().set('UserSession', null, data, callback);
-  };
+  }
 
   /**
    * Get last saved sessions
    *
-   * @function getLastSession
-   * @memberof OSjs.Core.Storage#
-   *
    * @param   {CallbackHandler}  callback      Callback function
    */
-  Storage.prototype.getLastSession = function(callback) {
+  getLastSession(callback) {
     callback = callback || function() {};
 
     var res = OSjs.Core.getSettingsManager().get('UserSession');
@@ -141,17 +121,14 @@
     });
 
     callback(false, list);
-  };
+  }
 
   /**
    * Default method to restore last running session
    *
-   * @function loadSession
-   * @memberof OSjs.Core.Storage#
-   *
    * @param   {Function}  callback      Callback function => fn()
    */
-  Storage.prototype.loadSession = function(callback) {
+  loadSession(callback) {
     callback = callback || function() {};
 
     console.info('Storage::loadSession()');
@@ -163,25 +140,12 @@
         API.launchList(list, null, null, callback);
       }
     });
-  };
+  }
+}
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-  OSjs.Core.Storage = Storage;
-
-  /**
-   * Get running 'Storage' instance
-   *
-   * @function getStorage
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.Storage}
-   */
-  OSjs.Core.getStorage = function Core_getStorage() {
-    return _storageInstance;
-  };
-
-})(OSjs.API, OSjs.Utils);
+module.exports = Storage;
 

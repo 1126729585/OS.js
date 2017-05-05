@@ -33,8 +33,6 @@
 const API = OSjs.API;
 const Utils = OSjs.Utils;
 
-var _connectionInstance;
-
 /*
  * Attaches options to a XHR call
  */
@@ -71,31 +69,26 @@ function appendRequestOptions(data, options) {
  * @mixes OSjs.Helpers.EventHandler
  */
 class Connection {
+
+  /**
+   * Create a new Connection
+   */
   constructor() {
-    this.index = 0;
 
     /**
      * If browser is offline
-     * @name offline
-     * @memberof OSjs.Core.Connection#
      * @type {Boolean}
      */
     this.offline    = false;
 
+    this.index = 0;
     this._evHandler = new OSjs.Helpers.EventHandler(name, []);
-
-    /*eslint consistent-this: "off"*/
-    _connectionInstance = this;
-
   }
 
   /**
    * Initializes the instance
    *
    * @param {Function}  callback    Callback function
-   *
-   * @function init
-   * @memberof OSjs.Core.Connection#
    */
   init(callback) {
     if ( typeof navigator.onLine !== 'undefined' ) {
@@ -112,9 +105,6 @@ class Connection {
 
   /**
    * Destroys the instance
-   *
-   * @function destroy
-   * @memberof OSjs.Core.Connection#
    */
   destroy() {
     Utils.$unbind(window, 'offline');
@@ -129,9 +119,6 @@ class Connection {
    * Default method to perform a resolve on a VFS File object.
    *
    * This should return the URL for given resource.
-   *
-   * @function getVFSPath
-   * @memberof OSjs.Core.Connection#
    *
    * @param   {OSjs.VFS.File}       item      The File Object
    * @param   {Object}              [options] Options. These are added to the URL
@@ -170,8 +157,6 @@ class Connection {
   /**
    * Get if connection is Online
    *
-   * @function isOnline
-   * @memberof OSjs.Core.Connection#
    * @return {Boolean}
    */
   isOnline() {
@@ -181,8 +166,6 @@ class Connection {
   /**
    * Get if connection is Offline
    *
-   * @function isOffline
-   * @memberof OSjs.Core.Connection#
    * @return {Boolean}
    */
   isOffline() {
@@ -195,9 +178,6 @@ class Connection {
    * You can use this to interrupt/hijack operations.
    *
    * It is what gets called 'before' a VFS request takes place
-   *
-   * @function onVFSRequest
-   * @memberof OSjs.Core.Connection#
    *
    * @param   {String}    vfsModule     VFS Module Name
    * @param   {String}    vfsMethod     VFS Method Name
@@ -215,9 +195,6 @@ class Connection {
    *
    * It is what gets called 'after' a VFS request has taken place
    *
-   * @function onVFSRequestCompleted
-   * @memberof OSjs.Core.Connection#
-   *
    * @param   {String}    vfsModule     VFS Module Name
    * @param   {String}    vfsMethod     VFS Method Name
    * @param   {Object}    vfsArguments  VFS Method Arguments
@@ -233,9 +210,6 @@ class Connection {
 
   /**
    * When browser goes online
-   *
-   * @function onOnline
-   * @memberof OSjs.Core.Connection#
    */
   onOnline() {
     console.warn('Connection::onOnline()', 'Going online...');
@@ -255,9 +229,6 @@ class Connection {
    * When browser goes offline
    *
    * @param {Number} reconnecting Amount retries for connection
-   *
-   * @function onOffline
-   * @memberof OSjs.Core.Connection#
    */
   onOffline(reconnecting) {
     console.warn('Connection::onOffline()', 'Going offline...');
@@ -288,8 +259,6 @@ class Connection {
    *
    * @return {Boolean}
    *
-   * @function request
-   * @memberof OSjs.Core.Connection#
    * @see OSjs.Core.API.call
    */
   request(method, args, cbSuccess, cbError, options) {
@@ -321,11 +290,9 @@ class Connection {
    * @param   {Function}  cbSuccess Callback on success
    * @param   {Function}  cbError   Callback on error
    *
-   * @function requestAPI
-   * @memberof OSjs.Core.Connection#
-   * @see OSjs.Core.Connection.request
-   *
    * @return {Boolean}
+   *
+   * @see OSjs.Core.Connection.request
    */
   requestAPI(method, args, options, cbSuccess, cbError) {
     return false;
@@ -340,11 +307,9 @@ class Connection {
    * @param   {Function}  cbSuccess Callback on success
    * @param   {Function}  cbError   Callback on error
    *
-   * @function requestVFS
-   * @memberof OSjs.Core.Connection#
-   * @see OSjs.Core.Connection.request
-   *
    * @return {Boolean}
+   *
+   * @see OSjs.Core.Connection.request
    */
   requestVFS(method, args, options, cbSuccess, cbError) {
     if ( method === 'get' ) {
@@ -363,9 +328,6 @@ class Connection {
    * @param   {Object}    options   Call options
    * @param   {Function}  onsuccess Callback on success
    * @param   {Function}  onerror   Callback on error
-   *
-   * @function _requestPOST
-   * @memberof OSjs.Core.Connection#
    *
    * @return {Boolean}
    */
@@ -400,9 +362,6 @@ class Connection {
    * @param   {Function}  onsuccess Callback on success
    * @param   {Function}  onerror   Callback on error
    *
-   * @function _requestGET
-   * @memberof OSjs.Core.Connection#
-   *
    * @return {Boolean}
    */
   _requestGET(args, options, onsuccess, onerror) {
@@ -436,9 +395,6 @@ class Connection {
    * @param   {Function}  onsuccess Callback on success
    * @param   {Function}  onerror   Callback on error
    *
-   * @function _requestXHR
-   * @memberof OSjs.Core.Connection#
-   *
    * @return {Boolean}
    */
   _requestXHR(url, args, options, onsuccess, onerror) {
@@ -463,14 +419,12 @@ class Connection {
    *
    * NOTE: This is only available on WebSocket connections
    *
-   * @function subscribe
-   * @memberof OSjs.Core.Connection#
-   * @see OSjs.Helpers.EventHandler#on
-   *
    * @param   {String}    k       Event name
    * @param   {Function}  func    Callback function
    *
    * @return  {Number}
+   *
+   * @see OSjs.Helpers.EventHandler#on
    */
   subscribe(k, func) {
     return this._evHandler.on(k, func, this);
@@ -479,14 +433,12 @@ class Connection {
   /**
    * Removes an event subscription
    *
-   * @function unsubscribe
-   * @memberof OSjs.Core.Connection#
-   * @see OSjs.Helpers.EventHandler#off
-   *
    * @param   {String}    k       Event name
    * @param   {Number}    [idx]   The hook index returned from subscribe()
    *
    * @return {Boolean}
+   *
+   * @see OSjs.Helpers.EventHandler#off
    */
   unsubscribe(k, idx) {
     return this._evHandler.off(k, idx);
@@ -496,18 +448,6 @@ class Connection {
 /////////////////////////////////////////////////////////////////////////////
 // EXPORTS
 /////////////////////////////////////////////////////////////////////////////
-
-/**
- * Get running 'Connection' instance
- *
- * @function getConnection
- * @memberof OSjs.Core
- *
- * @return {OSjs.Core.Connection}
- */
-OSjs.Core.getConnection = function Core_getConnection() {
-  return _connectionInstance;
-};
 
 module.exports = Connection;
 
