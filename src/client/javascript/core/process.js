@@ -407,9 +407,6 @@ class Process {
    * @param   {String|Function}          [opts.filter]    Filter by string or fn(process)
    *
    * @see OSjs.Core.Process#_onMessage
-   *
-   * @function message
-   * @memberof OSjs.API
    */
   static message(msg, obj, opts) {
     opts = opts || {};
