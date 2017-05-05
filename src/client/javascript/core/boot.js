@@ -58,6 +58,7 @@
   let _connectionInstance;
   let _storageInstance;
   let _authInstance;
+  let _WM;
 
   /////////////////////////////////////////////////////////////////////////////
   // GLOBAL EVENTS
@@ -557,6 +558,7 @@
     }
 
     OSjs.API.launch(config.WM.exec, (config.WM.args || {}), function onWMLaunchSuccess(app) {
+      _WM = app;
       app.setup(callback);
     }, function onWMLaunchError(error, name, args, exception) {
       callback(OSjs.API._('ERR_CORE_INIT_WM_FAILED_FMT', error), exception);
@@ -908,6 +910,18 @@
    */
   OSjs.Core.getAuthenticator = function Core_getAuthenticator() {
     return _authInstance;
+  };
+
+  /**
+   * Get the current WindowManager instance
+   *
+   * @function getWindowManager
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.WindowManager}
+   */
+  OSjs.Core.getWindowManager  = function Core_getWindowManager() {
+    return _WM;
   };
 
 })();
