@@ -49,7 +49,7 @@ class DemoStorage extends Storage {
   }
 
   saveSettings(pool, storage, callback) {
-    Object.keys(storage).forEach(function(key) {
+    Object.keys(storage).forEach((key) => {
       if ( pool && key !== pool ) {
         return;
       }

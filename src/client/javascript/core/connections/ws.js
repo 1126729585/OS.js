@@ -40,10 +40,10 @@ class WSConnection extends Connection {
   constructor() {
     super(...arguments);
 
-    var port = API.getConfig('Connection.WSPort');
-    var path = API.getConfig('Connection.WSPath') || '';
-    var url = window.location.protocol.replace('http', 'ws') + '//' + window.location.host;
+    const port = API.getConfig('Connection.WSPort');
+    const path = API.getConfig('Connection.WSPath') || '';
 
+    let url = window.location.protocol.replace('http', 'ws') + '//' + window.location.host;
     if ( port !== 'upgrade' ) {
       if ( url.match(/:\d+$/) ) {
         url = url.replace(/:\d+$/, '');
@@ -83,21 +83,19 @@ class WSConnection extends Connection {
 
     console.info('Trying WebSocket Connection', this.wsurl);
 
-    var connected = false;
+    let connected = false;
 
     this.ws = new WebSocket(this.wsurl);
 
     this.ws.onopen = function() {
       connected = true;
       // NOTE: For some reason it needs to be fired on next tick
-      setTimeout(function() {
-        callback();
-      }, 0);
+      setTimeout(() => callback, 0);
     };
 
     this.ws.onmessage = (ev) => {
-      var data = JSON.parse(ev.data);
-      var idx = data._index;
+      const data = JSON.parse(ev.data);
+      const idx = data._index;
       this._onmessage(idx, data);
     };
 
@@ -161,7 +159,7 @@ class WSConnection extends Connection {
       console.warn('Connection::callWS()', 'error', arguments);
     };
 
-    var res = Connection.prototype.request.apply(this, arguments);
+    const res = super.request(...arguments);
     if ( res !== false ) {
       return res;
     }
@@ -169,8 +167,8 @@ class WSConnection extends Connection {
       return false;
     }
 
-    var idx = this.index++;
-    var base = method.match(/^FS:/) ? '/FS/' : '/API/';
+    const idx = this.index++;
+    const base = method.match(/^FS:/) ? '/FS/' : '/API/';
 
     try {
       this.ws.send(JSON.stringify({

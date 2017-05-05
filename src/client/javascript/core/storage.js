@@ -82,10 +82,10 @@ class Storage {
   saveSettings(pool, storage, callback) {
     clearTimeout(this.saveTimeout);
     this.saveTimeout = setTimeout(() => {
-      self._settings(pool, storage, callback);
+      this._settings(pool, storage, callback);
       clearTimeout(this.saveTimeout);
     }, 250);
-  };
+  }
 
   /**
    * Default method for saving current sessions
@@ -93,8 +93,8 @@ class Storage {
    * @param   {CallbackHandler}  callback      Callback function
    */
   saveSession(callback) {
-    var data = [];
-    API.getProcesses().forEach(function(proc, i) {
+    const data = [];
+    API.getProcesses().forEach((proc, i) => {
       if ( proc && (proc instanceof OSjs.Core.Application) ) {
         data.push(proc._getSessionData());
       }
@@ -110,10 +110,10 @@ class Storage {
   getLastSession(callback) {
     callback = callback || function() {};
 
-    var res = OSjs.Core.getSettingsManager().get('UserSession');
-    var list = [];
-    (res || []).forEach(function(iter, i) {
-      var args = iter.args;
+    const res = OSjs.Core.getSettingsManager().get('UserSession');
+    const list = [];
+    (res || []).forEach((iter, i) => {
+      const args = iter.args;
       args.__resume__ = true;
       args.__windows__ = iter.windows || [];
 
@@ -133,7 +133,7 @@ class Storage {
 
     console.info('Storage::loadSession()');
 
-    this.getLastSession(function onGetLastSession(err, list) {
+    this.getLastSession((err, list) => {
       if ( err ) {
         callback();
       } else {

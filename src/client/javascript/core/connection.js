@@ -39,10 +39,10 @@ const Utils = OSjs.Utils;
 function appendRequestOptions(data, options) {
   options = options || {};
 
-  var onprogress = options.onprogress || function() {};
-  var ignore = ['onsuccess', 'onerror', 'onprogress', 'oncanceled'];
+  const onprogress = options.onprogress || function() {};
+  const ignore = ['onsuccess', 'onerror', 'onprogress', 'oncanceled'];
 
-  Object.keys(options).forEach(function(key) {
+  Object.keys(options).forEach((key) => {
     if ( ignore.indexOf(key) === -1 ) {
       data[key] = options[key];
     }
@@ -128,12 +128,12 @@ class Connection {
   getVFSPath(item, options) {
     options = options || {};
 
-    var base = API.getConfig('Connection.RootURI', '/');
+    const base = API.getConfig('Connection.RootURI', '/');
     if ( window.location.protocol === 'file:' ) {
       return base + item.path.replace(/^osjs:\/\/\//, '');
     }
 
-    var url = API.getConfig('Connection.FSURI', '/');
+    let url = API.getConfig('Connection.FSURI', '/');
     if ( item ) {
       url += '/read';
       options.path = item.path;
@@ -142,7 +142,7 @@ class Connection {
     }
 
     if ( options ) {
-      var q = Object.keys(options).map(function(k) {
+      const q = Object.keys(options).map((k) => {
         return k + '=' + encodeURIComponent(options[k]);
       });
 
@@ -215,7 +215,7 @@ class Connection {
     console.warn('Connection::onOnline()', 'Going online...');
     this.offline = false;
 
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( wm ) {
       wm.notification({title: API._('LBL_INFO'), message: API._('CONNECTION_RESTORED')});
     }
@@ -239,7 +239,7 @@ class Connection {
 
     this.offline = true;
 
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( wm ) {
       wm.notification({title: API._('LBL_WARNING'), message: API._(reconnecting ? 'CONNECTION_RESTORE_FAILED' : 'CONNECTION_LOST')});
     }
