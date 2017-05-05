@@ -30,6 +30,13 @@ module.exports = new Promise((resolve) => {
       //devtool: 'source-map',
       devtool: debug ? 'eval-source-map' : 'source-map',
 
+      resolve: {
+        modules: [
+          _path.resolve(getAbsolute('src/client/javascript'))
+
+        ]
+      },
+
       entry: {
         osjs: bf.javascript.filter(getFiltered).map(getAbsolute),
         locales: bf.locales.filter(getFiltered).map(getAbsolute)
@@ -39,6 +46,17 @@ module.exports = new Promise((resolve) => {
         path: getAbsolute('dist'),
         sourceMapFilename: '[name].min.js.map',
         filename: '[name].min.js'
+      },
+
+      module: {
+
+        loaders: [
+          {
+            test: /\.js$/,
+            loader: 'babel-loader'
+          }
+        ]
+
       },
 
       plugins: [

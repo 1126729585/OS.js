@@ -27,22 +27,21 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+'use strict';
 
-(function(VFS, API, Utils, Connection) {
-  'use strict';
+// FIXME
+const VFS = OSjs.VFS;
+const API = OSjs.API;
+const Utils = OSjs.Utils;
+const Connection = OSjs.Core.Connection;
 
-  function HttpConnection() {
-    Connection.apply(this, arguments);
-  }
+class HttpConnection extends Connection {
 
-  HttpConnection.prototype = Object.create(Connection.prototype);
-  HttpConnection.constructor = Connection;
-
-  HttpConnection.prototype.request = function(method, args, onsuccess, onerror, options) {
-    var res = Connection.prototype.request.apply(this, arguments);
+  request(method, args, onsuccess, onerror, options) {
+    const res = super.request.apply(this, arguments);
 
     if ( res === false ) {
-      var url = (function() {
+      const url = (() => {
         if ( method.match(/^FS:/) ) {
           return API.getConfig('Connection.FSURI') + '/' + method.replace(/^FS\:/, '');
         }
@@ -53,13 +52,13 @@
     }
 
     return res;
-  };
+  }
 
-  HttpConnection.prototype.onVFSRequestCompleted = function(module, method, args, error, result, callback, appRef) {
+  onVFSRequestCompleted(module, method, args, error, result, callback, appRef) {
     if ( !error ) {
       // Emit a VFS event when a change occures
       if ( ['write', 'mkdir', 'copy', 'move', 'unlink'].indexOf(method) !== -1 ) {
-        var arg = method === 'move' ? {
+        const arg = method === 'move' ? {
           source: args[0] instanceof VFS.File ? args[0] : null,
           destination: args[1] instanceof VFS.File ? args[1] : null
         } : args[method === 'copy' ? 1 : 0];
@@ -68,13 +67,8 @@
       }
     }
     callback();
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Connections = OSjs.Connections || {};
-  OSjs.Connections.http = HttpConnection;
-
-})(OSjs.VFS, OSjs.API, OSjs.Utils, OSjs.Core.Connection);
+module.exports = HttpConnection;

@@ -346,7 +346,8 @@
     var conf = OSjs.API.getConfig('Connection');
     var ctype = conf.Type === 'standalone' ? 'http' : conf.Type;
 
-    var connection = new OSjs.Connections[ctype]();
+    const connection = new (require('core/connections/' + ctype + '.js'));
+
     var authenticator = new OSjs.Auth[conf.Authenticator]();
     var storage = new OSjs.Storage[conf.Storage]();
 
