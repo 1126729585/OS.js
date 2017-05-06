@@ -31,6 +31,7 @@ module.exports.init = function() {
   const Storage = require('core/storage.js');
   const API = require('core/api.js');
 
+  const UIScheme = require('gui/scheme.js');
   const UIElement = require('gui/element.js');
   const UIDataView = require('gui/dataview.js');
 
@@ -62,6 +63,7 @@ module.exports.init = function() {
 
   OSjs.GUI.Element = Object.seal(UIElement);
   OSjs.GUI.DataView = Object.seal(UIDataView);
+  OSjs.GUI.Scheme = Object.seal(UIScheme);
 
   /**
    * Get the current SettingsManager  instance
@@ -211,6 +213,20 @@ module.exports.init = function() {
    */
   OSjs.Core.getWindowManager  = function Core_getWindowManager() {
     return WindowManager.instance;
+  };
+
+  /**
+   * Shortcut for creating a new UIScheme class
+   *
+   * @function createScheme
+   * @memberof OSjs.GUI
+   *
+   * @param {String}    url     URL to scheme file
+   *
+   * @return {OSjs.GUI.Scheme}
+   */
+  OSjs.GUI.createScheme = function(url) {
+    return new UIScheme(url);
   };
 
 };

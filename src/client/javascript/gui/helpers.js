@@ -1013,4 +1013,80 @@
     };
   };
 
+  /**
+   * Shortcut for creating a new UIScheme class
+   *
+   * @summary Helper for loading Dialog scheme files.
+   *
+   * @constructor DialogScheme
+   * @memberof OSjs.GUI
+   */
+  GUI.DialogScheme = (function() {
+    var dialogScheme;
+
+    return {
+
+      /**
+       * Get the Dialog scheme
+       *
+       * @function get
+       * @memberof OSjs.GUI.DialogScheme#
+       *
+       * @return {OSjs.GUI.Scheme}
+       */
+      get: function() {
+        return dialogScheme;
+      },
+
+      /**
+       * Destroy the Dialog scheme
+       *
+       * @function destroy
+       * @memberof OSjs.GUI.DialogScheme#
+       */
+      destroy: function() {
+        if ( dialogScheme ) {
+          dialogScheme.destroy();
+        }
+        dialogScheme = null;
+      },
+
+      /**
+       * Initialize the Dialog scheme
+       *
+       * @function init
+       * @memberof OSjs.GUI.DialogScheme#
+       *
+       * @param   {Function}    cb      Callback function
+       */
+      init: function(cb) {
+        if ( dialogScheme ) {
+          cb();
+          return;
+        }
+
+        if ( OSjs.API.isStandalone() ) {
+          var html = OSjs.STANDALONE.SCHEMES['/dialogs.html'];
+          dialogScheme = new OSjs.GUI.Scheme();
+          dialogScheme.loadString(html);
+          cb();
+          return;
+        }
+
+        var root = API.getConfig('Connection.RootURI');
+        var url = root + 'dialogs.html';
+
+        dialogScheme = GUI.createScheme(url);
+        dialogScheme.load(function(error) {
+          if ( error ) {
+            console.warn('OSjs.GUI.initDialogScheme()', 'error loading dialog schemes', error);
+          }
+          cb();
+        });
+      }
+
+    };
+
+  })();
+
 })(OSjs.API, OSjs.Utils, OSjs.VFS, OSjs.GUI);
