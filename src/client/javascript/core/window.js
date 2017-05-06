@@ -205,7 +205,6 @@ let _NAMES              = [];
  * @mixes OSjs.Helpers.EventHandler
  * @throws {Error} On invalid arguments
  */
-
 class Window {
 
   /**

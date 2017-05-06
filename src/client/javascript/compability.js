@@ -1,5 +1,18 @@
 module.exports.init = function() {
 
+  // Make sure these namespaces exist
+  (['Bootstrap', 'Utils', 'API', 'GUI', 'Core', 'Dialogs', 'Helpers', 'Applications', 'Locales', 'VFS', 'Extensions', 'Auth', 'Storage', 'Connections', 'Broadway']).forEach(function(ns) {
+    OSjs[ns] = OSjs[ns] || {};
+  });
+
+  (['Helpers']).forEach(function(ns) {
+    OSjs.GUI[ns] = OSjs.GUI[ns] || {};
+  });
+
+  (['Helpers', 'Transports']).forEach(function(ns) {
+    OSjs.VFS[ns] = OSjs.VFS[ns] || {};
+  });
+
   /**
    * Callback for all Handler methods
    * @param {String} [error] Error from response (if any)
@@ -17,6 +30,9 @@ module.exports.init = function() {
   const Connection = require('core/connection.js');
   const Storage = require('core/storage.js');
   const API = require('core/api.js');
+
+  const UIElement = require('gui/element.js');
+  const UIDataView = require('gui/dataview.js');
 
   OSjs.API = API;
   OSjs.API.killAll = Process.killAll;
@@ -43,6 +59,9 @@ module.exports.init = function() {
   OSjs.Dialogs.FileUpload = Object.seal(require('dialogs/fileupload.js'));
   OSjs.Dialogs.Font = Object.seal(require('dialogs/font.js'));
   OSjs.Dialogs.Input = Object.seal(require('dialogs/input.js'));
+
+  OSjs.GUI.Element = Object.seal(UIElement);
+  OSjs.GUI.DataView = Object.seal(UIDataView);
 
   /**
    * Get the current SettingsManager  instance
