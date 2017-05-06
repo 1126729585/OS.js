@@ -89,14 +89,14 @@ class FileDialog extends DialogWindow {
       args.mime = args.file.mime;
 
       if ( args.filetypes.length ) {
-        var setTo = args.filetypes[0];
+        const setTo = args.filetypes[0];
         args.filename = Utils.replaceFileExtension(args.filename, setTo.extension);
         args.mime = setTo.mime;
       }
     }
 
-    var title = args.title || API._(args.type === 'save' ? 'DIALOG_FILE_SAVE' : 'DIALOG_FILE_OPEN');
-    var icon = args.type === 'open' ? 'actions/document-open.png' : 'actions/documentsave-as.png';
+    const title = args.title || API._(args.type === 'save' ? 'DIALOG_FILE_SAVE' : 'DIALOG_FILE_OPEN');
+    const icon = args.type === 'open' ? 'actions/document-open.png' : 'actions/documentsave-as.png';
 
     super('FileDialog', {
       title: title,
@@ -122,18 +122,18 @@ class FileDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
-    var view = this._find('FileView');
+    const root = super.init(...arguments);
+    const view = this._find('FileView');
     view.set('filter', this.args.filter);
     view.set('filetype', this.args.select || '');
     view.set('defaultcolumns', 'true');
 
-    var filename = this._find('Filename');
-    var home = this._find('HomeButton');
-    var mlist = this._find('ModuleSelect');
+    const filename = this._find('Filename');
+    const home = this._find('HomeButton');
+    const mlist = this._find('ModuleSelect');
 
     const checkEmptyInput = () => {
-      var disable = false;
+      let disable = false;
       if ( this.args.select !== 'dir' ) {
         disable = !filename.get('value').length;
       }
@@ -147,7 +147,7 @@ class FileDialog extends DialogWindow {
     this._find('ButtonMkdir').on('click', () => {
       API.createDialog('Input', {message: API._('DIALOG_FILE_MKDIR_MSG', this.path), value: 'New folder'}, (ev, btn, value) => {
         if ( btn === 'ok' && value ) {
-          var path = Utils.pathJoin(this.path, value);
+          const path = Utils.pathJoin(this.path, value);
           VFS.mkdir(VFS.file(path, 'dir'), (err) => {
             if ( err ) {
               API.error(API._('DIALOG_FILE_ERROR'), API._('ERR_VFSMODULE_MKDIR'), err);
@@ -160,7 +160,7 @@ class FileDialog extends DialogWindow {
     });
 
     home.on('click', () => {
-      var dpath = API.getDefaultPath();
+      const dpath = API.getDefaultPath();
       this.changePath(dpath);
     });
 
@@ -171,7 +171,7 @@ class FileDialog extends DialogWindow {
       }
 
       if ( ev && ev.detail && ev.detail.entries ) {
-        var activated = ev.detail.entries[0];
+        const activated = ev.detail.entries[0];
         if ( activated ) {
           this.selected = new VFS.File(activated.data);
           if ( this.selected.type !== 'dir' ) {
@@ -187,7 +187,7 @@ class FileDialog extends DialogWindow {
       //filename.set('value', '');
 
       if ( ev && ev.detail && ev.detail.entries ) {
-        var activated = ev.detail.entries[0];
+        const activated = ev.detail.entries[0];
         if ( activated ) {
           this.selected = new VFS.File(activated.data);
 
@@ -201,7 +201,7 @@ class FileDialog extends DialogWindow {
     });
 
     if ( this.args.type === 'save' ) {
-      var filetypes = [];
+      const filetypes = [];
       this.args.filetypes.forEach((f) => {
         filetypes.push({
           label: Utils.format('{0} (.{1} {2})', f.label, f.extension, f.mime),
@@ -209,8 +209,8 @@ class FileDialog extends DialogWindow {
         });
       });
 
-      var ft = this._find('Filetype').add(filetypes).on('change', (ev) => {
-        var newinput = Utils.replaceFileExtension(filename.get('value'), ev.detail);
+      const ft = this._find('Filetype').add(filetypes).on('change', (ev) => {
+        const newinput = Utils.replaceFileExtension(filename.get('value'), ev.detail);
         filename.set('value', newinput);
       });
 
@@ -237,11 +237,11 @@ class FileDialog extends DialogWindow {
       this._find('FileInput').hide();
     }
 
-    var mm = OSjs.Core.getMountManager();
-    var rootPath = mm.getRootFromPath(this.path);
-    var modules = mm.getModules().filter((m) => {
+    const mm = OSjs.Core.getMountManager();
+    const rootPath = mm.getRootFromPath(this.path);
+    const modules = mm.getModules().filter((m) => {
       if ( this.args.mfilter.length ) {
-        var success = false;
+        let success = false;
 
         this.args.mfilter.forEach((fn) => {
           if ( !success ) {
@@ -272,12 +272,12 @@ class FileDialog extends DialogWindow {
   }
 
   changePath(dir, fromDropdown) {
-    var view = this._find('FileView');
-    var lastDir = this.path;
+    const view = this._find('FileView');
+    const lastDir = this.path;
 
     const resetLastSelected = () => {
-      var mm = OSjs.Core.getMountManager();
-      var rootPath = mm.getRootFromPath(lastDir);
+      const mm = OSjs.Core.getMountManager();
+      const rootPath = mm.getRootFromPath(lastDir);
       try {
         this._find('ModuleSelect').set('value', rootPath);
       } catch ( e ) {
@@ -307,10 +307,10 @@ class FileDialog extends DialogWindow {
   }
 
   checkFileExtension() {
-    var filename = this._find('Filename');
+    const filename = this._find('Filename');
 
-    var mime = this.args.mime;
-    var input = filename.get('value');
+    let mime = this.args.mime;
+    let input = filename.get('value');
 
     if ( this.args.filetypes.length ) {
       if ( !input && this.args.filename ) {
@@ -318,9 +318,9 @@ class FileDialog extends DialogWindow {
       }
 
       if ( input.length ) {
-        var extension = input.split('.').pop();
-        var found = false;
+        const extension = input.split('.').pop();
 
+        let found = false;
         this.args.filetypes.forEach((f) => {
           if ( f.extension === extension ) {
             found = f;
@@ -350,7 +350,7 @@ class FileDialog extends DialogWindow {
     }
 
     if ( this.args.type === 'save' ) {
-      var check = this.checkFileExtension();
+      let check = this.checkFileExtension();
 
       if ( !this.path || !check.filename ) {
         API.error(API._('DIALOG_FILE_ERROR'), API._('DIALOG_FILE_MISSING_FILENAME'));
@@ -399,7 +399,7 @@ class FileDialog extends DialogWindow {
         return false;
       }
 
-      var res = this.selected;
+      let res = this.selected;
       if ( !res && this.args.select === 'dir' ) {
         res = new VFS.File({
           filename: Utils.filename(this.path),

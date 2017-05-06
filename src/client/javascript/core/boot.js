@@ -31,6 +31,7 @@
   'use strict';
 
   const SettingsManager = require('core/settings-manager.js');
+  const SearchEngine = require('core/search-engine.js');
 
   /**
    * @namespace Bootstrap
@@ -938,6 +939,18 @@
    */
   OSjs.Core.getSettingsManager = function Core_getSettingsManager() {
     return SettingsManager;
+  };
+
+  /**
+   * Get the current SearchEngine  instance
+   *
+   * @function getSearchEngine
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.SearchEngine}
+   */
+  OSjs.Core.getSearchEngine = function Core_getSearchEngine() {
+    return SearchEngine;
   };
 
 })();

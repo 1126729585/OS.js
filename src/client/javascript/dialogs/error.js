@@ -60,8 +60,9 @@ class ErrorDialog extends DialogWindow {
 
     console.error('ErrorDialog::constructor()', args);
 
-    var exception = args.exception || {};
-    var error = '';
+    const exception = args.exception || {};
+
+    let error = '';
     if ( exception.stack ) {
       error = exception.stack;
     } else {
@@ -90,10 +91,10 @@ class ErrorDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
     root.setAttribute('role', 'alertdialog');
 
-    var msg = DialogWindow.parseMessage(this.args.message);
+    const msg = DialogWindow.parseMessage(this.args.message);
     this._find('Message').empty().append(msg);
     this._find('Summary').set('value', this.args.error);
     this._find('Trace').set('value', this.traceMessage);
@@ -104,12 +105,12 @@ class ErrorDialog extends DialogWindow {
 
     if ( this.args.bugreport ) {
       this._find('ButtonBugReport').on('click', () => {
-        var title = '';
-        var body = [];
+        let title = '';
+        let body = [];
 
         if ( API.getConfig('BugReporting.options.issue') ) {
-          var obj = {};
-          var keys = ['userAgent', 'platform', 'language', 'appVersion'];
+          const obj = {};
+          const keys = ['userAgent', 'platform', 'language', 'appVersion'];
           keys.forEach((k) => {
             obj[k] = navigator[k];
           });
@@ -138,7 +139,7 @@ class ErrorDialog extends DialogWindow {
           }
         }
 
-        var url = API.getConfig('BugReporting.url')
+        const url = API.getConfig('BugReporting.url')
           .replace('%TITLE%', encodeURIComponent(title))
           .replace('%BODY%', encodeURIComponent(body.join('\n')));
 

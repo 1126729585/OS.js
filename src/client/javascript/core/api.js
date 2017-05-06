@@ -1922,12 +1922,4 @@
     return {};
   };
 
-
-  // FIXME
-  OSjs.API.killAll           = Process.killAll;
-  OSjs.API.kill              = Process.kill;
-  OSjs.API.message           = Process.message;
-  OSjs.API.getProcess        = Process.getProcess;
-  OSjs.API.getProcesses      = Process.getProcesses;
-
 })(OSjs.Utils, OSjs.API);

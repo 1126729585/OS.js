@@ -63,7 +63,7 @@ function BehaviourState(wm, win, action, mousePosition) {
     b: win._dimension.h + win._position.y
   };
 
-  var theme = Utils.cloneObject(wm.getStyleTheme(true, true));
+  const theme = Utils.cloneObject(wm.getStyleTheme(true, true));
   if ( !theme.style ) {
     theme.style = {'window': {margin: 0, border: 0}};
   }
@@ -86,12 +86,12 @@ function BehaviourState(wm, win, action, mousePosition) {
   this.minWidth   = win._properties.min_width;
   this.minHeight  = win._properties.min_height;
 
-  var windowRects = [];
+  const windowRects = [];
   wm.getWindows().forEach((w) => {
     if ( w && w._wid !== win._wid ) {
-      var pos = w._position;
-      var dim = w._dimension;
-      var rect = {
+      const pos = w._position;
+      const dim = w._dimension;
+      const rect = {
         left: pos.x - this.theme.borderSize,
         top: pos.y - this.theme.borderSize,
         width: dim.w + (this.theme.borderSize * 2),
@@ -109,7 +109,7 @@ function BehaviourState(wm, win, action, mousePosition) {
 }
 
 BehaviourState.prototype.getRect = function() {
-  var win = this.win;
+  const win = this.win;
 
   return {
     left: win._position.x,
@@ -120,13 +120,12 @@ BehaviourState.prototype.getRect = function() {
 };
 
 BehaviourState.prototype.calculateDirection = function() {
-  var dir = Utils.$position(this.$handle);
-  var dirX = this.startX - dir.left;
-  var dirY = this.startY - dir.top;
-  var dirD = 20;
+  const dir = Utils.$position(this.$handle);
+  const dirX = this.startX - dir.left;
+  const dirY = this.startY - dir.top;
+  const dirD = 20;
 
-  var direction = 's';
-  var checks = {
+  const checks = {
     nw: (dirX <= dirD) && (dirY <= dirD),
     n: (dirX > dirD) && (dirY <= dirD),
     w: (dirX <= dirD) && (dirY >= dirD),
@@ -136,6 +135,7 @@ BehaviourState.prototype.calculateDirection = function() {
     sw: (dirX <= dirD) && (dirY >= (dir.height - dirD))
   };
 
+  let direction = 's';
   Object.keys(checks).forEach(function(k) {
     if ( checks[k] ) {
       direction = k;
@@ -149,8 +149,8 @@ BehaviourState.prototype.calculateDirection = function() {
  * Window Behavour Abstraction
  */
 function createWindowBehaviour(win, wm) {
-  var current = null;
-  var newRect = {};
+  let current = null;
+  let newRect = {};
 
   /*
    * Resizing action
@@ -160,7 +160,7 @@ function createWindowBehaviour(win, wm) {
       return false;
     }
 
-    var nw, nh, nl, nt;
+    let nw, nh, nl, nt;
 
     (function() { // North/South
       if ( current.direction.indexOf('s') !== -1 ) {
@@ -210,21 +210,22 @@ function createWindowBehaviour(win, wm) {
    * Movement action
    */
   function onWindowMove(ev, mousePosition, dx, dy) {
-    var newWidth = null;
-    var newHeight = null;
-    var newLeft = current.rectWindow.x + dx;
-    var newTop = current.rectWindow.y + dy;
-    var borderSize = current.theme.borderSize;
-    var topMargin = current.theme.topMargin;
-    var cornerSnapSize = current.snapping.cornerSize;
-    var windowSnapSize = current.snapping.windowSize;
+    let newWidth = null;
+    let newHeight = null;
+    let newLeft = current.rectWindow.x + dx;
+    let newTop = current.rectWindow.y + dy;
+
+    const borderSize = current.theme.borderSize;
+    const topMargin = current.theme.topMargin;
+    const cornerSnapSize = current.snapping.cornerSize;
+    const windowSnapSize = current.snapping.windowSize;
 
     if ( newTop < current.rectWorkspace.top ) {
       newTop = current.rectWorkspace.top;
     }
 
-    var newRight = newLeft + current.rectWindow.w + (borderSize * 2);
-    var newBottom = newTop + current.rectWindow.h + topMargin + (borderSize);
+    let newRight = newLeft + current.rectWindow.w + (borderSize * 2);
+    let newBottom = newTop + current.rectWindow.h + topMargin + (borderSize);
 
     // 8-directional corner window snapping
     if ( cornerSnapSize > 0 ) {
@@ -313,9 +314,10 @@ function createWindowBehaviour(win, wm) {
 
     ev.preventDefault();
 
-    var result;
-    var dx = mousePosition.x - current.startX;
-    var dy = mousePosition.y - current.startY;
+    let result;
+
+    const dx = mousePosition.x - current.startX;
+    const dy = mousePosition.y - current.startY;
 
     if ( action === 'move' ) {
       result = onWindowMove(ev, mousePosition, dx, dy);
@@ -509,8 +511,9 @@ class WindowManager extends Process {
       this._onMouseLeave(ev);
     });
 
-    var queries = this.getDefaultSetting('mediaQueries') || {};
-    var maxWidth = 0;
+    const queries = this.getDefaultSetting('mediaQueries') || {};
+
+    let maxWidth = 0;
     Object.keys(queries).forEach((q) => {
       maxWidth = Math.max(maxWidth, queries[q]);
     });
@@ -539,7 +542,7 @@ class WindowManager extends Process {
    * @return  {OSjs.Core.Window}
    */
   getWindow(name) {
-    var result = null;
+    let result = null;
     this._windows.every((w) => {
       if ( w && w._name === name ) {
         result = w;
@@ -602,7 +605,7 @@ class WindowManager extends Process {
     }
     console.debug('WindowManager::removeWindow()', w._wid);
 
-    var result = false;
+    let result = false;
     this._windows.every((win, i) => {
       if ( win && win._wid === w._wid ) {
         this._windows[i] = null;
@@ -630,7 +633,7 @@ class WindowManager extends Process {
     settings = settings || {};
     console.debug('WindowManager::applySettings()', 'forced?', force);
 
-    var result = force ? settings : Utils.mergeObject(this._settings.get(), settings);
+    const result = force ? settings : Utils.mergeObject(this._settings.get(), settings);
     this._settings.set(null, result, save, triggerWatch);
 
     return true;
@@ -651,9 +654,9 @@ class WindowManager extends Process {
   createStylesheet(styles, rawStyles) {
     this.destroyStylesheet();
 
-    var innerHTML = [];
+    let innerHTML = [];
     Object.keys(styles).forEach((key) => {
-      var rules = [];
+      let rules = [];
       Object.keys(styles[key]).forEach((r) => {
         rules.push(Utils.format('    {0}: {1};', r, styles[key][r]));
       });
@@ -667,9 +670,9 @@ class WindowManager extends Process {
       innerHTML += '\n' + rawStyles;
     }
 
-    var style       = document.createElement('style');
-    style.type      = 'text/css';
-    style.id        = 'WMGeneratedStyles';
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.id = 'WMGeneratedStyles';
     style.innerHTML = innerHTML;
     document.getElementsByTagName('head')[0].appendChild(style);
 
@@ -818,7 +821,7 @@ class WindowManager extends Process {
   }
 
   _onMouseLeave(ev) {
-    var from = ev.relatedTarget || ev.toElement;
+    const from = ev.relatedTarget || ev.toElement;
     if ( !from || from.nodeName === 'HTML' ) {
       this._mouselock = false;
     } else {

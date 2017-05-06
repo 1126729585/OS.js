@@ -1,10 +1,18 @@
 module.exports.init = function() {
 
+  const Process = require('core/process.js');
+
+  OSjs.API.killAll           = Process.killAll;
+  OSjs.API.kill              = Process.kill;
+  OSjs.API.message           = Process.message;
+  OSjs.API.getProcess        = Process.getProcess;
+  OSjs.API.getProcesses      = Process.getProcesses;
+
   OSjs.Core.DialogWindow = Object.seal(require('core/dialog.js'));
   OSjs.Core.Window = Object.seal(require('core/window.js'));
   OSjs.Core.WindowManager = Object.seal(require('core/windowmanager.js'));
   OSjs.Core.Service = Object.seal(require('core/service.js'));
-  OSjs.Core.Process = Object.seal(require('core/process.js'));
+  OSjs.Core.Process = Object.seal(Process);
   OSjs.Core.Application = Object.seal(require('core/application.js'));
 
   OSjs.Dialogs.Alert = Object.seal(require('dialogs/alert.js'));

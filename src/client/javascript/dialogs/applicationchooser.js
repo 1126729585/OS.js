@@ -62,17 +62,17 @@ class ApplicationChooserDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
-    var cols = [{label: API._('LBL_NAME')}];
-    var rows = [];
-    var metadata = OSjs.Core.getPackageManager().getPackages();
+    const cols = [{label: API._('LBL_NAME')}];
+    const rows = [];
+    const metadata = OSjs.Core.getPackageManager().getPackages();
 
     (this.args.list || []).forEach((name) => {
-      var iter = metadata[name];
+      const iter = metadata[name];
 
       if ( iter && iter.type === 'application' ) {
-        var label = [iter.name];
+        const label = [iter.name];
         if ( iter.description ) {
           label.push(iter.description);
         }
@@ -89,8 +89,8 @@ class ApplicationChooserDialog extends DialogWindow {
       this.onClose(ev, 'ok');
     });
 
-    var file = '<unknown file>';
-    var label = '<unknown mime>';
+    let file = '<unknown file>';
+    let label = '<unknown mime>';
     if ( this.args.file ) {
       file = Utils.format('{0} ({1})', this.args.file.filename, this.args.file.mime);
       label = API._('DIALOG_APPCHOOSER_SET_DEFAULT', this.args.file.mime);
@@ -103,11 +103,12 @@ class ApplicationChooserDialog extends DialogWindow {
   }
 
   onClose(ev, button) {
-    var result = null;
+    let result = null;
 
     if ( button === 'ok' ) {
-      var useDefault = this._find('SetDefault').get('value');
-      var selected = this._find('ApplicationList').get('value');
+      const useDefault = this._find('SetDefault').get('value');
+      const selected = this._find('ApplicationList').get('value');
+
       if ( selected && selected.length ) {
         result = selected[0].data.className;
       }

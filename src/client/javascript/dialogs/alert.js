@@ -65,7 +65,8 @@ class AlertDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
+
     root.setAttribute('role', 'alertdialog');
 
     this._find('Message').set('value', this.args.message, true);

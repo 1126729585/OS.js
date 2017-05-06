@@ -69,7 +69,7 @@ class FileProgressDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
     if ( this.args.message ) {
       this._find('Message').set('value', this.args.message, true);
     }

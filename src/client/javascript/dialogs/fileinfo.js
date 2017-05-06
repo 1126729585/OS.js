@@ -69,10 +69,10 @@ class FileInfoDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
-    var txt = this._find('Info').set('value', API._('LBL_LOADING'));
-    var file = this.args.file;
+    const txt = this._find('Info').set('value', API._('LBL_LOADING'));
+    const file = this.args.file;
 
     function _onError(error) {
       if ( error ) {
@@ -81,7 +81,7 @@ class FileInfoDialog extends DialogWindow {
     }
 
     function _onSuccess(data) {
-      var info = [];
+      const info = [];
       Object.keys(data).forEach((i) => {
         if ( i === 'exif' ) {
           info.push(i + ':\n\n' + data[i]);

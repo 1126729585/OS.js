@@ -68,18 +68,18 @@ class ConfirmDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
-    var msg = DialogWindow.parseMessage(this.args.message);
+    const msg = DialogWindow.parseMessage(this.args.message);
     this._find('Message').empty().append(msg);
 
-    var buttonMap = {
+    const buttonMap = {
       yes: 'ButtonYes',
       no: 'ButtonNo',
       cancel: 'ButtonCancel'
     };
 
-    var hide = [];
+    const hide = [];
     (['yes', 'no', 'cancel']).forEach((b) => {
       if ( this.args.buttons.indexOf(b) < 0 ) {
         hide.push(b);

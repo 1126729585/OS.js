@@ -36,7 +36,8 @@ const Utils = OSjs.Utils;
 const DialogWindow = require('core/dialog.js');
 
 function getColor(rgb) {
-  var hex = rgb;
+  let hex = rgb;
+
   if ( typeof rgb === 'string' ) {
     hex = rgb;
     rgb = Utils.convertToRGB(rgb);
@@ -92,7 +93,7 @@ class ColorDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
     const updateHex = (update) => {
       this._find('LabelRed').set('value', API._('DIALOG_COLOR_R', this.color.r));
@@ -104,7 +105,7 @@ class ColorDialog extends DialogWindow {
         this.color.hex = Utils.convertToHEX(this.color.r, this.color.g, this.color.b);
       }
 
-      var value = this.color.hex;
+      let value = this.color.hex;
       if ( this.color.a !== null && !isNaN(this.color.a) ) {
         value = Utils.format('rgba({0}, {1}, {2}, {3})', this.color.r, this.color.g, this.color.b, this.color.a);
       }

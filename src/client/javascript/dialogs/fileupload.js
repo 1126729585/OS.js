@@ -31,6 +31,7 @@
 
 // FIXME
 const API = OSjs.API;
+const VFS = OSjs.VFS;
 const Utils = OSjs.Utils;
 
 const DialogWindow = require('core/dialog.js');
@@ -70,13 +71,13 @@ class FileUploadDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
-    var message = this._find('Message');
-    var maxSize = API.getConfig('VFS.MaxUploadSize');
+    const root = super.init(...arguments);
+    const message = this._find('Message');
+    const maxSize = API.getConfig('VFS.MaxUploadSize');
 
     message.set('value', API._('DIALOG_UPLOAD_DESC', this.args.dest, maxSize), true);
 
-    var input = this._find('File');
+    const input = this._find('File');
     if ( this.args.file ) {
       this.setFile(this.args.file, input);
     } else {
@@ -89,7 +90,7 @@ class FileUploadDialog extends DialogWindow {
   }
 
   setFile(file, input) {
-    var progressDialog;
+    let progressDialog;
 
     const error = (msg, ev) => {
       API.error(
@@ -103,7 +104,7 @@ class FileUploadDialog extends DialogWindow {
     };
 
     if ( file ) {
-      var fileSize = 0;
+      let fileSize = 0;
       if ( file.size > 1024 * 1024 ) {
         fileSize = (Math.round(file.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
       } else {
@@ -116,7 +117,7 @@ class FileUploadDialog extends DialogWindow {
 
       this._find('ButtonCancel').set('disabled', true);
 
-      var desc = API._('DIALOG_UPLOAD_MSG_FMT', file.name, file.type, fileSize, this.dest);
+      const desc = API._('DIALOG_UPLOAD_MSG_FMT', file.name, file.type, fileSize, this.dest);
 
       progressDialog = API.createDialog('FileProgress', {
         message: desc,
@@ -143,7 +144,7 @@ class FileUploadDialog extends DialogWindow {
       }, {
         onprogress: (ev) => {
           if ( ev.lengthComputable ) {
-            var p = Math.round(ev.loaded * 100 / ev.total);
+            const p = Math.round(ev.loaded * 100 / ev.total);
             progressDialog.setProgress(p);
           }
         }

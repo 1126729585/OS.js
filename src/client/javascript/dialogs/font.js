@@ -91,16 +91,16 @@ class FontDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
-    var preview = this._find('FontPreview');
-    var sizes = [];
-    var fonts = [];
+    const preview = this._find('FontPreview');
+    const sizes = [];
+    const fonts = [];
 
-    for ( var i = this.args.minSize; i < this.args.maxSize; i++ ) {
+    for ( let i = this.args.minSize; i < this.args.maxSize; i++ ) {
       sizes.push({value: i, label: i});
     }
-    for ( var j = 0; j < this.args.fonts.length; j++ ) {
+    for ( let j = 0; j < this.args.fonts.length; j++ ) {
       fonts.push({value: this.args.fonts[j], label: this.args.fonts[j]});
     }
 
@@ -109,14 +109,14 @@ class FontDialog extends DialogWindow {
       preview.querySelector('textarea').style.fontSize = this.selection.fontSize;
     };
 
-    var listFonts = this._find('FontName');
+    const listFonts = this._find('FontName');
     listFonts.add(fonts).set('value', this.args.fontName);
     listFonts.on('change', (ev) => {
       this.selection.fontName = ev.detail;
       updatePreview();
     });
 
-    var listSizes = this._find('FontSize');
+    const listSizes = this._find('FontSize');
     listSizes.add(sizes).set('value', this.args.fontSize);
     listSizes.on('change', (ev) => {
       this.selection.fontSize = ev.detail + this.args.unit;
@@ -137,7 +137,7 @@ class FontDialog extends DialogWindow {
   }
 
   onClose(ev, button) {
-    var result = button === 'ok' ? this.selection : null;
+    const result = button === 'ok' ? this.selection : null;
     this.closeCallback(ev, button, result);
   }
 

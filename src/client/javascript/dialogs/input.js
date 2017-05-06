@@ -67,14 +67,14 @@ class InputDialog extends DialogWindow {
   }
 
   init() {
-    var root = super.init(...arguments);
+    const root = super.init(...arguments);
 
     if ( this.args.message ) {
-      var msg = DialogWindow.parseMessage(this.args.message);
+      const msg = DialogWindow.parseMessage(this.args.message);
       this._find('Message').empty().append(msg);
     }
 
-    var input = this._find('Input');
+    const input = this._find('Input');
     input.set('placeholder', this.args.placeholder || '');
     input.set('value', this.args.value || '');
     input.on('enter', (ev) => {
@@ -93,12 +93,12 @@ class InputDialog extends DialogWindow {
   }
 
   onClose(ev, button) {
-    var result = this._find('Input').get('value');
+    const result = this._find('Input').get('value');
     this.closeCallback(ev, button, button === 'ok' ? result : null);
   }
 
   setRange(range) {
-    var input = this._find('Input');
+    const input = this._find('Input');
     if ( input.$element ) {
       input.$element.querySelector('input').select(range);
     }
