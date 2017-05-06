@@ -1,6 +1,9 @@
 module.exports.init = function() {
 
   const Process = require('core/process.js');
+  const SettingsManager = require('core/settings-manager.js');
+  const SearchEngine = require('core/search-engine.js');
+  const PackageManager = require('core/package-manager.js');
 
   OSjs.API.killAll           = Process.killAll;
   OSjs.API.kill              = Process.kill;
@@ -26,5 +29,40 @@ module.exports.init = function() {
   OSjs.Dialogs.FileUpload = Object.seal(require('dialogs/fileupload.js'));
   OSjs.Dialogs.Font = Object.seal(require('dialogs/font.js'));
   OSjs.Dialogs.Input = Object.seal(require('dialogs/input.js'));
+
+  /**
+   * Get the current SettingsManager  instance
+   *
+   * @function getSettingsManager
+   * @memberof OSjs.Core
+   * @return {OSjs.Core.SettingsManager}
+   */
+  OSjs.Core.getSettingsManager = function Core_getSettingsManager() {
+    return SettingsManager;
+  };
+
+  /**
+   * Get the current SearchEngine  instance
+   *
+   * @function getSearchEngine
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.SearchEngine}
+   */
+  OSjs.Core.getSearchEngine = function Core_getSearchEngine() {
+    return SearchEngine;
+  };
+
+  /**
+   * Get the current PackageManager instance
+   *
+   * @function getPackageManager
+   * @memberof OSjs.Core
+   *
+   * @return {OSjs.Core.PackageManager}
+   */
+  OSjs.Core.getPackageManager = function Core_getPackageManager() {
+    return PackageManager;
+  };
 
 };

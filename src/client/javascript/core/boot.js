@@ -30,9 +30,6 @@
 (function() {
   'use strict';
 
-  const SettingsManager = require('core/settings-manager.js');
-  const SearchEngine = require('core/search-engine.js');
-
   /**
    * @namespace Bootstrap
    * @memberof OSjs
@@ -928,29 +925,6 @@
    */
   OSjs.Core.getWindowManager  = function Core_getWindowManager() {
     return _WM;
-  };
-
-  /**
-   * Get the current SettingsManager  instance
-   *
-   * @function getSettingsManager
-   * @memberof OSjs.Core
-   * @return {OSjs.Core.SettingsManager}
-   */
-  OSjs.Core.getSettingsManager = function Core_getSettingsManager() {
-    return SettingsManager;
-  };
-
-  /**
-   * Get the current SearchEngine  instance
-   *
-   * @function getSearchEngine
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.SearchEngine}
-   */
-  OSjs.Core.getSearchEngine = function Core_getSearchEngine() {
-    return SearchEngine;
   };
 
 })();
