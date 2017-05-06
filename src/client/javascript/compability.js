@@ -65,6 +65,11 @@ module.exports.init = function() {
   OSjs.GUI.DataView = Object.seal(UIDataView);
   OSjs.GUI.Scheme = Object.seal(UIScheme);
 
+  const languages = OSjs.Core.getConfig().Languages;
+  Object.keys(languages).forEach((k) => {
+    OSjs.Locales[k] = require('locales/' + k + '.js');
+  });
+
   /**
    * Get the current SettingsManager  instance
    *

@@ -33,7 +33,6 @@ module.exports = new Promise((resolve) => {
       resolve: {
         modules: [
           _path.resolve(getAbsolute('src/client/javascript'))
-
         ]
       },
 

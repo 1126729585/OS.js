@@ -31,6 +31,7 @@
 
 // FIXME
 const Utils = OSjs.Utils;
+const Locales = OSjs.Locales;
 
 /**
  * @namespace API
@@ -198,11 +199,11 @@ module.exports._ = function() {
   var a = arguments;
 
   try {
-    var cl = OSjs.Locales[CurrentLocale];
+    var cl = Locales[CurrentLocale];
     if ( cl && cl[s] ) {
       a[0] = cl[s];
     } else {
-      a[0] = OSjs.Locales[DefaultLocale][s] || s;
+      a[0] = Locales[DefaultLocale][s] || s;
     }
 
     return a.length > 1 ? Utils.format.apply(null, a) : a[0];
@@ -262,7 +263,7 @@ module.exports.getLocale = function() {
 module.exports.setLocale = function(l) {
   var RTL = module.exports.getConfig('LocaleOptions.RTL', []);
 
-  if ( OSjs.Locales[l] ) {
+  if ( Locales[l] ) {
     CurrentLocale = l;
   } else {
     console.warn('API::setLocale()', 'Invalid locale', l, '(Using default)');
