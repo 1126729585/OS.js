@@ -30,10 +30,10 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const GUI = OSjs.GUI;
 const Utils = OSjs.Utils;
 
+const API = require('core/api.js');
 const Window = require('core/window.js');
 
 /**

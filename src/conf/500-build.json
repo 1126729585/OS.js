@@ -34,7 +34,6 @@
       "src/client/javascript/compability.js",
       "src/client/javascript/core/boot.js",
       "src/client/javascript/core/api.js",
-      "src/client/javascript/core/handler.js",
       "src/client/javascript/core/connection.js",
       "src/client/javascript/core/authenticator.js",
       "src/client/javascript/core/storage.js",

@@ -30,9 +30,10 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const VFS = OSjs.VFS;
 const Utils = OSjs.Utils;
+
+const API = require('core/api.js');
 
 /**
  * A mountpoint object for use in MountManager

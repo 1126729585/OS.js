@@ -30,9 +30,10 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
 const VFS = OSjs.VFS;
+
+const API = require('core/api.js');
 
 /*
  * Attaches options to a XHR call
@@ -60,6 +61,8 @@ function appendRequestOptions(data, options) {
   return data;
 }
 
+let _instance;
+
 /**
  * Default Connection Implementation
  *
@@ -71,10 +74,16 @@ function appendRequestOptions(data, options) {
  */
 class Connection {
 
+  static get instance() {
+    return _instance;
+  }
+
   /**
    * Create a new Connection
    */
   constructor() {
+    /* eslint consistent-this: "warn" */
+    _instance = this;
 
     /**
      * If browser is offline
@@ -114,6 +123,8 @@ class Connection {
     if ( this._evHandler ) {
       this._evHandler = this._evHandler.destroy();
     }
+
+    _instance = null;
   }
 
   /**

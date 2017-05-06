@@ -30,9 +30,9 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
 
+const API = require('core/api.js');
 const Window = require('core/window.js');
 const Process = require('core/process.js');
 const DialogWindow = require('core/dialog.js');
@@ -400,6 +400,8 @@ function createWindowBehaviour(win, wm) {
 // WINDOW MANAGER
 /////////////////////////////////////////////////////////////////////////////
 
+let _instance;
+
 /**
  * WindowManager Process Class
  * The default implementation of this is in apps/CoreWM/main.js
@@ -421,6 +423,10 @@ function createWindowBehaviour(win, wm) {
  */
 class WindowManager extends Process {
 
+  static get instance() {
+    return _instance;
+  }
+
   /**
    * @param   {String}                      name      Window Manager name
    * @param   {OSjs.Core.WindowManager}     ref       Constructed instance ref
@@ -434,6 +440,9 @@ class WindowManager extends Process {
     console.debug('Arguments', args);
 
     super(name, args, metadata);
+
+    /* eslint consistent-this: "warn" */
+    _instance = this;
 
     this._$notifications = null;
     this._windows        = [];
@@ -487,7 +496,7 @@ class WindowManager extends Process {
     this._lastWin = null;
     this._scheme = null;
 
-    //_WM = null; // FIXME ES2015
+    _instance = null;
 
     return super.destroy();
   }

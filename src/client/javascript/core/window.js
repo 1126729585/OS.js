@@ -30,10 +30,11 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const GUI = OSjs.GUI;
 const VFS = OSjs.VFS;
 const Utils = OSjs.Utils;
+
+const API = require('core/api.js');
 
 /**
  * The predefined events are as follows:

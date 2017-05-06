@@ -31,10 +31,12 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
 
+const API = require('core/api.js');
 const Application = require('core/application.js');
+
+let _instance;
 
 /**
  * Storage Base Class
@@ -44,7 +46,15 @@ const Application = require('core/application.js');
  * @memberof OSjs.Core
  */
 class Storage {
+
+  static get instance() {
+    return _instance;
+  }
+
   constructor() {
+    /* eslint consistent-this: "warn" */
+    _instance = this;
+
     this.saveTimeout = null;
   }
 
@@ -61,6 +71,7 @@ class Storage {
    * Destroys the Storage
    */
   destroy() {
+    _instance = null;
   }
 
   /**

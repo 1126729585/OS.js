@@ -31,8 +31,9 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
+
+const API = require('core/api.js');
 
 /**
  * This is the contents of a 'metadata.json' file for a package.

@@ -58,11 +58,6 @@
   var signingOut = false;
   var instanceOptions = {};
 
-  let _connectionInstance;
-  let _storageInstance;
-  let _authInstance;
-  let _WM;
-
   /////////////////////////////////////////////////////////////////////////////
   // GLOBAL EVENTS
   /////////////////////////////////////////////////////////////////////////////
@@ -354,20 +349,20 @@
     var conf = OSjs.API.getConfig('Connection');
     var ctype = conf.Type === 'standalone' ? 'http' : conf.Type;
 
-    _connectionInstance = new (require('core/connections/' + ctype + '.js'));
-    _authInstance = new (require('core/auth/' + conf.Authenticator + '.js'));
-    _storageInstance = new (require('core/storage/' + conf.Storage + '.js'));
+    const connection = new (require('core/connections/' + ctype + '.js'));
+    const authenticator = new (require('core/auth/' + conf.Authenticator + '.js'));
+    const storage = new (require('core/storage/' + conf.Storage + '.js'));
 
     OSjs.API.setLocale(OSjs.API.getConfig('Locale'));
 
-    _connectionInstance.init(function(err) {
+    connection.init(function(err) {
       console.groupEnd();
 
       if ( err ) {
         callback(err);
       } else {
-        _storageInstance.init(function() {
-          _authInstance.init(function(err) {
+        storage.init(function() {
+          authenticator.init(function(err) {
             if ( !err ) {
               inited = true;
             }
@@ -561,7 +556,6 @@
     }
 
     OSjs.API.launch(config.WM.exec, (config.WM.args || {}), function onWMLaunchSuccess(app) {
-      _WM = app;
       app.setup(callback);
     }, function onWMLaunchError(error, name, args, exception) {
       callback(OSjs.API._('ERR_CORE_INIT_WM_FAILED_FMT', error), exception);
@@ -877,54 +871,6 @@
     isShuttingDown: function() {
       return signingOut;
     }
-  };
-
-  /**
-   * Get running 'Connection' instance
-   *
-   * @function getConnection
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.Connection}
-   */
-  OSjs.Core.getConnection = function Core_getConnection() {
-    return _connectionInstance;
-  };
-
-  /**
-   * Get running 'Storage' instance
-   *
-   * @function getStorage
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.Storage}
-   */
-  OSjs.Core.getStorage = function Core_getStorage() {
-    return _storageInstance;
-  };
-
-  /**
-   * Get running 'Authenticator' instance
-   *
-   * @function getAuthenticator
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.Authenticator}
-   */
-  OSjs.Core.getAuthenticator = function Core_getAuthenticator() {
-    return _authInstance;
-  };
-
-  /**
-   * Get the current WindowManager instance
-   *
-   * @function getWindowManager
-   * @memberof OSjs.Core
-   *
-   * @return {OSjs.Core.WindowManager}
-   */
-  OSjs.Core.getWindowManager  = function Core_getWindowManager() {
-    return _WM;
   };
 
 })();

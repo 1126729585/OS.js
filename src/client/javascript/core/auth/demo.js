@@ -29,9 +29,7 @@
  */
 'use strict';
 
-// FIXME
-const API = OSjs.API;
-
+const API = require('core/api.js');
 const Authenticator = require('core/authenticator.js');
 
 class DemoAuthenticator extends Authenticator {

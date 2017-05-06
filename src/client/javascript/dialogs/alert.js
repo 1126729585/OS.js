@@ -30,9 +30,9 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
 
+const API = require('core/api.js');
 const DialogWindow = require('core/dialog.js');
 
 /**

@@ -31,8 +31,11 @@
 'use strict';
 
 // FIXME
-const API = OSjs.API;
 const Utils = OSjs.Utils;
+
+const API = require('core/api.js');
+
+let _instance;
 
 /**
  * Authenticator Base Class
@@ -43,7 +46,13 @@ const Utils = OSjs.Utils;
  */
 class Authenticator {
 
+  static get instance() {
+    return _instance;
+  }
+
   constructor() {
+    /* eslint consistent-this: "warn" */
+    _instance = this;
 
     /**
      * User data
@@ -82,6 +91,7 @@ class Authenticator {
    * Destroys the Authenticator
    */
   destroy() {
+    _instance = null;
   }
 
   /**

@@ -60,12 +60,14 @@ module.exports = new Promise((resolve) => {
       },
 
       plugins: [
+        /*
         new _webpack.optimize.UglifyJsPlugin({
           minimize: debug,
           level: 2, // FIXME
           rebase: false,
           sourceMap: true
         })
+        */
       ]
     });
   });

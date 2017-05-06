@@ -29,9 +29,7 @@
  */
 'use strict';
 
-// FIXME
-const API = OSjs.API;
-
+const API = require('core/api.js');
 const Storage = require('core/storage.js');
 
 class DemoStorage extends Storage {
