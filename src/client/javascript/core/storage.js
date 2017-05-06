@@ -34,6 +34,8 @@
 const API = OSjs.API;
 const Utils = OSjs.Utils;
 
+const Application = require('core/application.js');
+
 /**
  * Storage Base Class
  *
@@ -95,7 +97,7 @@ class Storage {
   saveSession(callback) {
     const data = [];
     API.getProcesses().forEach((proc, i) => {
-      if ( proc && (proc instanceof OSjs.Core.Application) ) {
+      if ( proc && (proc instanceof Application) ) {
         data.push(proc._getSessionData());
       }
     });

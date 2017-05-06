@@ -27,27 +27,35 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(API, Utils, DialogWindow) {
-  'use strict';
+'use strict';
+
+// FIXME
+const API = OSjs.API;
+const Utils = OSjs.Utils;
+
+const DialogWindow = require('core/dialog.js');
+
+/**
+ * An 'Error' dialog
+ *
+ * @example
+ *
+ * OSjs.API.createDialog('Error', {}, fn);
+ *
+ * @constructor Error
+ * @memberof OSjs.Dialogs
+ */
+class ErrorDialog extends DialogWindow {
 
   /**
-   * An 'Error' dialog
-   *
-   * @example
-   *
-   * OSjs.API.createDialog('Error', {}, fn);
-   *
    * @param  {Object}          args              An object with arguments
    * @param  {String}          args.title        Dialog title
    * @param  {String}          args.message      Dialog message
    * @param  {String}          args.error        Error message
    * @param  {Error}           [args.exception]  Exception
    * @param  {CallbackDialog}  callback          Callback when done
-   *
-   * @constructor Error
-   * @memberof OSjs.Dialogs
    */
-  function ErrorDialog(args, callback) {
+  constructor(args, callback) {
     args = Utils.argumentDefaults(args, {});
 
     console.error('ErrorDialog::constructor()', args);
@@ -68,12 +76,12 @@
       }
     }
 
-    DialogWindow.apply(this, ['ErrorDialog', {
+    super('ErrorDialog', {
       title: args.title || API._('DIALOG_ERROR_TITLE'),
       icon: 'status/dialog-error.png',
       width: 400,
       height: error ? 400 : 200
-    }, args, callback]);
+    }, args, callback);
 
     this._sound = 'ERROR';
     this._soundVolume = 1.0;
@@ -81,13 +89,8 @@
     this.traceMessage = error;
   }
 
-  ErrorDialog.prototype = Object.create(DialogWindow.prototype);
-  ErrorDialog.constructor = DialogWindow;
-
-  ErrorDialog.prototype.init = function() {
-    var self = this;
-
-    var root = DialogWindow.prototype.init.apply(this, arguments);
+  init() {
+    var root = super.init(...arguments);
     root.setAttribute('role', 'alertdialog');
 
     var msg = DialogWindow.parseMessage(this.args.message);
@@ -100,14 +103,14 @@
     }
 
     if ( this.args.bugreport ) {
-      this._find('ButtonBugReport').on('click', function() {
+      this._find('ButtonBugReport').on('click', () => {
         var title = '';
         var body = [];
 
         if ( API.getConfig('BugReporting.options.issue') ) {
           var obj = {};
           var keys = ['userAgent', 'platform', 'language', 'appVersion'];
-          keys.forEach(function(k) {
+          keys.forEach((k) => {
             obj[k] = navigator[k];
           });
 
@@ -115,9 +118,9 @@
           body = [
             '**' + API.getConfig('BugReporting.options.message').replace('%VERSION%', API.getConfig('Version')) +  ':**',
             '\n',
-            '> ' + self.args.message,
+            '> ' + this.args.message,
             '\n',
-            '> ' + (self.args.error || 'Unknown error'),
+            '> ' + (this.args.error || 'Unknown error'),
             '\n',
             '## Expected behaviour',
             '\n',
@@ -130,8 +133,8 @@
             '```\n' + JSON.stringify(obj) + '\n```'
           ];
 
-          if ( self.traceMessage ) {
-            body.push('\n## Stack Trace \n```\n' + self.traceMessage + '\n```\n');
+          if ( this.traceMessage ) {
+            body.push('\n## Stack Trace \n```\n' + this.traceMessage + '\n```\n');
           }
         }
 
@@ -146,12 +149,13 @@
     }
 
     return root;
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Dialogs.Error = Object.seal(ErrorDialog);
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-})(OSjs.API, OSjs.Utils, OSjs.Core.DialogWindow);
+module.exports = ErrorDialog;
+

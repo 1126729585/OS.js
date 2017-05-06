@@ -32,9 +32,10 @@
 // FIXME
 const API = OSjs.API;
 const Utils = OSjs.Utils;
-const Window = OSjs.Core.Window;
 
+const Window = require('core/window.js');
 const Process = require('core/process.js');
+const DialogWindow = require('core/dialog.js');
 
 let _LNEWX = 0;
 let _LNEWY = 0;
@@ -510,7 +511,7 @@ class WindowManager extends Process {
 
     var queries = this.getDefaultSetting('mediaQueries') || {};
     var maxWidth = 0;
-    Object.keys(queries).forEach(function(q) {
+    Object.keys(queries).forEach((q) => {
       maxWidth = Math.max(maxWidth, queries[q]);
     });
     this._responsiveRes = maxWidth || 800;
@@ -539,7 +540,7 @@ class WindowManager extends Process {
    */
   getWindow(name) {
     var result = null;
-    this._windows.every(function(w) {
+    this._windows.every((w) => {
       if ( w && w._name === name ) {
         result = w;
       }
@@ -576,8 +577,8 @@ class WindowManager extends Process {
     this._windows.push(w);
     w._inited();
 
-    if ( focus === true || (w instanceof OSjs.Core.DialogWindow) ) {
-      setTimeout(function() {
+    if ( focus === true || (w instanceof DialogWindow) ) {
+      setTimeout(() => {
         w._focus();
       }, 10);
     }
@@ -651,9 +652,9 @@ class WindowManager extends Process {
     this.destroyStylesheet();
 
     var innerHTML = [];
-    Object.keys(styles).forEach(function(key) {
+    Object.keys(styles).forEach((key) => {
       var rules = [];
-      Object.keys(styles[key]).forEach(function(r) {
+      Object.keys(styles[key]).forEach((r) => {
         rules.push(Utils.format('    {0}: {1};', r, styles[key][r]));
       });
 
@@ -832,9 +833,9 @@ class WindowManager extends Process {
         return;
       }
 
-      this._windows.filter(function(w) {
+      this._windows.filter((w) => {
         return !!w;
-      }).forEach(function(w) {
+      }).forEach((w) => {
         w._onResize();
         w._emit('resize');
       });
@@ -1058,5 +1059,3 @@ class WindowManager extends Process {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports = WindowManager;
-
-OSjs.Core.WindowManager     = Object.seal(WindowManager);

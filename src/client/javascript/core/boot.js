@@ -50,6 +50,9 @@
     OSjs.VFS[ns] = OSjs.VFS[ns] || {};
   });
 
+  // FIXME
+  require('compability.js').init();
+
   // Globals
 
   var inited = false;

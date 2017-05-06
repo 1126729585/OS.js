@@ -31,6 +31,7 @@
 
 // FIXME
 const API = OSjs.API;
+const GUI = OSjs.GUI;
 const Utils = OSjs.Utils;
 
 const Window = require('core/window.js');
@@ -106,11 +107,11 @@ class DialogWindow extends Window {
     this._state.ontop                 = true;
     this._tag                         = 'DialogWindow';
 
-    if ( args.scheme && args.scheme instanceof OSjs.GUI.Scheme ) {
+    if ( args.scheme && args.scheme instanceof GUI.Scheme ) {
       this.scheme = args.scheme;
       delete args.scheme;
     } else {
-      this.scheme = OSjs.GUI.DialogScheme.get();
+      this.scheme = GUI.DialogScheme.get();
     }
 
     this.args = args;
@@ -136,8 +137,8 @@ class DialogWindow extends Window {
 
     root.setAttribute('role', 'dialog');
 
-    this.scheme.render(this, this.className.replace(/Dialog$/, ''), root, 'application-dialog', function(node) {
-      node.querySelectorAll('gui-label').forEach(function(el) {
+    this.scheme.render(this, this.className.replace(/Dialog$/, ''), root, 'application-dialog', (node) => {
+      node.querySelectorAll('gui-label').forEach((el) => {
         if ( el.childNodes.length && el.childNodes[0].nodeType === 3 && el.childNodes[0].nodeValue ) {
           const label = el.childNodes[0].nodeValue;
           Utils.$empty(el);
@@ -231,5 +232,3 @@ class DialogWindow extends Window {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports = DialogWindow;
-
-OSjs.Core.DialogWindow = Object.seal(DialogWindow);

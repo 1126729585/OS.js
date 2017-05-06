@@ -64,7 +64,7 @@ class DemoAuthenticator extends Authenticator {
       });
     }
 
-    return super.login(login, function(error, result) {
+    return super.login(login, (error, result) => {
       if ( error ) {
         callback(error);
       } else {

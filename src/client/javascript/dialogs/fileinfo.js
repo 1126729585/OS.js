@@ -27,42 +27,49 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(API, Utils, VFS, DialogWindow) {
-  'use strict';
+'use strict';
+
+// FIXME
+const API = OSjs.API;
+const VFS = OSjs.VFS;
+const Utils = OSjs.Utils;
+
+const DialogWindow = require('core/dialog.js');
+
+/**
+ * An 'File Information' dialog
+ *
+ * @example
+ *
+ * OSjs.API.createDialog('FileInfo', {}, fn);
+ *
+ * @constructor FileInfo
+ * @memberof OSjs.Dialogs
+ */
+class FileInfoDialog extends DialogWindow {
 
   /**
-   * An 'File Information' dialog
-   *
-   * @example
-   *
-   * OSjs.API.createDialog('FileInfo', {}, fn);
-   *
    * @param  {Object}          args              An object with arguments
    * @param  {String}          args.title        Dialog title
    * @param  {OSjs.VFS.File}   args.file         File to use
    * @param  {CallbackDialog}  callback          Callback when done
-   *
-   * @constructor FileInfo
-   * @memberof OSjs.Dialogs
    */
-  function FileInfoDialog(args, callback) {
+  constructor(args, callback) {
     args = Utils.argumentDefaults(args, {});
-    DialogWindow.apply(this, ['FileInfoDialog', {
+
+    super('FileInfoDialog', {
       title: args.title || API._('DIALOG_FILEINFO_TITLE'),
       width: 400,
       height: 400
-    }, args, callback]);
+    }, args, callback);
 
     if ( !this.args.file ) {
       throw new Error('You have to select a file for FileInfo');
     }
   }
 
-  FileInfoDialog.prototype = Object.create(DialogWindow.prototype);
-  FileInfoDialog.constructor = DialogWindow;
-
-  FileInfoDialog.prototype.init = function() {
-    var root = DialogWindow.prototype.init.apply(this, arguments);
+  init() {
+    var root = super.init(...arguments);
 
     var txt = this._find('Info').set('value', API._('LBL_LOADING'));
     var file = this.args.file;
@@ -75,7 +82,7 @@
 
     function _onSuccess(data) {
       var info = [];
-      Object.keys(data).forEach(function(i) {
+      Object.keys(data).forEach((i) => {
         if ( i === 'exif' ) {
           info.push(i + ':\n\n' + data[i]);
         } else {
@@ -85,7 +92,7 @@
       txt.set('value', info.join('\n\n'));
     }
 
-    VFS.fileinfo(file, function(error, result) {
+    VFS.fileinfo(file, (error, result) => {
       if ( error ) {
         _onError(error);
         return;
@@ -94,12 +101,12 @@
     });
 
     return root;
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Dialogs.FileInfo = Object.seal(FileInfoDialog);
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-})(OSjs.API, OSjs.Utils, OSjs.VFS, OSjs.Core.DialogWindow);
+module.exports = FileInfoDialog;

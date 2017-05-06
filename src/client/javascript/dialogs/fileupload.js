@@ -27,46 +27,50 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(API, VFS, Utils, DialogWindow) {
-  'use strict';
+'use strict';
+
+// FIXME
+const API = OSjs.API;
+const Utils = OSjs.Utils;
+
+const DialogWindow = require('core/dialog.js');
+
+/**
+ * An 'FileUpload' dialog
+ *
+ * @example
+ *
+ * OSjs.API.createDialog('FileUpload', {}, fn);
+ *
+ * @constructor FileUpload
+ * @memberof OSjs.Dialogs
+ */
+class FileUploadDialog extends DialogWindow {
 
   /**
-   * An 'FileUpload' dialog
-   *
-   * @example
-   *
-   * OSjs.API.createDialog('FileUpload', {}, fn);
-   *
    * @param  {Object}          args              An object with arguments
    * @param  {String}          args.title        Dialog title
    * @param  {String}          args.dest         VFS destination
    * @param  {OSjs.VFS.File}   [args.file]       File to upload
    * @param  {CallbackDialog}  callback          Callback when done
-   *
-   * @constructor FileUpload
-   * @memberof OSjs.Dialogs
    */
-  function FileUploadDialog(args, callback) {
+  constructor(args, callback) {
     args = Utils.argumentDefaults(args, {
       dest: API.getDefaultPath(),
       progress: {},
       file: null
     });
 
-    DialogWindow.apply(this, ['FileUploadDialog', {
+    super('FileUploadDialog', {
       title: args.title || API._('DIALOG_UPLOAD_TITLE'),
       icon: 'actions/document-new.png',
       width: 400,
       height: 100
-    }, args, callback]);
+    }, args, callback);
   }
 
-  FileUploadDialog.prototype = Object.create(DialogWindow.prototype);
-  FileUploadDialog.constructor = DialogWindow;
-
-  FileUploadDialog.prototype.init = function() {
-    var self = this;
-    var root = DialogWindow.prototype.init.apply(this, arguments);
+  init() {
+    var root = super.init(...arguments);
     var message = this._find('Message');
     var maxSize = API.getConfig('VFS.MaxUploadSize');
 
@@ -76,28 +80,27 @@
     if ( this.args.file ) {
       this.setFile(this.args.file, input);
     } else {
-      input.on('change', function(ev) {
-        self.setFile(ev.detail, input);
+      input.on('change', (ev) => {
+        this.setFile(ev.detail, input);
       });
     }
 
     return root;
-  };
+  }
 
-  FileUploadDialog.prototype.setFile = function(file, input) {
-    var self = this;
+  setFile(file, input) {
     var progressDialog;
 
-    function error(msg, ev) {
+    const error = (msg, ev) => {
       API.error(
-        OSjs.API._('DIALOG_UPLOAD_FAILED'),
-        OSjs.API._('DIALOG_UPLOAD_FAILED_MSG'),
-        msg || OSjs.API._('DIALOG_UPLOAD_FAILED_UNKNOWN')
+        API._('DIALOG_UPLOAD_FAILED'),
+        API._('DIALOG_UPLOAD_FAILED_MSG'),
+        msg || API._('DIALOG_UPLOAD_FAILED_UNKNOWN')
       );
 
       progressDialog._close(true);
-      self.onClose(ev, 'cancel');
-    }
+      this.onClose(ev, 'cancel');
+    };
 
     if ( file ) {
       var fileSize = 0;
@@ -113,7 +116,7 @@
 
       this._find('ButtonCancel').set('disabled', true);
 
-      var desc = OSjs.API._('DIALOG_UPLOAD_MSG_FMT', file.name, file.type, fileSize, this.dest);
+      var desc = API._('DIALOG_UPLOAD_MSG_FMT', file.name, file.type, fileSize, this.dest);
 
       progressDialog = API.createDialog('FileProgress', {
         message: desc,
@@ -121,7 +124,7 @@
         filename: file.name,
         mime: file.type,
         size: fileSize
-      }, function(ev, button) {
+      }, (ev, button) => {
         // Dialog closed
       }, this);
 
@@ -129,15 +132,16 @@
         this._wmref.createNotificationIcon(this.notificationId, {className: 'BusyNotification', tooltip: desc, image: false});
       }
 
-      OSjs.VFS.upload({files: [file], destination: this.args.dest}, function(err, result, ev) {
+      VFS.upload({files: [file], destination: this.args.dest}, (err, result, ev) => {
         if ( err ) {
           error(err, ev);
           return;
         }
+
         progressDialog._close();
-        self.onClose(ev, 'ok', file);
+        this.onClose(ev, 'ok', file);
       }, {
-        onprogress: function(ev) {
+        onprogress: (ev) => {
           if ( ev.lengthComputable ) {
             var p = Math.round(ev.loaded * 100 / ev.total);
             progressDialog.setProgress(p);
@@ -145,23 +149,23 @@
         }
       });
 
-      setTimeout(function() {
+      setTimeout(() => {
         if ( progressDialog ) {
           progressDialog._focus();
         }
       }, 100);
     }
-  };
+  }
 
-  FileUploadDialog.prototype.onClose = function(ev, button, result) {
+  onClose(ev, button, result) {
     result = result || null;
     this.closeCallback(ev, button, result);
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Dialogs.FileUpload = Object.seal(FileUploadDialog);
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-})(OSjs.API, OSjs.VFS, OSjs.Utils, OSjs.Core.DialogWindow);
+module.exports = FileUploadDialog;

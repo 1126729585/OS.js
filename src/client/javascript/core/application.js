@@ -30,7 +30,11 @@
 
 'use strict';
 
+// FIXME
+const GUI = OSjs.GUI;
+
 const Process = require('core/process.js');
+const Window = require('core/window.js');
 
 /**
  * Look at the 'ProcessEvent' for more.
@@ -139,7 +143,7 @@ class Application extends Process {
       let last;
 
       if ( wm ) {
-        this.__windows.forEach(function(win, i) {
+        this.__windows.forEach((win, i) => {
           if ( win ) {
             wm.addWindow(win);
             last = win;
@@ -182,7 +186,7 @@ class Application extends Process {
 
     console.group('Application::destroy()', this.__pname);
 
-    this.__windows.forEach(function(w) {
+    this.__windows.forEach((w) => {
       try {
         if ( w && w._wid !== sourceWid ) {
           w.destroy();
@@ -243,7 +247,7 @@ class Application extends Process {
    * @param   {Function}      cb      Callback => fn(scheme)
    */
   _loadScheme(s, cb) {
-    const scheme = OSjs.GUI.createScheme(this._getResource(s));
+    const scheme = GUI.createScheme(this._getResource(s));
     scheme.load(function __onApplicationLoadScheme(error, result) {
       if ( error ) {
         console.error('Application::_loadScheme()', error);
@@ -265,7 +269,7 @@ class Application extends Process {
    * @return  {OSjs.Core.Window}
    */
   _addWindow(w, cb, setmain) {
-    if ( !(w instanceof OSjs.Core.Window) ) {
+    if ( !(w instanceof Window) ) {
       throw new TypeError('Application::_addWindow() expects Core.Window');
     }
 
@@ -283,7 +287,7 @@ class Application extends Process {
       }
 
       if ( w._properties.start_focused ) {
-        setTimeout(function() {
+        setTimeout(() => {
           w._focus();
         }, 5);
       }
@@ -302,7 +306,7 @@ class Application extends Process {
    * @return  {Boolean}
    */
   _removeWindow(w) {
-    if ( !(w instanceof OSjs.Core.Window) ) {
+    if ( !(w instanceof Window) ) {
       throw new TypeError('Application::_removeWindow() expects Core.Window');
     }
 
@@ -342,7 +346,7 @@ class Application extends Process {
     }
 
     let result = key === 'tag' ? [] : null;
-    this.__windows.every(function(win, i) {
+    this.__windows.every((win, i) => {
       if ( win ) {
         if ( win['_' + key] === value ) {
           if ( key === 'tag' ) {
@@ -424,7 +428,7 @@ class Application extends Process {
     const wins = this.__windows;
     const data = {name: this.__pname, args: args, windows: []};
 
-    wins.forEach(function(win, i) {
+    wins.forEach((win, i) => {
       if ( win && win._properties.allow_session ) {
         data.windows.push({
           name: win._name,
@@ -482,5 +486,3 @@ class Application extends Process {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports = Application;
-
-OSjs.Core.Application = Object.seal(Application);

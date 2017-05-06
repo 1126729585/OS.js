@@ -27,38 +27,46 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(API, VFS, Utils, DialogWindow) {
-  'use strict';
+'use strict';
 
-  /**
-   * An 'File' dialog
-   *
-   * @example
-   *
-   * OSjs.API.createDialog('File', {}, fn);
-   *
-   * @param  {Object}           args                      An object with arguments
-   * @param  {String}           args.title                Dialog title
-   * @param  {String}           [args.type=open]          Dialog type (alternative=save)
-   * @param  {Boolean}          [args.multiple=false]     Multiple file selection
-   * @param  {OSjs.VFS.File}    [args.file]               Current file
-   * @param  {String}           [args.path]               Default path
-   * @param  {String}           [args.filename]           Default filename
-   * @param  {String}           [args.extension]          Default file extension
-   * @param  {String}           [args.mime]               Default file MIME
-   * @param  {Array}            [args.filter]             Array of MIMIE filters
-   * @param  {Array}            [args.mfilter]            Array of function to filter module list
-   * @param  {String}           [args.select]             Selection type (file/dir)
-   * @param  {CallbackDialog}   callback                  Callback when done
-   *
-   * @constructor File
-   * @memberof OSjs.Dialogs
-   */
-  function FileDialog(args, callback) {
+// FIXME
+const API = OSjs.API;
+const VFS = OSjs.VFS;
+const GUI = OSjs.GUI;
+const Utils = OSjs.Utils;
+
+const DialogWindow = require('core/dialog.js');
+
+/**
+ * An 'File' dialog
+ *
+ * @example
+ *
+ * OSjs.API.createDialog('File', {}, fn);
+ *
+ * @param  {Object}           args                      An object with arguments
+ * @param  {String}           args.title                Dialog title
+ * @param  {String}           [args.type=open]          Dialog type (alternative=save)
+ * @param  {Boolean}          [args.multiple=false]     Multiple file selection
+ * @param  {OSjs.VFS.File}    [args.file]               Current file
+ * @param  {String}           [args.path]               Default path
+ * @param  {String}           [args.filename]           Default filename
+ * @param  {String}           [args.extension]          Default file extension
+ * @param  {String}           [args.mime]               Default file MIME
+ * @param  {Array}            [args.filter]             Array of MIMIE filters
+ * @param  {Array}            [args.mfilter]            Array of function to filter module list
+ * @param  {String}           [args.select]             Selection type (file/dir)
+ * @param  {CallbackDialog}   callback                  Callback when done
+ *
+ * @constructor File
+ * @memberof OSjs.Dialogs
+ */
+class FileDialog extends DialogWindow {
+  constructor(args, callback) {
     args = Utils.argumentDefaults(args, {
       file: null,
       type: 'open',
-      path: OSjs.API.getDefaultPath(),
+      path: API.getDefaultPath(),
       filename: '',
       filetypes: [],
       extension: '',
@@ -90,35 +98,31 @@
     var title = args.title || API._(args.type === 'save' ? 'DIALOG_FILE_SAVE' : 'DIALOG_FILE_OPEN');
     var icon = args.type === 'open' ? 'actions/document-open.png' : 'actions/documentsave-as.png';
 
-    DialogWindow.apply(this, ['FileDialog', {
+    super('FileDialog', {
       title: title,
       icon: icon,
       width: 600,
       height: 400
-    }, args, callback]);
+    }, args, callback);
 
     this.selected = null;
     this.path = args.path;
 
-    var self = this;
-    this.settingsWatch = OSjs.Core.getSettingsManager().watch('VFS', function() {
-      self.changePath();
+    this.settingsWatch = OSjs.Core.getSettingsManager().watch('VFS', () => {
+      this.changePath();
     });
   }
 
-  FileDialog.prototype = Object.create(DialogWindow.prototype);
-  FileDialog.constructor = DialogWindow;
-
-  FileDialog.prototype.destroy = function() {
+  destroy() {
     try {
       OSjs.Core.getSettingsManager().unwatch(this.settingsWatch);
     } catch ( e ) {}
-    return DialogWindow.prototype.destroy.apply(this, arguments);
-  };
 
-  FileDialog.prototype.init = function() {
-    var self = this;
-    var root = DialogWindow.prototype.init.apply(this, arguments);
+    return super.destroy(...arguments);
+  }
+
+  init() {
+    var root = super.init(...arguments);
     var view = this._find('FileView');
     view.set('filter', this.args.filter);
     view.set('filetype', this.args.select || '');
@@ -128,67 +132,67 @@
     var home = this._find('HomeButton');
     var mlist = this._find('ModuleSelect');
 
-    function checkEmptyInput() {
+    const checkEmptyInput = () => {
       var disable = false;
-      if ( self.args.select !== 'dir' ) {
+      if ( this.args.select !== 'dir' ) {
         disable = !filename.get('value').length;
       }
-      self._find('ButtonOK').set('disabled', disable);
-    }
+      this._find('ButtonOK').set('disabled', disable);
+    };
 
     this._toggleLoading(true);
     view.set('multiple', this.args.multiple);
     filename.set('value', this.args.filename || '');
 
-    this._find('ButtonMkdir').on('click', function() {
-      API.createDialog('Input', {message: API._('DIALOG_FILE_MKDIR_MSG', self.path), value: 'New folder'}, function(ev, btn, value) {
+    this._find('ButtonMkdir').on('click', () => {
+      API.createDialog('Input', {message: API._('DIALOG_FILE_MKDIR_MSG', this.path), value: 'New folder'}, (ev, btn, value) => {
         if ( btn === 'ok' && value ) {
-          var path = Utils.pathJoin(self.path, value);
-          VFS.mkdir(VFS.file(path, 'dir'), function(err) {
+          var path = Utils.pathJoin(this.path, value);
+          VFS.mkdir(VFS.file(path, 'dir'), (err) => {
             if ( err ) {
               API.error(API._('DIALOG_FILE_ERROR'), API._('ERR_VFSMODULE_MKDIR'), err);
             } else {
-              self.changePath(path);
+              this.changePath(path);
             }
           });
         }
-      }, self);
+      }, this);
     });
 
-    home.on('click', function() {
+    home.on('click', () => {
       var dpath = API.getDefaultPath();
-      self.changePath(dpath);
+      this.changePath(dpath);
     });
 
-    view.on('activate', function(ev) {
-      self.selected = null;
-      if ( self.args.type !== 'save' ) {
+    view.on('activate', (ev) => {
+      this.selected = null;
+      if ( this.args.type !== 'save' ) {
         filename.set('value', '');
       }
 
       if ( ev && ev.detail && ev.detail.entries ) {
         var activated = ev.detail.entries[0];
         if ( activated ) {
-          self.selected = new VFS.File(activated.data);
-          if ( self.selected.type !== 'dir' ) {
-            filename.set('value', self.selected.filename);
+          this.selected = new VFS.File(activated.data);
+          if ( this.selected.type !== 'dir' ) {
+            filename.set('value', this.selected.filename);
           }
-          self.checkSelection(ev, true);
+          this.checkSelection(ev, true);
         }
       }
     });
 
-    view.on('select', function(ev) {
-      self.selected = null;
+    view.on('select', (ev) => {
+      this.selected = null;
       //filename.set('value', '');
 
       if ( ev && ev.detail && ev.detail.entries ) {
         var activated = ev.detail.entries[0];
         if ( activated ) {
-          self.selected = new VFS.File(activated.data);
+          this.selected = new VFS.File(activated.data);
 
-          if ( self.selected.type !== 'dir' ) {
-            filename.set('value', self.selected.filename);
+          if ( this.selected.type !== 'dir' ) {
+            filename.set('value', this.selected.filename);
           }
         }
       }
@@ -198,30 +202,30 @@
 
     if ( this.args.type === 'save' ) {
       var filetypes = [];
-      this.args.filetypes.forEach(function(f) {
+      this.args.filetypes.forEach((f) => {
         filetypes.push({
           label: Utils.format('{0} (.{1} {2})', f.label, f.extension, f.mime),
           value: f.extension
         });
       });
 
-      var ft = this._find('Filetype').add(filetypes).on('change', function(ev) {
+      var ft = this._find('Filetype').add(filetypes).on('change', (ev) => {
         var newinput = Utils.replaceFileExtension(filename.get('value'), ev.detail);
         filename.set('value', newinput);
       });
 
       if ( filetypes.length <= 1 ) {
-        new OSjs.GUI.Element(ft.$element.parentNode).hide();
+        new GUI.Element(ft.$element.parentNode).hide();
       }
 
-      filename.on('enter', function(ev) {
-        self.selected = null;
-        self.checkSelection(ev);
+      filename.on('enter', (ev) => {
+        this.selected = null;
+        this.checkSelection(ev);
       });
-      filename.on('change', function(ev) {
+      filename.on('change', (ev) => {
         checkEmptyInput();
       });
-      filename.on('keyup', function(ev) {
+      filename.on('keyup', (ev) => {
         checkEmptyInput();
       });
     } else {
@@ -235,11 +239,11 @@
 
     var mm = OSjs.Core.getMountManager();
     var rootPath = mm.getRootFromPath(this.path);
-    var modules = mm.getModules().filter(function(m) {
-      if ( self.args.mfilter.length ) {
+    var modules = mm.getModules().filter((m) => {
+      if ( this.args.mfilter.length ) {
         var success = false;
 
-        self.args.mfilter.forEach(function(fn) {
+        this.args.mfilter.forEach((fn) => {
           if ( !success ) {
             success = fn(m);
           }
@@ -248,7 +252,7 @@
         return success;
       }
       return true;
-    }).map(function(m) {
+    }).map((m) => {
       return {
         label: m.name + (m.module.readOnly ? Utils.format(' ({0})', API._('LBL_READONLY')) : ''),
         value: m.module.root
@@ -256,8 +260,8 @@
     });
 
     mlist.clear().add(modules).set('value', rootPath);
-    mlist.on('change', function(ev) {
-      self.changePath(ev.detail, true);
+    mlist.on('change', (ev) => {
+      this.changePath(ev.detail, true);
     });
 
     this.changePath();
@@ -265,45 +269,44 @@
     checkEmptyInput();
 
     return root;
-  };
+  }
 
-  FileDialog.prototype.changePath = function(dir, fromDropdown) {
-    var self = this;
+  changePath(dir, fromDropdown) {
     var view = this._find('FileView');
     var lastDir = this.path;
 
-    function resetLastSelected() {
+    const resetLastSelected = () => {
       var mm = OSjs.Core.getMountManager();
       var rootPath = mm.getRootFromPath(lastDir);
       try {
-        self._find('ModuleSelect').set('value', rootPath);
+        this._find('ModuleSelect').set('value', rootPath);
       } catch ( e ) {
         console.warn('FileDialog::changePath()', 'resetLastSelection()', e);
       }
-    }
+    };
 
     this._toggleLoading(true);
 
     view.chdir({
       path: dir || this.path,
-      done: function(error) {
+      done: (error) => {
         if ( error ) {
           if ( fromDropdown ) {
             resetLastSelected();
           }
         } else {
           if ( dir ) {
-            self.path = dir;
+            this.path = dir;
           }
         }
 
-        self.selected = null;
-        self._toggleLoading(false);
+        this.selected = null;
+        this._toggleLoading(false);
       }
     });
-  };
+  }
 
-  FileDialog.prototype.checkFileExtension = function() {
+  checkFileExtension() {
     var filename = this._find('Filename');
 
     var mime = this.args.mime;
@@ -318,7 +321,7 @@
         var extension = input.split('.').pop();
         var found = false;
 
-        this.args.filetypes.forEach(function(f) {
+        this.args.filetypes.forEach((f) => {
           if ( f.extension === extension ) {
             found = f;
           }
@@ -335,11 +338,9 @@
       filename: input,
       mime: mime
     };
-  };
+  }
 
-  FileDialog.prototype.checkSelection = function(ev, wasActivated) {
-    var self = this;
-
+  checkSelection(ev, wasActivated) {
     if ( this.selected && this.selected.type === 'dir' ) {
       if ( wasActivated ) {
         // this.args.select !== 'dir' &&
@@ -359,10 +360,10 @@
       this.selected = new VFS.File(this.path.replace(/^\//, '') + '/' + check.filename, check.mime);
       this._toggleDisabled(true);
 
-      VFS.exists(this.selected, function(error, result) {
-        self._toggleDisabled(false);
+      VFS.exists(this.selected, (error, result) => {
+        this._toggleDisabled(false);
 
-        if ( self._destroyed ) {
+        if ( this._destroyed ) {
           return;
         }
 
@@ -370,22 +371,22 @@
           API.error(API._('DIALOG_FILE_ERROR'), API._('DIALOG_FILE_MISSING_FILENAME'));
         } else {
           if ( result ) {
-            self._toggleDisabled(true);
+            this._toggleDisabled(true);
 
-            if ( self.selected ) {
+            if ( this.selected ) {
               API.createDialog('Confirm', {
                 buttons: ['yes', 'no'],
-                message: API._('DIALOG_FILE_OVERWRITE', self.selected.filename)
-              }, function(ev, button) {
-                self._toggleDisabled(false);
+                message: API._('DIALOG_FILE_OVERWRITE', this.selected.filename)
+              }, (ev, button) => {
+                this._toggleDisabled(false);
 
                 if ( button === 'yes' || button === 'ok' ) {
-                  self.closeCallback(ev, 'ok', self.selected);
+                  this.closeCallback(ev, 'ok', this.selected);
                 }
-              }, self);
+              }, this);
             }
           } else {
-            self.closeCallback(ev, 'ok', self.selected);
+            this.closeCallback(ev, 'ok', this.selected);
           }
         }
 
@@ -411,20 +412,20 @@
     }
 
     return true;
-  };
+  }
 
-  FileDialog.prototype.onClose = function(ev, button) {
+  onClose(ev, button) {
     if ( button === 'ok' && !this.checkSelection(ev) ) {
       return;
     }
 
     this.closeCallback(ev, button, this.selected);
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  OSjs.Dialogs.File = Object.seal(FileDialog);
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-})(OSjs.API, OSjs.VFS, OSjs.Utils, OSjs.Core.DialogWindow);
+module.exports = FileDialog;

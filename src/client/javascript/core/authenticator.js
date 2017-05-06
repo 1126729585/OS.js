@@ -159,6 +159,9 @@ class Authenticator {
    * @param   {CallbackHandler}      callback        Callback function
    */
   onLogin(data, callback) {
+    const sm = OSjs.Core.getSettingsManager();
+    const pm = OSjs.Core.getPackageManager();
+
     let userSettings = data.userSettings;
     if ( !userSettings || userSettings instanceof Array ) {
       userSettings = {};
@@ -176,7 +179,7 @@ class Authenticator {
         curLocale = detectedLocale;
       }
 
-      let result = OSjs.Core.getSettingsManager().get('CoreWM');
+      let result = sm.get('CoreWM');
       if ( !result ) {
         try {
           result = userSettings.CoreWM;
@@ -188,10 +191,10 @@ class Authenticator {
     document.getElementById('LoadingScreen').style.display = 'block';
 
     API.setLocale(getUserLocale());
-    OSjs.Core.getSettingsManager().init(userSettings);
+    sm.init(userSettings);
 
     if ( data.blacklistedPackages ) {
-      OSjs.Core.getPackageManager().setBlacklist(data.blacklistedPackages);
+      pm.setBlacklist(data.blacklistedPackages);
     }
 
     this.loggedIn = true;
@@ -236,7 +239,7 @@ class Authenticator {
       this.onLoginRequest({
         username: u.value,
         password: p.value
-      }, function(err) {
+      }, (err) => {
         if ( err ) {
           alert(err);
           _restore();

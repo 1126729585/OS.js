@@ -32,6 +32,7 @@
 // FIXME
 const API = OSjs.API;
 const GUI = OSjs.GUI;
+const VFS = OSjs.VFS;
 const Utils = OSjs.Utils;
 
 /**
@@ -60,7 +61,7 @@ const Utils = OSjs.Utils;
  */
 
 function _noEvent(ev) {
-  OSjs.API.blurMenu();
+  API.blurMenu();
   ev.preventDefault();
   ev.stopPropagation();
   return false;
@@ -250,7 +251,7 @@ class Window {
       throw new TypeError('appRef given was not instance of Core.Application');
     }
 
-    if ( schemeRef && !(schemeRef instanceof OSjs.GUI.Scheme) ) {
+    if ( schemeRef && !(schemeRef instanceof GUI.Scheme) ) {
       throw new TypeError('schemeRef given was not instance of GUI.Scheme');
     }
 
@@ -550,7 +551,7 @@ class Window {
 
     ((position, dimension) => {
       if ( appRef && appRef.__args && appRef.__args.__windows__ ) {
-        appRef.__args.__windows__.forEach(function(restore) {
+        appRef.__args.__windows__.forEach((restore) => {
           if ( !this._restored && restore.name && restore.name === this._name ) {
             position.x = restore.position.x;
             position.y = restore.position.y;
@@ -570,8 +571,8 @@ class Window {
       const grav = properties.gravity;
       if ( grav && !restored ) {
         if ( grav === 'center' ) {
-          position.y = (window.innerHeight / 2) - (self._dimension.h / 2);
-          position.x = (window.innerWidth / 2) - (self._dimension.w / 2);
+          position.y = (window.innerHeight / 2) - (this._dimension.h / 2);
+          position.x = (window.innerWidth / 2) - (this._dimension.w / 2);
         } else {
           const space = getWindowSpace();
           if ( grav.match(/^south/) ) {
@@ -617,7 +618,7 @@ class Window {
 
     // Create DOM
     this._$element = Utils.$create('application-window', {
-      className: (function(n, t) {
+      className: ((n, t) => {
         const classNames = ['Window', Utils.$safeName(n)];
         if ( t && (n !== t) ) {
           classNames.push(Utils.$safeName(t));
@@ -689,7 +690,7 @@ class Window {
       this._focus();
     });
 
-    Utils.$bind(this._$element, 'contextmenu', function(ev) {
+    Utils.$bind(this._$element, 'contextmenu', (ev) => {
       const r = Utils.$isFormElement(ev);
 
       if ( !r ) {
@@ -697,7 +698,7 @@ class Window {
         ev.stopPropagation();
       }
 
-      OSjs.API.blurMenu();
+      API.blurMenu();
 
       return !!r;
     });
@@ -726,24 +727,24 @@ class Window {
         const border = document.createElement('div');
         border.className = 'WindowDropRect';
 
-        OSjs.GUI.Helpers.createDroppable(main, {
-          onOver: function(ev, el, args) {
+        GUI.Helpers.createDroppable(main, {
+          onOver: (ev, el, args) => {
             main.setAttribute('data-dnd-state', 'true');
           },
 
-          onLeave: function() {
+          onLeave: () => {
             main.setAttribute('data-dnd-state', 'false');
           },
 
-          onDrop: function() {
+          onDrop: () => {
             main.setAttribute('data-dnd-state', 'false');
           },
 
-          onItemDropped: function(ev, el, item, args) {
+          onItemDropped: (ev, el, item, args) => {
             main.setAttribute('data-dnd-state', 'false');
             return this._onDndEvent(ev, 'itemDrop', item, args, el);
           },
-          onFilesDropped: function(ev, el, files, args) {
+          onFilesDropped: (ev, el, files, args) => {
             main.setAttribute('data-dnd-state', 'false');
             return this._onDndEvent(ev, 'filesDrop', files, args, el);
           }
@@ -883,7 +884,7 @@ class Window {
     const _destroyDOM = () => {
       if ( this._$element ) {
         // Make sure to remove any remaining event listeners
-        this._$element.querySelectorAll('*').forEach(function(iter) {
+        this._$element.querySelectorAll('*').forEach((iter) => {
           if ( iter ) {
             Utils.$unbind(iter);
           }
@@ -926,7 +927,7 @@ class Window {
             // This prevents windows from sticking when shutting down.
             // In some cases this would happen when you remove the stylesheet
             // with animation properties attached.
-            let animatetimeout = setTimeout(function() {
+            let animatetimeout = setTimeout(() => {
               if ( this._animationCallback ) {
                 this._animationCallback();
               }
@@ -942,7 +943,7 @@ class Window {
 
     this._onChange('close');
 
-    _animateClose(function() {
+    _animateClose(() => {
       _removeDOM();
     });
     _destroyDOM();
@@ -1053,7 +1054,7 @@ class Window {
     }
 
     if ( all ) {
-      return root.querySelectorAll(query).map(function(el) {
+      return root.querySelectorAll(query).map((el) => {
         return GUI.Element.createFromNode(el, query);
       });
     }
@@ -1174,7 +1175,7 @@ class Window {
     key = key || 'wid';
 
     let result = key === 'tag' ? [] : null;
-    this._children.every(function(child, i) {
+    this._children.every((child, i) => {
       if ( child ) {
         if ( key === 'tag' ) {
           result.push(child);
@@ -1238,7 +1239,7 @@ class Window {
    */
   _removeChildren() {
     if ( this._children && this._children.length ) {
-      this._children.forEach(function(child, i) {
+      this._children.forEach((child, i) => {
         if ( child ) {
           child.destroy();
         }
@@ -1490,7 +1491,7 @@ class Window {
    * Blurs the GUI
    */
   _blurGUI() {
-    this._$root.querySelectorAll('input, textarea, select, iframe, button').forEach(function(el) {
+    this._$root.querySelectorAll('input, textarea, select, iframe, button').forEach((el) => {
       el.blur();
     });
   }
@@ -1569,7 +1570,7 @@ class Window {
       const wm = OSjs.Core.getWindowManager();
       const anim = wm ? wm.getSetting('animations') : false;
       if ( anim ) {
-        this._animationCallback = function Window_animationCallback() {
+        this._animationCallback = () => {
           this._emit('resized');
         };
       } else {
@@ -1599,31 +1600,28 @@ class Window {
       if ( !p.allow_resize ) {
         return false;
       }
-      (function() {
-        if ( !isNaN(w) && w ) {
-          if ( w < p.min_width ) {
-            w = p.min_width;
-          }
-          if ( p.max_width !== null ) {
-            if ( w > p.max_width ) {
-              w = p.max_width;
-            }
-          }
-        }
-      })();
 
-      (function() {
-        if ( !isNaN(h) && h ) {
-          if ( h < p.min_height ) {
-            h = p.min_height;
-          }
-          if ( p.max_height !== null ) {
-            if ( h > p.max_height ) {
-              h = p.max_height;
-            }
+      if ( !isNaN(w) && w ) {
+        if ( w < p.min_width ) {
+          w = p.min_width;
+        }
+        if ( p.max_width !== null ) {
+          if ( w > p.max_width ) {
+            w = p.max_width;
           }
         }
-      })();
+      }
+
+      if ( !isNaN(h) && h ) {
+        if ( h < p.min_height ) {
+          h = p.min_height;
+        }
+        if ( p.max_height !== null ) {
+          if ( h > p.max_height ) {
+            h = p.max_height;
+          }
+        }
+      }
     }
 
     if ( !isNaN(w) && w ) {
@@ -1797,10 +1795,10 @@ class Window {
    * @param   {Event}     ev            DOM Event
    */
   _nextTabIndex(ev) {
-    const nextElement = OSjs.GUI.Helpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
+    const nextElement = GUI.Helpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
     if ( nextElement ) {
       if ( Utils.$hasClass(nextElement, 'gui-data-view') ) {
-        OSjs.GUI.Element.createFromNode(nextElement).focus();
+        GUI.Element.createFromNode(nextElement).focus();
       } else {
         try {
           nextElement.focus();
@@ -1837,7 +1835,7 @@ class Window {
       if ( type === 'filesDrop' ) {
         this._emit('drop:upload', [ev, item, args, el]);
       } else if ( type === 'itemDrop' && item.type === 'file' && item.data ) {
-        this._emit('drop:file', [ev, new OSjs.VFS.File(item.data || {}), args, el]);
+        this._emit('drop:file', [ev, new VFS.File(item.data || {}), args, el]);
       }
     }
 
@@ -1960,13 +1958,13 @@ class Window {
     ];
 
     const list = [];
-    control.forEach(function(iter) {
+    control.forEach((iter) => {
       if (iter[0] ) {
         list.push(iter[1]());
       }
     });
 
-    OSjs.API.createMenu(list, ev);
+    API.createMenu(list, ev);
   }
 
   /**
@@ -2174,5 +2172,3 @@ class Window {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports = Window;
-
-OSjs.Core.Window = Object.seal(Window);

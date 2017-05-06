@@ -68,5 +68,3 @@ class Service extends Process {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports =  Service;
-
-OSjs.Core.Service = Object.seal(Service);

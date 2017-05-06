@@ -367,17 +367,17 @@ class Process {
     if ( match ) {
       let isMatching;
       if ( match instanceof RegExp && _PROCS ) {
-        isMatching = function(p) {
+        isMatching = (p) => {
           return p.__pname && p.__pname.match(match);
         };
       } else if ( typeof match === 'string' ) {
-        isMatching = function(p) {
+        isMatching = (p) => {
           return p.__pname === match;
         };
       }
 
       if ( isMatching ) {
-        _PROCS.forEach(function(p) {
+        _PROCS.forEach((p) => {
           if ( p && isMatching(p) ) {
             _kill(p.__pid);
           }
@@ -386,7 +386,7 @@ class Process {
       return;
     }
 
-    _PROCS.forEach(function(proc, i) {
+    _PROCS.forEach((proc, i) => {
       if ( proc ) {
         proc.destroy(true);
       }
@@ -419,13 +419,13 @@ class Process {
 
     if ( typeof filter === 'string' ) {
       const s = filter;
-      filter = function(p) {
+      filter = (p) => {
         return p.__pname === s;
       };
     }
 
-    _PROCS.forEach(function(p, i) {
-      if ( p && (p instanceof OSjs.Core.Application || p instanceof OSjs.Core.Process) ) {
+    _PROCS.forEach((p, i) => {
+      if ( p && (p instanceof Process) ) {
         if ( filter(p) ) {
           p._onMessage(msg, obj, opts);
         }
@@ -448,7 +448,7 @@ class Process {
       return _PROCS[name];
     }
 
-    _PROCS.every(function(p, i) {
+    _PROCS.every((p, i) => {
       if ( p ) {
         if ( p.__pname === name ) {
           if ( first ) {
@@ -484,5 +484,3 @@ class Process {
 /////////////////////////////////////////////////////////////////////////////
 
 module.exports = Process;
-
-OSjs.Core.Process          = Object.seal(Process);
