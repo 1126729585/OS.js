@@ -4,6 +4,7 @@ module.exports.init = function() {
   const SettingsManager = require('core/settings-manager.js');
   const SearchEngine = require('core/search-engine.js');
   const PackageManager = require('core/package-manager.js');
+  const MountManager = require('core/mount-manager.js');
 
   OSjs.API.killAll           = Process.killAll;
   OSjs.API.kill              = Process.kill;
@@ -63,6 +64,17 @@ module.exports.init = function() {
    */
   OSjs.Core.getPackageManager = function Core_getPackageManager() {
     return PackageManager;
+  };
+
+  /**
+   * Get the current MountManager  instance
+   *
+   * @function getMountManager
+   * @memberof OSjs.Core
+   * @return {OSjs.Core.MountManager}
+   */
+  OSjs.Core.getMountManager = function Core_getMountManager() {
+    return MountManager;
   };
 
 };
