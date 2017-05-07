@@ -27,55 +27,52 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(Utils, API, VFS) {
-  'use strict';
+'use strict';
 
-  /**
-   * @namespace Applications
-   * @memberof OSjs.VFS.Transports
-   */
+/**
+ * @namespace Applications
+ * @memberof OSjs.VFS.Transports
+ */
 
-  /////////////////////////////////////////////////////////////////////////////
-  // API
-  /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+// API
+/////////////////////////////////////////////////////////////////////////////
 
-  /*
-   * Application VFS Transport Module
-   *
-   * This is only used for listing packages
-   */
-  var Transport = {
-    scandir: function(item, callback, options) {
-      var metadata = OSjs.Core.getPackageManager().getPackages();
-      var files = [];
+/*
+ * Application VFS Transport Module
+ *
+ * This is only used for listing packages
+ */
+const Transport = {
+  scandir: function(item, callback, options) {
+    const metadata = OSjs.Core.getPackageManager().getPackages();
+    const files = [];
 
-      Object.keys(metadata).forEach(function(m) {
-        var iter = metadata[m];
-        if ( iter.type !== 'extension' ) {
-          files.push(new OSjs.VFS.File({
-            filename: iter.name,
-            type: 'application',
-            path: 'applications:///' + m,
-            mime: 'osjs/application'
-          }, 'osjs/application'));
-        }
-      });
+    Object.keys(metadata).forEach((m) => {
+      const iter = metadata[m];
+      if ( iter.type !== 'extension' ) {
+        files.push(new OSjs.VFS.File({
+          filename: iter.name,
+          type: 'application',
+          path: 'applications:///' + m,
+          mime: 'osjs/application'
+        }, 'osjs/application'));
+      }
+    });
 
-      callback(false, files);
-    }
-  };
+    callback(false, files);
+  }
+};
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-  VFS.Transports.Applications = {
-    module: Transport,
-    defaults: function(opts) {
-      opts.readOnly = true;
-      opts.special = true;
-      opts.searchable = true;
-    }
-  };
-
-})(OSjs.Utils, OSjs.API, OSjs.VFS);
+module.exports = {
+  module: Transport,
+  defaults: function(opts) {
+    opts.readOnly = true;
+    opts.special = true;
+    opts.searchable = true;
+  }
+};

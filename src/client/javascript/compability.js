@@ -58,6 +58,13 @@ module.exports.init = function() {
   OSjs.VFS.FileDataURL = VFSFileData;
   assignInto(FS, OSjs.VFS.Helpers);
 
+  OSjs.VFS.Transports.Applications = require('vfs/transports/applications.js');
+  OSjs.VFS.Transports.Dist = require('vfs/transports/dist.js');
+  OSjs.VFS.Transports.HTTP = require('vfs/transports/http.js');
+  OSjs.VFS.Transports.OSjs = require('vfs/transports/osjs.js');
+  OSjs.VFS.Transports.Web = require('vfs/transports/web.js');
+  OSjs.VFS.Transports.WebDAV = require('vfs/transports/webdav.js');
+
   assignInto(FS, OSjs.Utils);
   assignInto(DOM, OSjs.Utils);
   assignInto(XHR, OSjs.Utils);
@@ -434,5 +441,29 @@ module.exports.init = function() {
     };
 
   })();
+
+  /*
+   * A hidden mountpoint for making HTTP requests via VFS
+   */
+  OSjs.Core.getMountManager()._add({
+    readOnly: true,
+    name: 'HTTP',
+    transport: 'HTTP',
+    description: 'HTTP',
+    visible: false,
+    searchable: false,
+    unmount: function(cb) {
+      cb(false, false);
+    },
+    mounted: function() {
+      return true;
+    },
+    enabled: function() {
+      return true;
+    },
+    root: 'http:///',
+    icon: 'places/google-drive.png',
+    match: /^https?\:\/\//
+  });
 
 };
