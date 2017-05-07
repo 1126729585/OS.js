@@ -29,64 +29,33 @@
  */
 
 /*eslint valid-jsdoc: "off"*/
-(function(Utils, API, VFS) {
-  'use strict';
+'use strict';
 
-  /////////////////////////////////////////////////////////////////////////////
-  // FILE ABSTRACTION
-  /////////////////////////////////////////////////////////////////////////////
+// FIXME
+const VFS = OSjs.VFS;
 
-  /**
-   * This is a object you can pass around in VFS when
-   * handling DataURL()s (strings). Normally you would
-   * use a File, Blob or ArrayBuffer, but this is an alternative.
-   *
-   * Useful for canvas data etc.
-   *
-   * @param {String}    dataURL     Data URI
-   *
-   * @constructor
-   * @memberof OSjs.VFS
-   */
-  function FileDataURL(dataURL) {
-    /**
-     * File URI data (base64 encoded)
-     * @name dataURL
-     * @memberof OSjs.VFS.FileDataURL#
-     * @type {String}
-     */
-    this.dataURL = dataURL;
-  }
+const FS = require('utils/fs.js');
+const API = require('core/api.js');
+
+/////////////////////////////////////////////////////////////////////////////
+// FILE ABSTRACTION
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This is the Metadata object you have to use when passing files around
+ * in the VFS API.
+ *
+ * This object has the same properties as in the option list below
+ *
+ * If you construct without a MIME type, OS.js will try to guess what it is.
+ *
+ * @constructor File
+ * @memberof OSjs.VFS
+ * @see OSjs.VFS.file
+ */
+class FileMetadata {
 
   /**
-   * Get base64 data
-   * @function toBase64
-   * @memberof OSjs.VFS.FileDataURL#
-   * @return {String}
-   */
-  FileDataURL.prototype.toBase64 = function() {
-    return this.data.split(',')[1];
-  };
-
-  /**
-   * Get raw data URI
-   * @override
-   * @function toString
-   * @memberof OSjs.VFS.FileDataURL#
-   * @return {String}
-   */
-  FileDataURL.prototype.toString = function() {
-    return this.dataURL;
-  };
-
-  /**
-   * This is the Metadata object you have to use when passing files around
-   * in the VFS API.
-   *
-   * This object has the same properties as in the option list below
-   *
-   * If you construct without a MIME type, OS.js will try to guess what it is.
-   *
    * @param   {(String|Object)} arg           Either a 'path' or 'object' (filled with properties)
    * @param   {String}          arg.path      Full path
    * @param   {String}          arg.filename  Filename (automatically detected)
@@ -95,20 +64,14 @@
    * @param   {String}          arg.mime      File MIME (ex: application/json)
    * @param   {Mixed}           arg.id        Unique identifier (not required)
    * @param   {String}          [mime]        MIME type of File Type (ex: 'application/json' or 'dir')
-   *
-   * @constructor File
-   * @memberof OSjs.VFS
-   * @see OSjs.VFS.file
    */
-  function FileMetadata(arg, mime) {
+  constructor(arg, mime) {
     if ( !arg ) {
       throw new Error(API._('ERR_VFS_FILE_ARGS'));
     }
 
     /**
      * Full path
-     * @name path
-     * @memberof OSjs.VFS.File#
      * @type {String}
      * @example home:///foo/bar.baz
      */
@@ -116,8 +79,6 @@
 
     /**
      * Filename
-     * @name filename
-     * @memberof OSjs.VFS.File#
      * @type {String}
      * @example foo.baz
      */
@@ -125,8 +86,6 @@
 
     /**
      * Type (dir or file)
-     * @name type
-     * @memberof OSjs.VFS.File#
      * @type {String}
      * @example file
      */
@@ -134,8 +93,6 @@
 
     /**
      * Size in bytes
-     * @name size
-     * @memberof OSjs.VFS.File#
      * @type {Number}
      * @example 1234
      */
@@ -143,8 +100,6 @@
 
     /**
      * MIME type
-     * @name mime
-     * @memberof OSjs.VFS.File#
      * @type {String}
      * @example application/octet-stream
      */
@@ -152,16 +107,12 @@
 
     /**
      * Unique identifier (Only used for external services requring it)
-     * @name id
-     * @memberof OSjs.VFS.File#
      * @type {String}
      */
     this.id       = null;
 
     /**
      * Internal boolean for a shortcut type file
-     * @name shortcut
-     * @memberof OSjs.VFS.File#
      * @type {Boolean}
      */
     this.shortcut = false;
@@ -187,35 +138,28 @@
   /**
    * Set data from Object (key/value pair)
    *
-   * @function setData
-   * @memberof OSjs.VFS.File#
-   *
    * @param {Object}    o     Object
    */
-  FileMetadata.prototype.setData = function(o) {
-    var self = this;
+  setData(o) {
     if ( o ) {
-      Object.keys(o).forEach(function(k) {
+      Object.keys(o).forEach((k) => {
         if ( k !== '_element' ) {
-          self[k] = o[k];
+          this[k] = o[k];
         }
       });
     }
 
     if ( !this.filename ) {
-      this.filename = Utils.filename(this.path);
+      this.filename = FS.filename(this.path);
     }
-  };
+  }
 
   /**
    * Get object data as key/value pair.
    *
-   * @function getData
-   * @memberof OSjs.VFS.File#
-   *
    * @return {Object}
    */
-  FileMetadata.prototype.getData = function() {
+  getData() {
     return {
       path: this.path,
       filename: this.filename,
@@ -224,210 +168,166 @@
       mime: this.mime,
       id: this.id
     };
-  };
+  }
 
   /**
    * Copies the file to given destination.
    *
-   * @function copy
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.copy
    * @see OSjs.VFS.copy
    */
-  FileMetadata.prototype.copy = function(dest, callback, options, appRef) {
+  copy(dest, callback, options, appRef) {
     return VFS.copy(this, dest, callback, options, appRef);
-  };
+  }
 
   /**
    * Downloads the file to computer
    *
-   * @function download
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.download
    * @see OSjs.VFS.download
    */
-  FileMetadata.prototype.download = function(callback) {
+  download(callback) {
     return VFS.download(this, callback);
-  };
+  }
 
   /**
    * Deletes the file
    *
-   * @function delete
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.File#unlink
    * @see OSjs.VFS.File#unlink
    */
-  FileMetadata.prototype.delete = function() {
+  delete() {
     return this.unlink.apply(this, arguments);
-  };
+  }
 
   /**
    * Removes the file
    *
-   * @function unlink
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.unlink
    * @see OSjs.VFS.unlink
    */
-  FileMetadata.prototype.unlink = function(callback, options, appRef) {
+  unlink(callback, options, appRef) {
     return VFS.unlink(this, callback, options, appRef);
-  };
+  }
 
   /**
    * Checks if file exists
    *
-   * @function exists
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.exists
    * @see OSjs.VFS.exists
    */
-  FileMetadata.prototype.exists = function(callback) {
+  exists(callback) {
     return VFS.exists(this, callback);
-  };
+  }
 
   /**
    * Creates a directory
    *
-   * @function mkdir
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.mkdir
    * @see OSjs.VFS.mkdir
    */
-  FileMetadata.prototype.mkdir = function(callback, options, appRef) {
+  mkdir(callback, options, appRef) {
     return VFS.mkdir(this, callback, options, appRef);
-  };
+  }
 
   /**
    * Moves the file to given destination
    *
-   * @function move
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.move
    * @see OSjs.VFS.move
    */
-  FileMetadata.prototype.move = function(dest, callback, options, appRef) {
-    var self = this;
-    return VFS.move(this, dest, function(err, res, newDest) {
+  move(dest, callback, options, appRef) {
+    return VFS.move(this, dest, (err, res, newDest) => {
       if ( !err && newDest ) {
         self.setData(newDest);
       }
-      callback.apply(self, arguments);
+      callback.call(this, err, res, newDest);
     }, options, appRef);
-  };
+  }
 
   /**
    * Reads the file contents
    *
-   * @function read
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.read
    * @see OSjs.VFS.read
    */
-  FileMetadata.prototype.read = function(callback, options) {
+  read(callback, options) {
     return VFS.read(this, callback, options);
-  };
+  }
 
   /**
    * Renames the file
    *
-   * @function rename
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.File#move
    * @see OSjs.VFS.File#move
    */
-  FileMetadata.prototype.rename = function() {
+  rename() {
     return this.move.apply(this, arguments);
-  };
+  }
 
   /**
    * Scans the folder contents
    *
-   * @function scandir
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.scandir
    * @see OSjs.VFS.scandir
    */
-  FileMetadata.prototype.scandir = function(callback, options) {
+  scandir(callback, options) {
     return VFS.scandir(this, callback, options);
-  };
+  }
 
   /**
    * Sends the file to the trash
    *
-   * @function trash
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.trash
    * @see OSjs.VFS.trash
    */
-  FileMetadata.prototype.trash = function(callback) {
+  trash(callback) {
     return VFS.trash(this, callback);
-  };
+  }
 
   /**
    * Restores the file from trash
    *
-   * @function untrash
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.untrash
    * @see OSjs.VFS.untrash
    */
-  FileMetadata.prototype.untrash = function(callback) {
+  untrash(callback) {
     return VFS.untrash(this, callback);
-  };
+  }
 
   /**
    * Gets the URL for physical file
    *
-   * @function url
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.url
    * @see OSjs.VFS.url
    */
-  FileMetadata.prototype.url = function(callback) {
+  url(callback) {
     return VFS.url(this, callback);
-  };
+  }
 
   /**
    * Writes data to the file
    *
-   * @function write
-   * @memberof OSjs.VFS.File#
    * @alias OSjs.VFS.write
    * @see OSjs.VFS.write
    */
-  FileMetadata.prototype.write = function(data, callback, options, appRef) {
+  write(data, callback, options, appRef) {
     return VFS.write(this, data, callback, options, appRef);
-  };
+  }
 
-  FileMetadata.prototype._guessMime = function() {
+  _guessMime() {
     if ( this.mime || this.type === 'dir' || (!this.path || this.path.match(/\/$/)) ) {
       return;
     }
 
-    var ext = Utils.filext(this.path);
+    const ext = FS.filext(this.path);
     this.mime = API.getConfig('MIME.mapping')['.' + ext] || 'application/octet-stream';
-  };
+  }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+}
 
-  /**
-   * Creates a new VFS.File instance
-   *
-   * @function file
-   * @memberof OSjs.VFS
-   * @see OSjs.VFS.File
-   *
-   * @example
-   * OSjs.VFS.file('home:///foo').read(<fn>);
-   */
-  VFS.file = function createFileInstance(arg, mime) {
-    return new FileMetadata(arg, mime);
-  };
+/////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+/////////////////////////////////////////////////////////////////////////////
 
-  VFS.File = FileMetadata;
-  VFS.FileDataURL = FileDataURL;
-
-})(OSjs.Utils, OSjs.API, OSjs.VFS);
+module.exports = FileMetadata;

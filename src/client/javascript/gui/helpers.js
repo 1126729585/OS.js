@@ -34,7 +34,6 @@ const DOM = require('utils/dom.js');
 const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
 const Compability = require('utils/compability.js');
-const GUIElement = require('gui/element.js');
 
 /**
  * @namespace GUI
@@ -185,6 +184,8 @@ module.exports.getIcon = function getIcon(el, win) {
  * @return  {Mixed}
  */
 module.exports.getProperty = function getProperty(el, param, tagName) {
+  const GUIElement = require('gui/element.js');
+
   tagName = tagName || el.tagName.toLowerCase();
   var isDataView = tagName.match(/^gui\-(tree|icon|list|file)\-view$/);
 
@@ -929,6 +930,8 @@ module.exports.blurMenu = function blurMenu(ev) {
  * @memberof OSjs.GUI.Helpers
  */
 module.exports.createMenu = function createMenu(items, ev, customInstance) {
+  const GUIElement = require('gui/element.js');
+
   items = items || [];
 
   module.exports.blurMenu(ev);

@@ -36,6 +36,9 @@ module.exports.init = function() {
   const UIDataView = require('gui/dataview.js');
   const GUIHelpers = require('gui/helpers.js');
 
+  const VFSFile = require('vfs/file.js');
+  const VFSFileData = require('vfs/filedata.js');
+
   const FS = require('utils/fs.js');
   const DOM = require('utils/dom.js');
   const XHR = require('utils/xhr.js');
@@ -48,6 +51,9 @@ module.exports.init = function() {
       ns[k] = lib[k];
     });
   };
+
+  OSjs.VFS.File = VFSFile;
+  OSjs.VFS.FileDataURL = VFSFileData;
 
   assignInto(FS, OSjs.Utils);
   assignInto(DOM, OSjs.Utils);
@@ -274,6 +280,20 @@ module.exports.init = function() {
   };
 
   /**
+   * Creates a new VFS.File instance
+   *
+   * @function file
+   * @memberof OSjs.VFS
+   * @see OSjs.VFS.File
+   *
+   * @example
+   * OSjs.VFS.file('home:///foo').read(<fn>);
+   */
+  OSjs.VFS.file = function createFileInstance(arg, mime) {
+    return new VFSFile(arg, mime);
+  };
+
+  /**
    * Shortcut for creating a new UIScheme class
    *
    * @summary Helper for loading Dialog scheme files.
@@ -336,7 +356,7 @@ module.exports.init = function() {
         var root = API.getConfig('Connection.RootURI');
         var url = root + 'dialogs.html';
 
-        dialogScheme = GUI.createScheme(url);
+        dialogScheme = OSjs.GUI.createScheme(url);
         dialogScheme.load(function(error) {
           if ( error ) {
             console.warn('OSjs.GUI.initDialogScheme()', 'error loading dialog schemes', error);
@@ -348,6 +368,5 @@ module.exports.init = function() {
     };
 
   })();
-
 
 };
