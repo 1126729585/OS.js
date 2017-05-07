@@ -29,9 +29,6 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 
@@ -159,14 +156,14 @@ const MountManager = (() => {
       mount.transport = 'WebDAV';
     }
 
-    const target = VFS.Transports[mount.transport];
+    const target = OSjs.VFS.Transports[mount.transport];
     if ( target && typeof target.defaults === 'function' ) {
       target.defaults(mount);
     }
 
     if ( dynamic ) {
       const validModule = (() => {
-        if ( Object.keys(VFS.Transports).indexOf(mount.transport) < 0 ) {
+        if ( Object.keys(OSjs.VFS.Transports).indexOf(mount.transport) < 0 ) {
           return 'No such transport \'' + mount.transport + '\'';
         }
         if ( mount.transport === 'WebDAV' && !mount.options.username ) {
@@ -263,7 +260,7 @@ const MountManager = (() => {
         console.warn('NO CALLBACK FUNCTION WAS ASSIGNED IN VFS REQUEST');
       };
 
-      const target = VFS.Transports[mount.transport];
+      const target = OSjs.VFS.Transports[mount.transport];
       if ( !target ) {
         callback(API._('ERR_VFSMODULE_INVALID_TYPE_FMT', mount.transport));
         return;

@@ -29,10 +29,6 @@
  */
 'use strict';
 
-// FIXME
-const Core = OSjs.Core;
-const VFS = OSjs.VFS;
-
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
@@ -144,7 +140,7 @@ function noop(err, res) {
  * Perform VFS request
  */
 function request(test, method, args, callback, options, appRef) {
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
   const d = mm.getModuleFromPath(test, false);
 
   if ( !d ) {
@@ -163,7 +159,7 @@ function request(test, method, args, callback, options, appRef) {
     throw new TypeError(API._('ERR_ARGUMENT_FMT', 'VFS::' + method, 'options', 'Object', typeof options));
   }
 
-  const conn  = Core.getConnection();
+  const conn = OSjs.Core.getConnection();
   conn.onVFSRequest(d, method, args, function vfsRequestCallback(err, response) {
     if ( arguments.length === 2 ) {
       console.warn('VFS::request()', 'Core::onVFSRequest hijacked the VFS request');
@@ -237,7 +233,7 @@ function hasAlias(item, retm) {
  * Check if destination is readOnly
  */
 function isReadOnly(item) {
-  const m = Core.getMountManager().getModuleFromPath(item.path, false, true) || {};
+  const m = OSjs.Core.getMountManager().getModuleFromPath(item.path, false, true) || {};
   return m.readOnly === true;
 }
 
@@ -261,7 +257,7 @@ function checkMetadataArgument(item, err, checkRo) {
     item.path = alias;
   }
 
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
   if ( !mm.getModuleFromPath(item.path, false) ) {
     throw new Error(API._('ERR_VFSMODULE_NOT_FOUND_FMT', item.path));
   }
@@ -278,7 +274,7 @@ function checkMetadataArgument(item, err, checkRo) {
  */
 function hasSameTransport(src, dest) {
   // Modules using the normal server API
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
   if ( mm.isInternal(src.path) && mm.isInternal(dest.path) ) {
     return true;
   }
@@ -747,7 +743,7 @@ module.exports.copy = function VFS_copy(src, dest, callback, options, appRef) {
     return;
   }
 
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
 
   try {
     src = checkMetadataArgument(src, API._('ERR_VFS_EXPECT_SRC_FILE'));
@@ -853,7 +849,7 @@ module.exports.move = function VFS_move(src, dest, callback, options, appRef) {
     return;
   }
 
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
 
   try {
     src = checkMetadataArgument(src, API._('ERR_VFS_EXPECT_SRC_FILE'));
@@ -970,7 +966,7 @@ module.exports.unlink = function VFS_unlink(item, callback, options, appRef) {
     });
 
     if ( found ) {
-      Core.getPackageManager().generateUserMetadata(function() {});
+      OSjs.Core.getPackageManager().generateUserMetadata(function() {});
     }
   }
 
@@ -1170,7 +1166,7 @@ module.exports.upload = function VFS_upload(args, callback, options, appRef) {
     return;
   }
 
-  const mm = Core.getMountManager();
+  const mm = OSjs.Core.getMountManager();
   if ( !mm.isInternal(args.destination) ) {
     args.files.forEach(function(f, i) {
       request(args.destination, 'upload', [f, args.destination], callback, options);
@@ -1201,7 +1197,7 @@ module.exports.upload = function VFS_upload(args, callback, options, appRef) {
           realDest = tmpPath;
         }
 
-        VFS.Transports.OSjs.upload(f, realDest, function(err, result, ev) {
+        OSjs.VFS.Transports.OSjs.upload(f, realDest, function(err, result, ev) {
           if ( err ) {
             if ( err === 'canceled' ) {
               callback(API._('ERR_VFS_UPLOAD_CANCELLED'), null, ev);
@@ -1211,7 +1207,7 @@ module.exports.upload = function VFS_upload(args, callback, options, appRef) {
               callback(msg, null, ev);
             }
           } else {
-            let file = VFS.Helpers.createFileFromUpload(args.destination, f);
+            let file = OSjs.VFS.Helpers.createFileFromUpload(args.destination, f);
             file = checkMetadataArgument(file);
 
             broadcastMessage('vfs:upload', file, args.app, appRef);
@@ -1267,7 +1263,7 @@ module.exports.download = (function download() {
 
     API.createLoading(lname, {className: 'BusyNotification', tooltip: API._('TOOLTIP_VFS_DOWNLOAD_NOTIFICATION')});
 
-    const mm = Core.getMountManager();
+    const mm = OSjs.Core.getMountManager();
     const dmodule = mm.getModuleFromPath(args.path);
     if ( !mm.isInternal(args.path) ) {
       let file = args;
@@ -1426,7 +1422,7 @@ module.exports.freeSpace = function VFS_freeSpace(item, callback) {
     return;
   }
 
-  const m = Core.getMountManager().getModuleFromPath(item.path, false, true);
+  const m = OSjs.Core.getMountManager().getModuleFromPath(item.path, false, true);
 
   requestWrapper([item.path, 'freeSpace', [m.root]], 'ERR_VFSMODULE_FREESPACE_FMT', callback);
 };

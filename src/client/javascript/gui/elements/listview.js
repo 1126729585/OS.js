@@ -30,8 +30,8 @@
 'use strict';
 
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Events = require('utils/events.js');
-const GUIHelpers = require('gui/helpers.js');
 const GUIDataView = require('gui/dataview.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ function createFakeHeader(el) {
         let minWidth     = widthOffset;
         let tmpEl        = null;
 
-        GUIHelpers.createDrag(resizer, (ev) => {
+        GUI.createDrag(resizer, (ev) => {
           startWidth = col.offsetWidth;
           minWidth = widthOffset;//calculateWidth();
           maxWidth = el.offsetWidth - (el.children.length * widthOffset);
@@ -147,7 +147,7 @@ function createEntry(cls, v, head) {
     delete v.size;
   }
 
-  const nel = GUIHelpers.createElement('gui-list-view-column', v);
+  const nel = GUI.createElement('gui-list-view-column', v);
   if ( setSize ) {
     nel.style.width = setSize;
   }
@@ -169,7 +169,7 @@ function createEntry(cls, v, head) {
 function createRow(cls, e) {
   e = e || {};
   if ( e.columns ) {
-    const row = GUIHelpers.createElement('gui-list-view-row', e, ['columns']);
+    const row = GUI.createElement('gui-list-view-row', e, ['columns']);
 
     e.columns.forEach((se) => {
       row.appendChild(createEntry(cls, se));

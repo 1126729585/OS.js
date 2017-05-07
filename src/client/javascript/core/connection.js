@@ -29,9 +29,6 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const Events = require('utils/events.js');
@@ -350,7 +347,7 @@ class Connection {
     };
 
     XHR.ajax(appendRequestOptions({
-      url: VFS.Transports.OSjs.path(),
+      url: OSjs.VFS.Transports.OSjs.path(),
       method: 'POST',
       body: form,
       onsuccess: function Connection_POST_success(result) {
@@ -383,7 +380,7 @@ class Connection {
     }).bind(this);
 
     XHR.ajax(appendRequestOptions({
-      url: args.url || VFS.Transports.OSjs.path(args.path),
+      url: args.url || OSjs.VFS.Transports.OSjs.path(args.path),
       method: args.method || 'GET',
       responseType: 'arraybuffer',
       onsuccess: (response, xhr) => {

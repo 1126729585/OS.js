@@ -29,11 +29,9 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-const Utils = OSjs.Utils;
-
 const API = require('core/api.js');
+const VFS = require('vfs/fs.js');
+const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
 
 /**

@@ -29,11 +29,9 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const API = require('core/api.js');
 const Connection = require('core/connection.js');
+const VFSFile = require('vfs/file.js');
 
 class HttpConnection extends Connection {
 
@@ -59,11 +57,11 @@ class HttpConnection extends Connection {
       // Emit a VFS event when a change occures
       if ( ['write', 'mkdir', 'copy', 'move', 'unlink'].indexOf(method) !== -1 ) {
         const arg = method === 'move' ? {
-          source: args[0] instanceof VFS.File ? args[0] : null,
-          destination: args[1] instanceof VFS.File ? args[1] : null
+          source: args[0] instanceof VFSFile ? args[0] : null,
+          destination: args[1] instanceof VFSFile ? args[1] : null
         } : args[method === 'copy' ? 1 : 0];
 
-        VFS.Helpers.triggerWatch(method, arg, appRef);
+        OSjs.VFS.Helpers.triggerWatch(method, arg, appRef);
       }
     }
     callback();

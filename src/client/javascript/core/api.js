@@ -32,10 +32,10 @@
 const FS = require('utils/fs.js');
 const XHR = require('utils/xhr.js');
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Utils = require('utils/misc.js');
 const Compability = require('utils/compability.js');
 const GUIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
 
 /**
  * @namespace API
@@ -1903,7 +1903,7 @@ module.exports.isShuttingDown = function() {
  * @return {Boolean}
  */
 module.exports.createMenu = function() {
-  return GUIHelpers.createMenu.apply(null, arguments);
+  return GUI.createMenu.apply(null, arguments);
 };
 
 /**
@@ -1914,6 +1914,6 @@ module.exports.createMenu = function() {
  * @return {Boolean}
  */
 module.exports.blurMenu = function() {
-  return GUIHelpers.blurMenu.apply(null, arguments);
+  return GUI.blurMenu.apply(null, arguments);
 };
 

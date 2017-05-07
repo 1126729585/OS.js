@@ -31,9 +31,9 @@
 
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Events = require('utils/events.js');
 const GUIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
 
 let _buttonCount = 0;
 
@@ -107,7 +107,7 @@ function createInputOfType(el, type) {
     _bindDefaults();
     _bindEvents();
 
-    GUIHelpers.createInputLabel(el, type, input);
+    GUI.createInputLabel(el, type, input);
 
     const rolemap = {
       'TEXTAREA': () => {
@@ -290,7 +290,7 @@ class GUILabel extends GUIElement {
 
   build() {
     const el = this.$element;
-    const label = GUIHelpers.getValueLabel(el, true);
+    const label = GUI.getValueLabel(el, true);
     const lbl = document.createElement('label');
     lbl.appendChild(document.createTextNode(label));
     el.setAttribute('role', 'heading');
@@ -560,7 +560,7 @@ class GUISwitch extends GUIElement {
 
     const button = document.createElement('button');
     inner.appendChild(button);
-    GUIHelpers.createInputLabel(el, 'switch', inner);
+    GUI.createInputLabel(el, 'switch', inner);
 
     function toggleValue(v) {
       let val = false;
@@ -631,7 +631,7 @@ class GUIButton extends GUIElement {
       delete params.label;
     }
 
-    const el = GUIHelpers.createElement('gui-button', params);
+    const el = GUI.createElement('gui-button', params);
     if ( label ) {
       el.appendChild(document.createTextNode(label));
     }
@@ -649,7 +649,7 @@ class GUIButton extends GUIElement {
     const icon = el.getAttribute('data-icon');
     const disabled = el.getAttribute('data-disabled') !== null;
     const group = el.getAttribute('data-group');
-    const label = GUIHelpers.getValueLabel(el);
+    const label = GUI.getValueLabel(el);
     const input = document.createElement('button');
 
     function setGroup(g) {
@@ -829,7 +829,7 @@ class GUISlider extends GUIElement {
   }
 
   get(param) {
-    const val = GUIHelpers.getProperty(this.$element, param);
+    const val = GUI.getProperty(this.$element, param);
     if ( param === 'value' ) {
       return parseInt(val, 10);
     }

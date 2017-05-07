@@ -31,8 +31,8 @@
 
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Utils = require('utils/misc.js');
-const GUIHelpers = require('gui/helpers.js');
 
 /**
  * @namespace Elements
@@ -74,20 +74,20 @@ function parseDynamic(node, win, args) {
 
   node.querySelectorAll('gui-label, gui-button, gui-list-view-column, gui-select-option, gui-select-list-option').forEach(function(el) {
     if ( !el.children.length && !el.getAttribute('data-no-translate') ) {
-      const lbl = GUIHelpers.getValueLabel(el);
+      const lbl = GUI.getValueLabel(el);
       el.appendChild(document.createTextNode(translator(lbl)));
     }
   });
 
   node.querySelectorAll('gui-button').forEach(function(el) {
-    const label = GUIHelpers.getValueLabel(el);
+    const label = GUI.getValueLabel(el);
     if ( label ) {
       el.appendChild(document.createTextNode(API._(label)));
     }
   });
 
   node.querySelectorAll('*[data-icon]').forEach(function(el) {
-    const image = GUIHelpers.getIcon(el, win);
+    const image = GUI.getIcon(el, win);
     el.setAttribute('data-icon', image);
   });
 
@@ -316,7 +316,7 @@ class UIElement {
    */
   set(param, value, arg, arg2) {
     if ( this.$element ) {
-      GUIHelpers.setProperty(this.$element, param, value, arg, arg2);
+      GUI.setProperty(this.$element, param, value, arg, arg2);
     }
     return this;
   }
@@ -330,7 +330,7 @@ class UIElement {
    */
   get(param) {
     if ( this.$element ) {
-      return GUIHelpers.getProperty(this.$element, param);
+      return GUI.getProperty(this.$element, param);
     }
     return null;
   }
@@ -534,7 +534,7 @@ class UIElement {
     applyArgs = applyArgs || {};
     params = params || {};
 
-    const el = GUIHelpers.createElement(tagName, params);
+    const el = GUI.createElement(tagName, params);
     return createElementInstance(null, el, null, [applyArgs, win]);
   }
 

@@ -30,8 +30,8 @@
 'use strict';
 
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Events = require('utils/events.js');
-const GUIHelpers = require('gui/helpers.js');
 const GUIElement = require('gui/element.js');
 const Compability = require('utils/compability.js');
 
@@ -84,7 +84,7 @@ function onEntryClick(ev, pos, target, original) {
   const isExpander = !!target.querySelector('gui-menu');
 
   if ( !isExpander ) {
-    GUIHelpers.blurMenu(ev);
+    GUI.blurMenu(ev);
 
     const hasInput = target.querySelector('input');
     if ( hasInput ) {
@@ -156,8 +156,8 @@ class GUIMenuEntry extends GUIElement {
     }
     child.setAttribute('role', 'menuitem' + (child.getAttribute('data-type') || ''));
 
-    const label = GUIHelpers.getLabel(child);
-    const icon = GUIHelpers.getIcon(child, winRef);
+    const label = GUI.getLabel(child);
+    const icon = GUI.getIcon(child, winRef);
     child.setAttribute('aria-label', label);
 
     const span = document.createElement('label');
@@ -224,10 +224,10 @@ class GUIMenu extends GUIElement {
     // This is to use a menu-bar > menu as a contextmenu
     const newNode = this.$element.cloneNode(true);
     const el = this.$element;
-    GUIHelpers.createMenu(null, ev, newNode);
+    GUI.createMenu(null, ev, newNode);
 
     Events.$bind(newNode, 'click', (ev, pos) => {
-      GUIHelpers._menuClickWrapper(ev, pos, onEntryClick, el);
+      GUI._menuClickWrapper(ev, pos, onEntryClick, el);
     }, true);
   }
 
@@ -268,7 +268,7 @@ class GUIMenu extends GUIElement {
 
     if ( !customMenu ) {
       Events.$bind(el, 'click', (ev, pos) => {
-        GUIHelpers._menuClickWrapper(ev, pos, onEntryClick);
+        GUI._menuClickWrapper(ev, pos, onEntryClick);
       }, true);
     }
 
@@ -320,7 +320,7 @@ class GUIMenuBar extends GUIElement {
     }
 
     function _onClick(ev, mel) {
-      GUIHelpers.blurMenu(ev);
+      GUI.blurMenu(ev);
 
       ev.preventDefault();
       ev.stopPropagation();
@@ -336,7 +336,7 @@ class GUIMenuBar extends GUIElement {
       });
 
       if ( submenu ) {
-        GUIHelpers._menuSetActive((ev) => {
+        GUI._menuSetActive((ev) => {
           if ( ev ) {
             ev.stopPropagation();
           }
@@ -358,7 +358,7 @@ class GUIMenuBar extends GUIElement {
     }
 
     el.querySelectorAll('gui-menu-bar-entry').forEach((mel, idx) => {
-      const label = GUIHelpers.getLabel(mel);
+      const label = GUI.getLabel(mel);
 
       const span = document.createElement('span');
       span.appendChild(document.createTextNode(label));
@@ -369,7 +369,7 @@ class GUIMenuBar extends GUIElement {
 
       const submenu = mel.querySelector('gui-menu');
 
-      GUIHelpers._menuClamp(submenu);
+      GUI._menuClamp(submenu);
 
       mel.setAttribute('aria-haspopup', String(!!submenu));
       mel.setAttribute('data-index', String(idx));

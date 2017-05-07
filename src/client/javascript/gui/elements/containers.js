@@ -29,9 +29,9 @@
  */
 'use strict';
 
+const GUI = require('utils/gui.js');
 const Events = require('utils/events.js');
 const GUIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
 
 function toggleState(el, expanded) {
   if ( typeof expanded === 'undefined' ) {
@@ -83,7 +83,7 @@ class GUIPanedView extends GUIElement {
       let minSize = 16;
       let maxSize = Number.MAX_VALUE;
 
-      GUIHelpers.createDrag(resizer, (ev) => {
+      GUI.createDrag(resizer, (ev) => {
         startWidth = resizeEl.offsetWidth;
         startHeight = resizeEl.offsetHeight;
         minSize = parseInt(cel.getAttribute('data-min-size'), 10) || minSize;
@@ -154,7 +154,7 @@ class GUIPanedView extends GUIElement {
  */
 class GUIPanedViewContainer extends GUIElement {
   build() {
-    GUIHelpers.setFlexbox(this.$element);
+    GUI.setFlexbox(this.$element);
     return this;
   }
 }
@@ -263,7 +263,7 @@ class GUIVBox extends GUIElement {
  */
 class GUIVBoxContainer extends GUIElement {
   build() {
-    GUIHelpers.setFlexbox(this.$element);
+    GUI.setFlexbox(this.$element);
 
     return this;
   }
@@ -301,7 +301,7 @@ class GUIHBox extends GUIElement {
  */
 class GUIHBoxContainer extends GUIElement {
   build() {
-    GUIHelpers.setFlexbox(this.$element);
+    GUI.setFlexbox(this.$element);
 
     return this;
   }

@@ -29,7 +29,7 @@
  */
 'use strict';
 
-const GUIHelpers = require('gui/helpers.js');
+const GUI = require('utils/gui.js');
 const GUIDataView = require('gui/dataview.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -37,13 +37,13 @@ const GUIDataView = require('gui/dataview.js');
 /////////////////////////////////////////////////////////////////////////////
 
 function createEntry(cls, e) {
-  const entry = GUIHelpers.createElement('gui-icon-view-entry', e);
+  const entry = GUI.createElement('gui-icon-view-entry', e);
   return entry;
 }
 
 function initEntry(cls, cel) {
   const icon = cel.getAttribute('data-icon');
-  const label = GUIHelpers.getLabel(cel);
+  const label = GUI.getLabel(cel);
 
   const dicon = document.createElement('div');
   const dimg = document.createElement('img');

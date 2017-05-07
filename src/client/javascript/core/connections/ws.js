@@ -29,11 +29,9 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const API = require('core/api.js');
 const Connection = require('core/connection.js');
+const VFSFile = require('vfs/file.js');
 
 class WSConnection extends Connection {
   constructor() {
@@ -144,7 +142,7 @@ class WSConnection extends Connection {
   message(data) {
     // Emit a VFS event when a change occures
     if ( data.action === 'vfs:watch' ) {
-      VFS.Helpers.triggerWatch(data.args.event, VFS.file(data.args.file));
+      OSjs.VFS.Helpers.triggerWatch(data.args.event, new VFSFile(data.args.file));
     }
 
     // Emit a subscription event

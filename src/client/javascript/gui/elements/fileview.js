@@ -33,10 +33,10 @@ const FS = require('utils/fs.js');
 const VFS = require('vfs/fs.js');
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const VFSFile = require('vfs/file.js');
 const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
-const GUIHelpers = require('gui/helpers.js');
 const GUIElement = require('gui/element.js');
 const GUIDataView = require('gui/dataview.js');
 
@@ -401,7 +401,7 @@ class GUIFileView extends GUIElement {
       }
       return this;
     } else if ( (['filter', 'dotfiles', 'filetype', 'extensions', 'defaultcolumns', 'sortby', 'sortdir']).indexOf(param) >= 0 ) {
-      GUIHelpers.setProperty(el, param, value);
+      GUI.setProperty(el, param, value);
       return this;
     }
 

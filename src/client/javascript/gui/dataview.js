@@ -29,14 +29,12 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const API = require('core/api.js');
+const GUI = require('utils/gui.js');
 const DOM = require('utils/dom.js');
+const VFSFile = require('vfs/file.js');
 const Events = require('utils/events.js');
 const UIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // ABSTRACTION HELPERS
@@ -143,7 +141,7 @@ function handleKeyPress(cls, el, ev) {
 
         selected.forEach(function(s) {
           if ( s && s.data ) {
-            data.push(new VFS.File(s.data.path, s.data.mime));
+            data.push(new VFSFile(s.data.path, s.data.mime));
           }
         });
 
@@ -479,13 +477,13 @@ class UIDataView extends UIElement {
 
       let source = row.getAttribute('data-draggable-source');
       if ( source === null ) {
-        source = GUIHelpers.getWindowId(el);
+        source = GUI.getWindowId(el);
         if ( source !== null ) {
           source = {wid: source};
         }
       }
 
-      GUIHelpers.createDraggable(row, {
+      GUI.createDraggable(row, {
         type: el.getAttribute('data-draggable-type') || row.getAttribute('data-draggable-type'),
         source: source,
         data: value
@@ -499,7 +497,7 @@ class UIDataView extends UIElement {
 
     el.dispatchEvent(new CustomEvent('_render', {detail: {
       element: row,
-      data: GUIHelpers.getViewNodeValue(row)
+      data: GUI.getViewNodeValue(row)
     }}));
 
     if ( el.getAttribute('data-draggable') === 'true' ) {
@@ -516,7 +514,7 @@ class UIDataView extends UIElement {
       if ( DOM.$hasClass(iter, 'gui-active') ) {
         selected.push({
           index: idx,
-          data: GUIHelpers.getViewNodeValue(iter)
+          data: GUI.getViewNodeValue(iter)
         });
       }
     });

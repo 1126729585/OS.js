@@ -30,7 +30,7 @@
 'use strict';
 
 const DOM = require('utils/dom.js');
-const GUIHelpers = require('gui/helpers.js');
+const GUI = require('utils/gui.js');
 const GUIDataView = require('gui/dataview.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ const GUIDataView = require('gui/dataview.js');
 /////////////////////////////////////////////////////////////////////////////
 
 function createEntry(cls, e) {
-  const entry = GUIHelpers.createElement('gui-tree-view-entry', e, ['entries']);
+  const entry = GUI.createElement('gui-tree-view-entry', e, ['entries']);
   return entry;
 }
 
@@ -61,7 +61,7 @@ function handleItemExpand(ev, el, root, expanded) {
 
   const selected = {
     index: DOM.$index(root),
-    data: GUIHelpers.getViewNodeValue(root)
+    data: GUI.getViewNodeValue(root)
   };
 
   root.setAttribute('data-expanded', String(expanded));
@@ -78,7 +78,7 @@ function initEntry(cls, sel) {
   sel._rendered = true;
 
   const icon = sel.getAttribute('data-icon');
-  const label = GUIHelpers.getLabel(sel);
+  const label = GUI.getLabel(sel);
   const expanded = el.getAttribute('data-expanded') === 'true';
   const next = sel.querySelector('gui-tree-view-entry');
   const container = document.createElement('div');
@@ -111,7 +111,7 @@ function initEntry(cls, sel) {
   }
 
   if ( String(sel.getAttribute('data-draggable')) === 'true' ) {
-    GUIHelpers.createDraggable(container, (() => {
+    GUI.createDraggable(container, (() => {
       let data = {};
       try {
         data = JSON.parse(sel.getAttribute('data-value'));
@@ -123,7 +123,7 @@ function initEntry(cls, sel) {
 
   if ( String(sel.getAttribute('data-droppable')) === 'true' ) {
     let timeout;
-    GUIHelpers.createDroppable(container, {
+    GUI.createDroppable(container, {
       onEnter: onDndEnter,
       onOver: onDndEnter,
       onLeave: onDndLeave,

@@ -34,7 +34,7 @@ module.exports.init = function() {
   const UIScheme = require('gui/scheme.js');
   const UIElement = require('gui/element.js');
   const UIDataView = require('gui/dataview.js');
-  const GUIHelpers = require('gui/helpers.js');
+  const GUIHelpers = require('utils/gui.js');
 
   const VFS = require('vfs/fs.js');
   const VFSFile = require('vfs/file.js');

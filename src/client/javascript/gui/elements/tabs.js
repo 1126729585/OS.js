@@ -30,9 +30,9 @@
 'use strict';
 
 const DOM = require('utils/dom.js');
+const GUI = require('utils/gui.js');
 const Events = require('utils/events.js');
 const GUIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // HELPERS
@@ -191,7 +191,7 @@ class GUITabs extends GUIElement {
     const tabs = document.createElement('ul');
 
     el.querySelectorAll('gui-tab-container').forEach((tel, idx) => {
-      createTab(el, tabs, GUIHelpers.getLabel(tel));
+      createTab(el, tabs, GUI.getLabel(tel));
       tel.setAttribute('role', 'tabpanel');
     });
 

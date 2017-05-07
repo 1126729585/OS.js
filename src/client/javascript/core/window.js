@@ -29,17 +29,15 @@
  */
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const DOM = require('utils/dom.js');
 const API = require('core/api.js');
+const GUI = require('utils/gui.js');
 const Utils = require('utils/misc.js');
 const Scheme = require('gui/scheme.js');
 const Events = require('utils/events.js');
 const Compability = require('utils/compability.js');
 const GUIElement = require('gui/element.js');
-const GUIHelpers = require('gui/helpers.js');
+const VFSFile = require('vfs/file.js');
 
 /**
  * The predefined events are as follows:
@@ -738,7 +736,7 @@ class Window {
         const border = document.createElement('div');
         border.className = 'WindowDropRect';
 
-        GUIHelpers.createDroppable(main, {
+        GUI.createDroppable(main, {
           onOver: (ev, el, args) => {
             main.setAttribute('data-dnd-state', 'true');
           },
@@ -1806,7 +1804,7 @@ class Window {
    * @param   {Event}     ev            DOM Event
    */
   _nextTabIndex(ev) {
-    const nextElement = GUIHelpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
+    const nextElement = GUI.getNextElement(ev.shiftKey, document.activeElement, this._$root);
     if ( nextElement ) {
       if ( DOM.$hasClass(nextElement, 'gui-data-view') ) {
         GUIElement.createFromNode(nextElement).focus();
@@ -1846,7 +1844,7 @@ class Window {
       if ( type === 'filesDrop' ) {
         this._emit('drop:upload', [ev, item, args, el]);
       } else if ( type === 'itemDrop' && item.type === 'file' && item.data ) {
-        this._emit('drop:file', [ev, new VFS.File(item.data || {}), args, el]);
+        this._emit('drop:file', [ev, new VFSFile(item.data || {}), args, el]);
       }
     }
 

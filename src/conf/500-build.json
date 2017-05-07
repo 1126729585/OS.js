@@ -61,7 +61,7 @@
       "src/client/javascript/utils/dom.js",
       "src/client/javascript/utils/xhr.js",
       "src/client/javascript/utils/fs.js",
-      "src/client/javascript/gui/helpers.js",
+      "src/client/javascript/utils/gui.js",
       "src/client/javascript/gui/scheme.js",
       "src/client/javascript/gui/element.js",
       "src/client/javascript/gui/dataview.js",
