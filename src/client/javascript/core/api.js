@@ -61,13 +61,13 @@ const GUIHelpers = require('gui/helpers.js');
  * Please note that there are some more methods defined in `process.js`
  */
 
-var DefaultLocale = 'en_EN';
-var CurrentLocale = 'en_EN';
+let DefaultLocale = 'en_EN';
+let CurrentLocale = 'en_EN';
 
-var _CLIPBOARD;         // Current 'clipboard' data
-var _LAUNCHING = [];
+let _CLIPBOARD;         // Current 'clipboard' data
+let _LAUNCHING = [];
 
-var _hooks = {
+const _hooks = {
   'onInitialize': [],
   'onInited': [],
   'onWMInited': [],
@@ -98,21 +98,20 @@ function ServiceNotificationIcon() {
 }
 
 ServiceNotificationIcon.prototype.init = function() {
-  var wm = OSjs.Core.getWindowManager();
-  var self = this;
+  const wm = OSjs.Core.getWindowManager();
 
-  function show(ev) {
-    self.displayMenu(ev);
+  const show = (ev) => {
+    this.displayMenu(ev);
     return false;
-  }
+  };
 
   if ( wm ) {
     this.notif = wm.createNotificationIcon('ServiceNotificationIcon', {
       image: module.exports.getIcon('status/dialog-password.png'),
       onContextMenu: show,
       onClick: show,
-      onInited: function(el, img) {
-        self._updateIcon();
+      onInited: (el, img) => {
+        this._updateIcon();
       }
     });
 
@@ -124,7 +123,7 @@ ServiceNotificationIcon.prototype.init = function() {
  * Destroys the notification icon
  */
 ServiceNotificationIcon.prototype.destroy = function() {
-  var wm = OSjs.Core.getWindowManager();
+  const wm = OSjs.Core.getWindowManager();
   if ( wm ) {
     wm.removeNotificationIcon('ServiceNotificationIcon');
   }
@@ -147,10 +146,10 @@ ServiceNotificationIcon.prototype._updateIcon = function() {
  * Show the menu
  */
 ServiceNotificationIcon.prototype.displayMenu = function(ev) {
-  var menu = [];
-  var entries = this.entries;
+  const menu = [];
+  const entries = this.entries;
 
-  Object.keys(entries).forEach(function(name) {
+  Object.keys(entries).forEach((name) => {
     menu.push({
       title: name,
       menu: entries[name]
@@ -201,10 +200,9 @@ ServiceNotificationIcon.prototype.remove = function(name) {
 module.exports._ = function() {
   const userLocale = require('locales/' + CurrentLocale + '.js');
   const systemLocale = require('locales/' + DefaultLocale + '.js');
+  const s = arguments[0];
 
-  var s = arguments[0];
-  var a = arguments;
-
+  let a = arguments;
   try {
     if ( userLocale && userLocale[s] ) {
       a[0] = userLocale[s];
@@ -230,10 +228,10 @@ module.exports._ = function() {
  * @return {String}
  */
 module.exports.__ = function() {
-  var l = arguments[0];
-  var s = arguments[1];
-  var a = Array.prototype.slice.call(arguments, 1);
+  const l = arguments[0];
+  const s = arguments[1];
 
+  let a = Array.prototype.slice.call(arguments, 1);
   if ( l[CurrentLocale] && l[CurrentLocale][s] ) {
     a[0] = l[CurrentLocale][s];
   } else {
@@ -267,7 +265,7 @@ module.exports.getLocale = function() {
  * @param  {String}   l     Locale name
  */
 module.exports.setLocale = function(l) {
-  var RTL = module.exports.getConfig('LocaleOptions.RTL', []);
+  const RTL = module.exports.getConfig('LocaleOptions.RTL', []);
 
   const locale = require('locales/' + l + '.js');
   if ( locale ) {
@@ -277,8 +275,8 @@ module.exports.setLocale = function(l) {
     CurrentLocale = DefaultLocale;
   }
 
-  var major = CurrentLocale.split('_')[0];
-  var html = document.querySelector('html');
+  const major = CurrentLocale.split('_')[0];
+  const html = document.querySelector('html');
   if ( html ) {
     html.setAttribute('lang', l);
     html.setAttribute('dir', RTL.indexOf(major) !== -1 ? 'rtl' : 'ltr');
@@ -308,7 +306,7 @@ module.exports.curl = function(args, callback) {
   args = args || {};
   callback = callback || {};
 
-  var opts = args.body;
+  let opts = args.body;
   if ( typeof opts === 'object' ) {
     console.warn('DEPRECATION WARNING', 'The \'body\' wrapper is no longer needed');
   } else {
@@ -335,12 +333,12 @@ module.exports.curl = function(args, callback) {
  * @param   {Object}    [options]                   Options (all options except the ones listed below are sent to Connection)
  * @param   {Boolean}   [options.indicator=true]    Show loading indicator
  */
-var _CALL_INDEX = 1;
+let _CALL_INDEX = 1;
 module.exports.call = function(m, a, cb, options) {
   a = a || {};
   options = options || {};
 
-  var lname = 'APICall_' + _CALL_INDEX;
+  const lname = 'APICall_' + _CALL_INDEX;
 
   if ( typeof cb !== 'function' ) {
     throw new TypeError('call() expects a function as callback');
@@ -360,7 +358,7 @@ module.exports.call = function(m, a, cb, options) {
 
   _CALL_INDEX++;
 
-  var conn = OSjs.Core.getConnection();
+  const conn = OSjs.Core.getConnection();
   return conn.request(m, a, function API_call_success(response) {
     module.exports.destroyLoading(lname);
     response = response || {};
@@ -387,23 +385,25 @@ module.exports.call = function(m, a, cb, options) {
  * @param   {Object}          launchArgs    Arguments to send to process launch function
  */
 module.exports.open = function(file, launchArgs) {
+  const VFSFile = require('vfs/file.js');
+
   launchArgs = launchArgs || {};
 
   if ( !file.path ) {
     throw new Error('Cannot API::open() without a path');
   }
 
-  var settingsManager = OSjs.Core.getSettingsManager();
-  var wm = OSjs.Core.getWindowManager();
-  var args = {file: file};
+  const settingsManager = OSjs.Core.getSettingsManager();
+  const wm = OSjs.Core.getWindowManager();
+  const args = {file: file};
 
   function getApplicationNameByFile(file, forceList, callback) {
-    if ( !(file instanceof OSjs.VFS.File) ) {
+    if ( !(file instanceof VFSFile) ) {
       throw new Error('This function excepts a OSjs.VFS.File object');
     }
 
-    var pacman = OSjs.Core.getPackageManager();
-    var val = settingsManager.get('DefaultApplication', file.mime);
+    const pacman = OSjs.Core.getPackageManager();
+    const val = settingsManager.get('DefaultApplication', file.mime);
 
     console.debug('getApplicationNameByFile()', 'default application', val);
     if ( !forceList && val ) {
@@ -445,7 +445,7 @@ module.exports.open = function(file, launchArgs) {
           module.exports.createDialog('ApplicationChooser', {
             file: file,
             list: app
-          }, function(ev, btn, result) {
+          }, (ev, btn, result) => {
             if ( btn !== 'ok' ) {
               return;
             }
@@ -472,11 +472,11 @@ module.exports.open = function(file, launchArgs) {
   if ( file.mime === 'osjs/application' ) {
     _launchApp(FS.filename(file.path), launchArgs);
   } else if ( file.type === 'dir' ) {
-    var fm = settingsManager.instance('DefaultApplication').get('dir', 'ApplicationFileManager');
+    const fm = settingsManager.instance('DefaultApplication').get('dir', 'ApplicationFileManager');
     _launchApp(fm, {path: file.path});
   } else {
     if ( launchArgs.args ) {
-      Object.keys(launchArgs.args).forEach(function(i) {
+      Object.keys(launchArgs.args).forEach((i) => {
         args[i] = launchArgs.args[i];
       });
     }
@@ -497,11 +497,12 @@ module.exports.open = function(file, launchArgs) {
  */
 module.exports.relaunch = function(n) {
   const Process = require('core/process.js');
+  const Application = require('core/application.js');
 
   function relaunch(p) {
-    var data = null;
-    var args = {};
-    if ( p instanceof OSjs.Core.Application ) {
+    let data = null;
+    let args = {};
+    if ( p instanceof Application ) {
       data = p._getSessionData();
     }
 
@@ -522,12 +523,12 @@ module.exports.relaunch = function(n) {
 
     //setTimeout with 500 ms is used to allow applications that might need
     //  some time to destroy resources before it can be relaunched.
-    setTimeout(function() {
+    setTimeout(() => {
       module.exports.launch(n, args);
     }, 500);
   }
 
-  var res = Process.getProcess(n);
+  let res = Process.getProcess(n);
   if ( !(res instanceof Array) ) {
     res = [res];
   }
@@ -547,7 +548,9 @@ module.exports.relaunch = function(n) {
  * @param   {Function}    [onconstruct]   Callback on application init
  */
 module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
+  const VFS = require('vfs/fs.js');
   const Process = require('core/process.js');
+  const Application = require('core/application.js');
 
   args = args || {};
 
@@ -556,25 +559,25 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
     return;
   }
 
-  var err;
+  let err;
 
-  var splash = null;
-  var instance = null;
-  var pargs = {};
+  let splash = null;
+  let instance = null;
+  let pargs = {};
 
-  var packman = OSjs.Core.getPackageManager();
-  var compability = Compability.getCompability();
-  var metadata = packman.getPackage(name);
-  var running = Process.getProcess(name, true);
-  var launchIndex = -1;
+  const packman = OSjs.Core.getPackageManager();
+  const compability = Compability.getCompability();
+  const metadata = packman.getPackage(name);
+  const running = Process.getProcess(name, true);
 
-  var preloads = (function() {
-    var list = (metadata.preload || []).slice(0);
-    var additions = [];
+  let launchIndex = -1;
+  let preloads = (() => {
+    let list = (metadata.preload || []).slice(0);
+    let additions = [];
 
     function _add(chk) {
       if ( chk && chk.preload ) {
-        chk.preload.forEach(function(p) {
+        chk.preload.forEach((p) => {
           additions.push(p);
         });
       }
@@ -583,7 +586,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
     // If this package depends on another package, make sure
     // to load the resources for the related one as well
     if ( metadata.depends instanceof Array ) {
-      metadata.depends.forEach(function(k) {
+      metadata.depends.forEach((k) => {
         if ( !OSjs.Applications[k] ) {
           console.info('Using dependency', k);
           _add(packman.getPackage(k));
@@ -593,9 +596,9 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
 
     // ... same goes for packages that uses this package
     // as a dependency.
-    var pkgs = packman.getPackages(false);
-    Object.keys(pkgs).forEach(function(pn) {
-      var p = pkgs[pn];
+    const pkgs = packman.getPackages(false);
+    Object.keys(pkgs).forEach((pn) => {
+      const p = pkgs[pn];
       if ( p.type === 'extension' && p.uses === name ) {
         console.info('Using extension', pn);
         _add(p);
@@ -607,9 +610,9 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
 
     // For user packages, make sure to load the correct URL
     if ( metadata.scope === 'user' ) {
-      list = list.map(function(p) {
+      list = list.map((p) => {
         if ( p.src.substr(0, 1) !== '/' && !p.src.match(/^(https?|ftp)/) ) {
-          OSjs.VFS.url(p.src, function(error, url) {
+          VFS.url(p.src, (error, url) => {
             if ( !error ) {
               p.src = url;
             }
@@ -665,8 +668,8 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
   }
 
   function _preLaunch(cb) {
-    var isCompatible = (function() {
-      var list = (metadata.compability || []).filter(function(c) {
+    const isCompatible = (() => {
+      const list = (metadata.compability || []).filter((c) => {
         if ( typeof compability[c] !== 'undefined' ) {
           return !compability[c];
         }
@@ -687,7 +690,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
       launchIndex = _LAUNCHING.push(name) - 1;
 
       if ( running ) {
-        if ( running instanceof OSjs.Core.Application ) {
+        if ( running instanceof Application ) {
           // In this case we do not trigger an error. Applications simply get a signal for attention
           console.warn('API::launch()', 'detected that this application is a singular and already running...');
           running._onMessage('attention', args);
@@ -700,7 +703,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
     }
 
     Utils.asyncs(_hooks.onApplicationPreload, function asyncIter(qi, i, n) {
-      qi(name, args, preloads, function(p) {
+      qi(name, args, preloads, (p) => {
         if ( p && (p instanceof Array) ) {
           preloads = p;
         }
@@ -754,7 +757,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
     function __onschemesloaded(scheme) {
       try {
         if ( metadata.classType === 'simple' ) {
-          instance = new OSjs.Core.Application(name, args, metadata);
+          instance = new Application(name, args, metadata);
           OSjs.Applications[name].run(instance);
         } else {
           instance = new OSjs.Applications[name].Class(args, metadata);
@@ -769,7 +772,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
       }
 
       try {
-        var settings = OSjs.Core.getSettingsManager().get(instance.__pname) || {};
+        const settings = OSjs.Core.getSettingsManager().get(instance.__pname) || {};
         instance.init(settings, metadata, scheme);
 
         module.exports.triggerHook('onApplicationLaunched', [{
@@ -789,9 +792,9 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
       return true;
     }
 
-    var scheme = null;
+    let scheme = null;
     if ( preloadData ) {
-      preloadData.forEach(function(f) {
+      preloadData.forEach((f) => {
         if ( !scheme && f.item.type === 'scheme' ) {
           scheme = f.data;
         }
@@ -822,7 +825,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
     delete args.__preload__;
   }
 
-  pargs.max = (function(p) {
+  pargs.max = ((p) => {
     if ( p === true ) {
       p = module.exports.getConfig('Connection.PreloadParallel');
     }
@@ -879,9 +882,10 @@ module.exports.launchList = function(list, onSuccess, onError, onFinished) {
 
   Utils.asyncs(list, function asyncIter(s, current, next) {
     if ( typeof s === 'string' ) {
-      var args = {};
-      var spl = s.split('@');
-      var name = spl[0];
+      const spl = s.split('@');
+      const name = spl[0];
+
+      let args = {};
       if ( typeof spl[1] !== 'undefined' ) {
         try {
           args = JSON.parse(spl[1]);
@@ -894,8 +898,8 @@ module.exports.launchList = function(list, onSuccess, onError, onFinished) {
       };
     }
 
-    var aname = s.name;
-    var aargs = (typeof s.args === 'undefined') ? {} : (s.args || {});
+    const aname = s.name;
+    const aargs = (typeof s.args === 'undefined') ? {} : (s.args || {});
 
     if ( !aname ) {
       console.warn('API::launchList() next()', 'No application name defined');
@@ -939,7 +943,7 @@ module.exports.getApplicationResource = function(app, name, vfspath) {
   name = name.replace(/^\.\//, '');
 
   function getName() {
-    var appname = null;
+    let appname = null;
     if ( app instanceof Process ) {
       appname = app.__pname;
     } else if ( typeof app === 'string' ) {
@@ -961,12 +965,12 @@ module.exports.getApplicationResource = function(app, name, vfspath) {
     return path;
   }
 
-  return (function() {
-    var pacman = OSjs.Core.getPackageManager();
-    var appname = getName();
-    var pkg = pacman.getPackage(appname);
-    var path = '';
+  return (() => {
+    const pacman = OSjs.Core.getPackageManager();
+    const appname = getName();
+    const pkg = pacman.getPackage(appname);
 
+    let path = '';
     if ( pkg ) {
       if ( pkg.scope === 'user' ) {
         path = '/user-package/' + FS.filename(pkg.path) + '/' + name.replace(/^\//, '');
@@ -990,7 +994,7 @@ module.exports.getApplicationResource = function(app, name, vfspath) {
  * @return  {String}            The absolute URL of css file
  */
 module.exports.getThemeCSS = function(name) {
-  var root = module.exports.getConfig('Connection.RootURI', '/');
+  let root = module.exports.getConfig('Connection.RootURI', '/');
   if ( name === null ) {
     return root + 'blank.css';
   }
@@ -1012,17 +1016,19 @@ module.exports.getThemeCSS = function(name) {
  * @return  {String}            The absolute URL to the icon
  */
 module.exports.getFileIcon = function(file, size, icon) {
+  const VFSFile = require('vfs/file.js');
+
   icon = icon || 'mimetypes/text-x-preview.png';
 
-  if ( typeof file === 'object' && !(file instanceof OSjs.VFS.File) ) {
-    file = new OSjs.VFS.File(file);
+  if ( typeof file === 'object' && !(file instanceof VFSFile) ) {
+    file = new VFSFile(file);
   }
 
   if ( !file.filename ) {
     throw new Error('Filename is required for getFileIcon()');
   }
 
-  var map = [
+  const map = [
     {match: 'application/pdf', icon: 'mimetypes/x-office-document.png'},
     {match: 'application/zip', icon: 'mimetypes/package-x-generic.png'},
     {match: 'application/x-python', icon: 'mimetypes/text-x-script.png'},
@@ -1047,18 +1053,18 @@ module.exports.getFileIcon = function(file, size, icon) {
   } else if ( file.type === 'trash' ) {
     icon = 'places/user-trash.png';
   } else if ( file.type === 'application' ) {
-    var pm = OSjs.Core.getPackageManager();
-    var appname = FS.filename(file.path);
-    var meta = pm.getPackage(appname);
+    const pm = OSjs.Core.getPackageManager();
+    const appname = FS.filename(file.path);
+    const meta = pm.getPackage(appname);
 
     if ( meta ) {
       return module.exports.getIcon(meta.icon, size, appname);
     }
   } else {
-    var mime = file.mime || 'application/octet-stream';
+    const mime = file.mime || 'application/octet-stream';
 
-    map.every(function(iter) {
-      var match = false;
+    map.every((iter) => {
+      let match = false;
       if ( typeof iter.match === 'string' ) {
         match = (mime === iter.match);
       } else {
@@ -1092,7 +1098,7 @@ module.exports.getThemeResource = function(name, type) {
   name = name || null;
   type = type || null;
 
-  var root = module.exports.getConfig('Connection.ThemeURI');
+  const root = module.exports.getConfig('Connection.ThemeURI');
 
   function getName(str, theme) {
     if ( !str.match(/^\//) ) {
@@ -1106,8 +1112,8 @@ module.exports.getThemeResource = function(name, type) {
   }
 
   if ( name ) {
-    var wm = OSjs.Core.getWindowManager();
-    var theme = (wm ? wm.getSetting('theme') : 'default') || 'default';
+    const wm = OSjs.Core.getWindowManager();
+    const theme = (wm ? wm.getSetting('theme') : 'default') || 'default';
     name = getName(name, theme);
   }
 
@@ -1127,12 +1133,12 @@ module.exports.getThemeResource = function(name, type) {
 module.exports.getSound = function(name) {
   name = name || null;
   if ( name ) {
-    var wm = OSjs.Core.getWindowManager();
-    var theme = wm ? wm.getSoundTheme() : 'default';
-    var root = module.exports.getConfig('Connection.SoundURI');
-    var compability = Compability.getCompability();
+    const wm = OSjs.Core.getWindowManager();
+    const theme = wm ? wm.getSoundTheme() : 'default';
+    const root = module.exports.getConfig('Connection.SoundURI');
+    const compability = Compability.getCompability();
     if ( !name.match(/^\//) ) {
-      var ext = 'oga';
+      let ext = 'oga';
       if ( !compability.audioTypes.ogg ) {
         ext = 'mp3';
       }
@@ -1155,18 +1161,20 @@ module.exports.getSound = function(name) {
  * @return  {String}            The absolute URL to the resource
  */
 module.exports.getIcon = function(name, size, app) {
+  const Application = require('core/application.js');
+
   name = name || null;
   size = size || '16x16';
   app  = app  || null;
 
-  var root = module.exports.getConfig('Connection.IconURI');
-  var wm = OSjs.Core.getWindowManager();
-  var theme = wm ? wm.getIconTheme() : 'default';
+  const root = module.exports.getConfig('Connection.IconURI');
+  const wm = OSjs.Core.getWindowManager();
+  const theme = wm ? wm.getIconTheme() : 'default';
 
   function checkIcon() {
     if ( name.match(/^\.\//) ) {
       name = name.replace(/^\.\//, '');
-      if ( (app instanceof OSjs.Core.Application) || (typeof app === 'string') ) {
+      if ( (app instanceof Application) || (typeof app === 'string') ) {
         return module.exports.getApplicationResource(app, name);
       } else {
         if ( app !== null && typeof app === 'object' ) {
@@ -1184,7 +1192,7 @@ module.exports.getIcon = function(name, size, app) {
   }
 
   if ( name && !name.match(/^(http|\/\/)/) ) {
-    var chk = checkIcon();
+    const chk = checkIcon();
     if ( chk !== null ) {
       return chk;
     }
@@ -1206,14 +1214,14 @@ module.exports.getIcon = function(name, size, app) {
  * @return  {Mixed}             Parameter value or entire tree on no path
  */
 module.exports.getConfig = function(path, defaultValue) {
-  var config = OSjs.Core.getConfig();
+  const config = OSjs.Core.getConfig();
   if ( typeof path === 'string' ) {
-    var result = config[path];
+    let result = config[path];
     if ( path.indexOf('.') !== -1 ) {
-      var queue = path.split(/\./);
-      var ns = config;
+      const queue = path.split(/\./);
 
-      queue.forEach(function(k, i) {
+      let ns = config;
+      queue.forEach((k, i) => {
         if ( i >= queue.length - 1 ) {
           if ( ns ) {
             result = ns[k];
@@ -1265,7 +1273,7 @@ module.exports.getDefaultPath = function(fallback) {
  * @return {Object}   The created notification instance
  */
 module.exports.createNotification = function(opts) {
-  var wm = OSjs.Core.getWindowManager();
+  const wm = OSjs.Core.getWindowManager();
   return wm.notification(opts);
 };
 
@@ -1290,12 +1298,13 @@ module.exports.createDialog = function(className, args, callback, options) {
   callback = callback || function() {};
   options = options || {};
 
+  const Application = require('core/application.js');
   const Process = require('core/process.js');
   const Window = require('core/window.js');
 
-  var parentObj = options;
-  var parentIsWindow = (parentObj instanceof Window);
-  var parentIsProcess = (parentObj instanceof Process);
+  let parentObj = options;
+  let parentIsWindow = (parentObj instanceof Window);
+  let parentIsProcess = (parentObj instanceof Process);
   if ( parentObj && !(parentIsWindow && parentIsProcess) ) {
     parentObj = options.parent;
     parentIsWindow = (parentObj instanceof Window);
@@ -1321,19 +1330,19 @@ module.exports.createDialog = function(className, args, callback, options) {
     callback.apply(null, arguments);
   }
 
-  var win = typeof className === 'string' ? new OSjs.Dialogs[className](args, cb) : className(args, cb);
+  const win = typeof className === 'string' ? new OSjs.Dialogs[className](args, cb) : className(args, cb);
 
   if ( !parentObj ) {
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     wm.addWindow(win, true);
-  } else if ( parentObj instanceof OSjs.Core.Window ) {
-    win._on('destroy', function() {
+  } else if ( parentObj instanceof Window ) {
+    win._on('destroy', () => {
       if ( parentObj ) {
         parentObj._focus();
       }
     });
     parentObj._addChild(win, true);
-  } else if ( parentObj instanceof OSjs.Core.Application ) {
+  } else if ( parentObj instanceof Application ) {
     parentObj._addWindow(win);
   }
 
@@ -1341,7 +1350,7 @@ module.exports.createDialog = function(className, args, callback, options) {
     parentObj._toggleDisabled(true);
   }
 
-  setTimeout(function() {
+  setTimeout(() => {
     win._focus();
   }, 10);
 
@@ -1362,7 +1371,7 @@ module.exports.createDialog = function(className, args, callback, options) {
  */
 module.exports.createLoading = function(name, opts, panelId) {
   try {
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( wm.createNotificationIcon(name, opts, panelId) ) {
       return name;
     }
@@ -1386,7 +1395,7 @@ module.exports.createLoading = function(name, opts, panelId) {
  */
 module.exports.destroyLoading = function(name, panelId) {
   try {
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( wm.removeNotificationIcon(name, panelId) ) {
       return true;
     }
@@ -1408,16 +1417,16 @@ module.exports.destroyLoading = function(name, panelId) {
  * @return {Boolean}
  */
 module.exports.checkPermission = function(group) {
-  var user = OSjs.Core.getAuthenticator().getUser();
-  var userGroups = user.groups || [];
+  const user = OSjs.Core.getAuthenticator().getUser();
+  const userGroups = user.groups || [];
 
   if ( !(group instanceof Array) ) {
     group = [group];
   }
 
-  var result = true;
+  let result = true;
   if ( userGroups.indexOf('admin') < 0 ) {
-    group.every(function(g) {
+    group.every((g) => {
       if ( userGroups.indexOf(g) < 0 ) {
         result = false;
       }
@@ -1444,25 +1453,25 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
   label = label || module.exports._('LBL_STARTING');
   parentEl = parentEl || document.body;
 
-  var splash = document.createElement('application-splash');
+  let splash = document.createElement('application-splash');
   splash.setAttribute('role', 'dialog');
 
-  var img;
+  let img;
   if ( icon ) {
     img = document.createElement('img');
     img.alt = name;
     img.src = module.exports.getIcon(icon);
   }
 
-  var titleText = document.createElement('b');
+  let titleText = document.createElement('b');
   titleText.appendChild(document.createTextNode(name));
 
-  var title = document.createElement('span');
+  let title = document.createElement('span');
   title.appendChild(document.createTextNode(label + ' '));
   title.appendChild(titleText);
   title.appendChild(document.createTextNode('...'));
 
-  var progressBar;
+  let progressBar;
 
   if ( img ) {
     splash.appendChild(img);
@@ -1479,7 +1488,7 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
   parentEl.appendChild(splash);
 
   return {
-    destroy: function() {
+    destroy: () => {
       splash = DOM.$remove(splash);
 
       img = null;
@@ -1488,12 +1497,12 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
       progressBar = null;
     },
 
-    update: function(p, c) {
+    update: (p, c) => {
       if ( !splash || !progressBar ) {
         return;
       }
 
-      var per = c ? 0 : 100;
+      let per = c ? 0 : 100;
       if ( c ) {
         per = (p / c) * 100;
       }
@@ -1519,7 +1528,7 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
  * @param   {Boolean}   [bugreport=false]   Enable bugreporting for this error
  */
 module.exports.error = function(title, message, error, exception, bugreport) {
-  bugreport = (function() {
+  bugreport = (() => {
     if ( module.exports.getConfig('BugReporting.enabled') ) {
       return typeof bugreport === 'undefined' ? false : (bugreport ? true : false);
     }
@@ -1527,7 +1536,7 @@ module.exports.error = function(title, message, error, exception, bugreport) {
   })();
 
   function _dialog() {
-    var wm = OSjs.Core.getWindowManager();
+    const wm = OSjs.Core.getWindowManager();
     if ( wm && wm._fullyLoaded ) {
       try {
         module.exports.createDialog('Error', {
@@ -1584,9 +1593,9 @@ module.exports.error = function(title, message, error, exception, bugreport) {
  * @return {Audio}
  */
 module.exports.playSound = function(name, volume) {
-  var compability = Compability.getCompability();
-  var wm = OSjs.Core.getWindowManager();
-  var filename = wm ? wm.getSoundFilename(name) : null;
+  const compability = Compability.getCompability();
+  const wm = OSjs.Core.getWindowManager();
+  const filename = wm ? wm.getSoundFilename(name) : null;
 
   if ( !wm || !compability.audio || !wm.getSetting('enableSounds') || !filename ) {
     console.debug('API::playSound()', 'Cannot play sound!');
@@ -1597,10 +1606,10 @@ module.exports.playSound = function(name, volume) {
     volume = 1.0;
   }
 
-  var f = module.exports.getSound(filename);
+  const f = module.exports.getSound(filename);
   console.debug('API::playSound()', name, filename, f, volume);
 
-  var a = new Audio(f);
+  const a = new Audio(f);
   a.volume = volume;
   a.play();
   return a;
@@ -1647,7 +1656,7 @@ module.exports.getClipboard = function() {
  * @return  {ServiceNotificationIcon}
  */
 module.exports.getServiceNotificationIcon = (function() {
-  var _instance;
+  let _instance;
 
   return function _apiGetServiceNotificationIcon() {
     if ( !_instance ) {
@@ -1668,7 +1677,7 @@ module.exports.getServiceNotificationIcon = (function() {
  */
 module.exports.toggleFullscreen = (function() {
 
-  var _prev;
+  let _prev;
 
   function trigger(el, state) {
     function _request() {
@@ -1741,7 +1750,7 @@ module.exports.isStandalone = function() {
  * @return {String}
  */
 module.exports.getBrowserPath = function(app) {
-  var str = module.exports.getConfig('Connection.RootURI');
+  let str = module.exports.getConfig('Connection.RootURI');
   if ( typeof app === 'string' ) {
     str = str.replace(/\/?$/, app.replace(/^\/?/, '/'));
   }
@@ -1755,9 +1764,9 @@ module.exports.getBrowserPath = function(app) {
  * @memberof OSjs.API
  */
 module.exports.signOut = function() {
-  var auth = OSjs.Core.getAuthenticator();
-  var storage = OSjs.Core.getStorage();
-  var wm = OSjs.Core.getWindowManager();
+  const auth = OSjs.Core.getAuthenticator();
+  const storage = OSjs.Core.getStorage();
+  const wm = OSjs.Core.getWindowManager();
 
   function signOut(save) {
     module.exports.playSound('LOGOUT');
@@ -1776,7 +1785,7 @@ module.exports.signOut = function() {
   }
 
   if ( wm ) {
-    var user = auth.getUser() || {name: module.exports._('LBL_UNKNOWN')};
+    const user = auth.getUser() || {name: module.exports._('LBL_UNKNOWN')};
     module.exports.createDialog('Confirm', {
       title: module.exports._('DIALOG_LOGOUT_TITLE'),
       message: module.exports._('DIALOG_LOGOUT_MSG_FMT', user.name)
