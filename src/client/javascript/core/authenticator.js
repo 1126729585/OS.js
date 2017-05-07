@@ -30,10 +30,9 @@
 
 'use strict';
 
-// FIXME
-const Utils = OSjs.Utils;
-
 const API = require('core/api.js');
+const Utils = require('utils/misc.js');
+const Compability = require('utils/compability.js');
 
 let _instance;
 
@@ -182,7 +181,7 @@ class Authenticator {
     // Ensure we get the user-selected locale configured from WM
     function getUserLocale() {
       let curLocale = API.getConfig('Locale');
-      let detectedLocale = Utils.getUserLocale();
+      let detectedLocale = Compability.getUserLocale();
 
       if ( API.getConfig('LocaleOptions.AutoDetect', true) && detectedLocale ) {
         console.info('Auto-detected user locale via browser', detectedLocale);

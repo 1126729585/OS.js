@@ -31,7 +31,6 @@
 
 // FIXME
 const VFS = OSjs.VFS;
-const Utils = OSjs.Utils;
 
 const API = require('core/api.js');
 const Connection = require('core/connection.js');

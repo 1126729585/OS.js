@@ -29,11 +29,12 @@
  */
 'use strict';
 
-// FIXME
-const Utils = OSjs.Utils;
-const GUI = OSjs.GUI;
-
+const FS = require('utils/fs.js');
 const API = require('core/api.js');
+const XHR = require('utils/xhr.js');
+const DOM = require('utils/dom.js');
+const Utils = require('utils/misc.js');
+const GUIElement = require('gui/element.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // INTERNAL HELPERS
@@ -75,7 +76,7 @@ function resolveFragments(scheme, node) {
             console.warn('Fragment', id, 'not found');
           }
         }
-        Utils.$remove(el); // Or else we'll never get out of the loop!
+        DOM.$remove(el); // Or else we'll never get out of the loop!
       });
       return true;
     }
@@ -137,8 +138,8 @@ function resolveExternalFragments(root, html, cb) {
       return;
     }
 
-    Utils.ajax({
-      url: Utils.pathJoin(root, uri),
+    XHR.ajax({
+      url: FS.pathJoin(root, uri),
       onsuccess: function(h) {
         let tmp = document.createElement('div');
         tmp.innerHTML = cleanScheme(h);
@@ -196,7 +197,7 @@ class UIScheme {
    * Destroys the instance
    */
   destroy() {
-    Utils.$empty(this.scheme);
+    DOM.$empty(this.scheme);
 
     this.scheme = null;
     this.triggers = {};
@@ -240,7 +241,7 @@ class UIScheme {
       console.group('Scheme::_load() validation', src);
       this.scheme.querySelectorAll('*').forEach((node) => {
         const tagName = node.tagName.toLowerCase();
-        const gelData = GUI.Element.getRegisteredElement(tagName);
+        const gelData = GUIElement.getRegisteredElement(tagName);
         if ( gelData ) {
           const ac = gelData.metadata.allowedChildren;
           if ( ac instanceof Array && ac.length ) {
@@ -302,8 +303,8 @@ class UIScheme {
       src = API.getBrowserPath(src);
     }
 
-    const root = Utils.dirname(src);
-    Utils.ajax({
+    const root = FS.dirname(src);
+    XHR.ajax({
       url: src,
       onsuccess: (html) => {
         html = cleanScheme(html);
@@ -379,7 +380,7 @@ class UIScheme {
         resolveFragments(this, node);
       }
 
-      GUI.Element.parseNode(win, node, type, args, onparse, id);
+      GUIElement.parseNode(win, node, type, args, onparse, id);
 
       return node;
     }
@@ -399,7 +400,7 @@ class UIScheme {
    */
   render(win, id, root, type, onparse, args) {
     root = root || win._getRoot();
-    if ( root instanceof GUI.Element ) {
+    if ( root instanceof GUIElement ) {
       root = root.$element;
     }
 
@@ -429,7 +430,7 @@ class UIScheme {
     addChildren(content, root);
 
     root.querySelectorAll('application-fragment').forEach((e) => {
-      Utils.$remove(e);
+      DOM.$remove(e);
     });
 
     if ( !win._restored ) {
@@ -444,7 +445,7 @@ class UIScheme {
     if ( win ) {
       return win._create(tagName, params, parentNode, applyArgs);
     }
-    return GUI.Element.createInto(tagName, params, parentNode, applyArgs);
+    return GUIElement.createInto(tagName, params, parentNode, applyArgs);
   }
 
   find(win, id, root) {

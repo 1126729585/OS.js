@@ -32,9 +32,13 @@
 // FIXME
 const GUI = OSjs.GUI;
 const VFS = OSjs.VFS;
-const Utils = OSjs.Utils;
 
+const DOM = require('utils/dom.js');
 const API = require('core/api.js');
+const Utils = require('utils/misc.js');
+const Scheme = require('gui/scheme.js');
+const Events = require('utils/events.js');
+const Compability = require('utils/compability.js');
 
 /**
  * The predefined events are as follows:
@@ -105,7 +109,13 @@ function getWindowSpace() {
   if ( wm ) {
     return wm.getWindowSpace();
   }
-  return Utils.getRect();
+
+  return {
+    top: 0,
+    left: 0,
+    width: document.body.offsetWidth,
+    height: document.body.offsetHeight
+  };
 }
 
 /*
@@ -251,7 +261,7 @@ class Window {
       throw new TypeError('appRef given was not instance of Core.Application');
     }
 
-    if ( schemeRef && !(schemeRef instanceof GUI.Scheme) ) {
+    if ( schemeRef && !(schemeRef instanceof Scheme) ) {
       throw new TypeError('schemeRef given was not instance of GUI.Scheme');
     }
 
@@ -617,11 +627,11 @@ class Window {
     }
 
     // Create DOM
-    this._$element = Utils.$create('application-window', {
+    this._$element = DOM.$create('application-window', {
       className: ((n, t) => {
-        const classNames = ['Window', Utils.$safeName(n)];
+        const classNames = ['Window', DOM.$safeName(n)];
         if ( t && (n !== t) ) {
-          classNames.push(Utils.$safeName(t));
+          classNames.push(DOM.$safeName(t));
         }
         return classNames;
       })(this._name, this._tag).join(' '),
@@ -668,8 +678,8 @@ class Window {
     windowTitle.setAttribute('role', 'heading');
 
     // Bind events
-    Utils.$bind(this._$loading, 'mousedown', _noEvent);
-    Utils.$bind(this._$disabled, 'mousedown', _noEvent);
+    Events.$bind(this._$loading, 'mousedown', _noEvent);
+    Events.$bind(this._$disabled, 'mousedown', _noEvent);
 
     let preventTimeout;
     const _onanimationend = (ev) => {
@@ -683,15 +693,15 @@ class Window {
       }
     };
 
-    Utils.$bind(this._$element, 'transitionend', _onanimationend);
-    Utils.$bind(this._$element, 'animationend', _onanimationend);
+    Events.$bind(this._$element, 'transitionend', _onanimationend);
+    Events.$bind(this._$element, 'animationend', _onanimationend);
 
-    Utils.$bind(this._$element, 'mousedown', (ev) => {
+    Events.$bind(this._$element, 'mousedown', (ev) => {
       this._focus();
     });
 
-    Utils.$bind(this._$element, 'contextmenu', (ev) => {
-      const r = Utils.$isFormElement(ev);
+    Events.$bind(this._$element, 'contextmenu', (ev) => {
+      const r = DOM.$isFormElement(ev);
 
       if ( !r ) {
         ev.preventDefault();
@@ -703,7 +713,7 @@ class Window {
       return !!r;
     });
 
-    Utils.$bind(this._$top, 'click', (ev) => {
+    Events.$bind(this._$top, 'click', (ev) => {
       const t = ev.isTrusted ? ev.target : (ev.relatedTarget || ev.target);
 
       ev.preventDefault();
@@ -717,8 +727,8 @@ class Window {
       }
     }, true);
 
-    Utils.$bind(windowTitle, 'mousedown', _noEvent);
-    Utils.$bind(windowTitle, 'dblclick', () => {
+    Events.$bind(windowTitle, 'mousedown', _noEvent);
+    Events.$bind(windowTitle, 'dblclick', () => {
       this._maximize();
     });
 
@@ -750,14 +760,14 @@ class Window {
           }
         });
       }
-    })(this._properties, this._$element, Utils.getCompability());
+    })(this._properties, this._$element, Compability.getCompability());
 
     // Append to DOM
     windowTitle.appendChild(document.createTextNode(this._title));
 
     this._$top.appendChild(this._$winicon);
     this._$top.appendChild(windowTitle);
-    this._$top.appendChild(Utils.$create('application-window-button-minimize', {
+    this._$top.appendChild(DOM.$create('application-window-button-minimize', {
       className: 'application-window-button-entry',
       data: {
         action: 'minimize'
@@ -768,7 +778,7 @@ class Window {
       }
     }));
 
-    this._$top.appendChild(Utils.$create('application-window-button-maximize', {
+    this._$top.appendChild(DOM.$create('application-window-button-maximize', {
       className: 'application-window-button-entry',
       data: {
         action: 'maximize'
@@ -779,7 +789,7 @@ class Window {
       }
     }));
 
-    this._$top.appendChild(Utils.$create('application-window-button-close', {
+    this._$top.appendChild(DOM.$create('application-window-button-close', {
       className: 'application-window-button-entry',
       data: {
         action: 'close'
@@ -877,7 +887,7 @@ class Window {
       this._$disabled   = null;
       this._$resize     = null;
       this._$warning    = null;
-      this._$element    = Utils.$remove(this._$element);
+      this._$element    = DOM.$remove(this._$element);
     };
 
     // Removed DOM elements and their referring objects (GUI Elements etc)
@@ -886,7 +896,7 @@ class Window {
         // Make sure to remove any remaining event listeners
         this._$element.querySelectorAll('*').forEach((iter) => {
           if ( iter ) {
-            Utils.$unbind(iter);
+            Events.$unbind(iter);
           }
         });
       }
@@ -1520,7 +1530,7 @@ class Window {
     let dy = 0;
 
     if ( container ) {
-      const cpos  = Utils.$position(container, this._$root);
+      const cpos  = DOM.$position(container, this._$root);
       dx = parseInt(cpos.left, 10);
       dy = parseInt(cpos.top, 10);
     }
@@ -1776,9 +1786,9 @@ class Window {
     const _blink = (stat) => {
       if ( el ) {
         if ( stat ) {
-          Utils.$addClass(el, 'WindowAttentionBlink');
+          DOM.$addClass(el, 'WindowAttentionBlink');
         } else {
-          Utils.$removeClass(el, 'WindowAttentionBlink');
+          DOM.$removeClass(el, 'WindowAttentionBlink');
         }
       }
       this._onChange(stat ? 'attention_on' : 'attention_off');
@@ -1797,7 +1807,7 @@ class Window {
   _nextTabIndex(ev) {
     const nextElement = GUI.Helpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
     if ( nextElement ) {
-      if ( Utils.$hasClass(nextElement, 'gui-data-view') ) {
+      if ( DOM.$hasClass(nextElement, 'gui-data-view') ) {
         GUI.Element.createFromNode(nextElement).focus();
       } else {
         try {
@@ -1855,7 +1865,7 @@ class Window {
       return false;
     }
 
-    if ( type === 'keydown' && ev.keyCode === Utils.Keys.TAB ) {
+    if ( type === 'keydown' && ev.keyCode === Events.Keys.TAB ) {
       this._nextTabIndex(ev);
     }
 
@@ -2046,7 +2056,7 @@ class Window {
    * @return {Object}
    */
   _getViewRect() {
-    return this._$element ? Object.freeze(Utils.$position(this._$element)) : null;
+    return this._$element ? Object.freeze(DOM.$position(this._$element)) : null;
   }
 
   /**
@@ -2095,7 +2105,7 @@ class Window {
     this._title = text.join(' ') || this._origtitle;
 
     if ( tel ) {
-      Utils.$empty(tel);
+      DOM.$empty(tel);
       tel.appendChild(document.createTextNode(this._title));
     }
 
@@ -2125,7 +2135,7 @@ class Window {
    * @param   {String}      message       Warning message
    */
   _setWarning(message) {
-    this._$warning = Utils.$remove(this._$warning);
+    this._$warning = DOM.$remove(this._$warning);
 
     if ( this._destroyed || message === null ) {
       return;
@@ -2137,7 +2147,7 @@ class Window {
 
     let close = document.createElement('div');
     close.innerHTML = 'X';
-    Utils.$bind(close, 'click', () => {
+    Events.$bind(close, 'click', () => {
       this._setWarning(null);
     });
 

@@ -30,9 +30,11 @@
 'use strict';
 
 // FIXME
-const API = require('core/api.js');
 const GUI = OSjs.GUI;
-const Utils = OSjs.Utils;
+
+const API = require('core/api.js');
+const DOM = require('utils/dom.js');
+const Utils = require('utils/misc.js');
 
 /**
  * @namespace Elements
@@ -174,7 +176,7 @@ class UIElement {
    * @return {OSjs.GUI.Element} The current instance (this)
    */
   remove() {
-    this.$element = Utils.$remove(this.$element);
+    this.$element = DOM.$remove(this.$element);
     return this;
   }
 
@@ -184,7 +186,7 @@ class UIElement {
    * @return {OSjs.GUI.Element} The current instance (this)
    */
   empty() {
-    Utils.$empty(this.$element);
+    DOM.$empty(this.$element);
     return this;
   }
 
@@ -437,7 +439,7 @@ class UIElement {
    * @return {OSjs.GUI.Element} The current instance (this)
    */
   css(k, v) {
-    Utils.$css(this.$element, k, v);
+    DOM.$css(this.$element, k, v);
     return this;
   }
 
@@ -447,7 +449,7 @@ class UIElement {
    * @return {Object}
    */
   position() {
-    return Utils.$position(this.$element);
+    return DOM.$position(this.$element);
   }
 
   // NOTE: DEPRECATED
@@ -573,7 +575,7 @@ class UIElement {
     node.querySelectorAll('*').forEach((el) => {
       const lcase = el.tagName.toLowerCase();
       if ( lcase.match(/^gui\-/) && !lcase.match(/(\-container|\-(h|v)box|\-columns?|\-rows?|(status|tool)bar|(button|menu)\-bar|bar\-entry)$/) ) {
-        Utils.$addClass(el, 'gui-element');
+        DOM.$addClass(el, 'gui-element');
       }
     });
 
@@ -585,7 +587,7 @@ class UIElement {
 
     Object.keys(REGISTRY).forEach((key) => {
       node.querySelectorAll(key).forEach((pel) => {
-        if ( pel._wasParsed || Utils.$hasClass(pel, 'gui-data-view') ) {
+        if ( pel._wasParsed || DOM.$hasClass(pel, 'gui-data-view') ) {
           return;
         }
 

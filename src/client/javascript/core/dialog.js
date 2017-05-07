@@ -31,10 +31,12 @@
 
 // FIXME
 const GUI = OSjs.GUI;
-const Utils = OSjs.Utils;
 
 const API = require('core/api.js');
+const DOM = require('utils/dom.js');
+const Scheme = require('gui/scheme.js');
 const Window = require('core/window.js');
+const Events = require('utils/events.js');
 
 /**
  * A callback for Dialogs.
@@ -107,7 +109,7 @@ class DialogWindow extends Window {
     this._state.ontop                 = true;
     this._tag                         = 'DialogWindow';
 
-    if ( args.scheme && args.scheme instanceof GUI.Scheme ) {
+    if ( args.scheme && args.scheme instanceof Scheme ) {
       this.scheme = args.scheme;
       delete args.scheme;
     } else {
@@ -141,7 +143,7 @@ class DialogWindow extends Window {
       node.querySelectorAll('gui-label').forEach((el) => {
         if ( el.childNodes.length && el.childNodes[0].nodeType === 3 && el.childNodes[0].nodeValue ) {
           const label = el.childNodes[0].nodeValue;
-          Utils.$empty(el);
+          DOM.$empty(el);
           el.appendChild(document.createTextNode(API._(label)));
         }
       });
@@ -168,7 +170,7 @@ class DialogWindow extends Window {
       }
     });
 
-    Utils.$addClass(root, 'DialogWindow');
+    DOM.$addClass(root, 'DialogWindow');
 
     return root;
   }
@@ -199,7 +201,7 @@ class DialogWindow extends Window {
   _onKeyEvent(ev) {
     super._onKeyEvent(...arguments);
 
-    if ( ev.keyCode === Utils.Keys.ESC ) {
+    if ( ev.keyCode === Events.Keys.ESC ) {
       this.onClose(ev, 'cancel');
     }
   }
@@ -212,7 +214,7 @@ class DialogWindow extends Window {
    * @return {DocumentFragment}
    */
   static parseMessage(msg) {
-    msg = Utils.$escape(msg || '').replace(/\*\*(.*)\*\*/g, '<span>$1</span>');
+    msg = DOM.$escape(msg || '').replace(/\*\*(.*)\*\*/g, '<span>$1</span>');
 
     let tmp = document.createElement('div');
     tmp.innerHTML = msg;

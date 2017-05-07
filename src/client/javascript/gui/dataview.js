@@ -32,9 +32,10 @@
 // FIXME
 const GUI = OSjs.GUI;
 const VFS = OSjs.VFS;
-const Utils = OSjs.Utils;
 
 const API = require('core/api.js');
+const DOM = require('utils/dom.js');
+const Events = require('utils/events.js');
 const UIElement = require('gui/element.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,13 +89,13 @@ function handleItemSelection(ev, item, idx, className, selected, root, multipleS
 
   if ( idx === -1 ) {
     root.querySelectorAll(getEntryTagName(root)).forEach(function(e) {
-      Utils.$removeClass(e, 'gui-active');
+      DOM.$removeClass(e, 'gui-active');
     });
     selected = [];
   } else {
     if ( !multipleSelect || !ev.shiftKey ) {
       root.querySelectorAll(className).forEach(function(i) {
-        Utils.$removeClass(i, 'gui-active');
+        DOM.$removeClass(i, 'gui-active');
       });
       selected = [];
     }
@@ -102,10 +103,10 @@ function handleItemSelection(ev, item, idx, className, selected, root, multipleS
     const findex = selected.indexOf(idx);
     if ( findex >= 0 ) {
       selected.splice(findex, 1);
-      Utils.$removeClass(item, 'gui-active');
+      DOM.$removeClass(item, 'gui-active');
     } else {
       selected.push(idx);
-      Utils.$addClass(item, 'gui-active');
+      DOM.$addClass(item, 'gui-active');
     }
   }
 
@@ -129,12 +130,12 @@ function handleKeyPress(cls, el, ev) {
     return;
   }
 
-  if ( key === Utils.Keys.ENTER ) {
+  if ( key === Events.Keys.ENTER ) {
     el.dispatchEvent(new CustomEvent('_activate', {detail: {entries: cls.values()}}));
     return;
   }
 
-  map[Utils.Keys.C] = function(ev) {
+  map[Events.Keys.C] = function(ev) {
     if ( ev.ctrlKey ) {
       const selected = cls.values();
       if ( selected && selected.length ) {
@@ -203,19 +204,19 @@ function handleKeyPress(cls, el, ev) {
     }
 
     if ( type === 'gui-tree-view' || type === 'gui-list-view' ) {
-      map[Utils.Keys.UP] = prev;
-      map[Utils.Keys.DOWN] = next;
+      map[Events.Keys.UP] = prev;
+      map[Events.Keys.DOWN] = next;
     } else {
-      map[Utils.Keys.UP] = function() {
+      map[Events.Keys.UP] = function() {
         current = Math.max(0, first - getRowSize());
         select();
       };
-      map[Utils.Keys.DOWN] = function() {
+      map[Events.Keys.DOWN] = function() {
         current = Math.max(last, last + getRowSize());
         select();
       };
-      map[Utils.Keys.LEFT] = prev;
-      map[Utils.Keys.RIGHT] = next;
+      map[Events.Keys.LEFT] = prev;
+      map[Events.Keys.RIGHT] = next;
     }
 
     if ( map[key] ) {
@@ -296,10 +297,10 @@ class UIDataView extends UIElement {
     }
 
     el.querySelectorAll(getEntryTagName(el)).forEach((row) => {
-      Utils.$unbind(row);
+      Events.$unbind(row);
     });
 
-    Utils.$empty(body);
+    DOM.$empty(body);
     body.scrollTop = 0;
     el._selected = [];
 
@@ -367,8 +368,8 @@ class UIDataView extends UIElement {
         const row = oncreate(this, entry);
         if ( row ) {
           if ( insertBefore ) {
-            if ( Utils.$hasClass(insertBefore, 'gui-active') ) {
-              Utils.$addClass(row, 'gui-active');
+            if ( DOM.$hasClass(insertBefore, 'gui-active') ) {
+              DOM.$addClass(row, 'gui-active');
             }
 
             body.insertBefore(row, insertBefore);
@@ -409,14 +410,14 @@ class UIDataView extends UIElement {
     parentEl = parentEl || this.$element;
 
     if ( target ) {
-      Utils.$remove(target);
+      DOM.$remove(target);
     } else if ( typeof args[1] === 'undefined' && typeof args[0] === 'number' ) {
-      Utils.$remove(parentEl.querySelectorAll(className)[args[0]]);
+      DOM.$remove(parentEl.querySelectorAll(className)[args[0]]);
     } else {
       const findId = args[0];
       const findKey = args[1] || 'id';
       const q = 'data-' + findKey + '="' + findId + '"';
-      parentEl.querySelectorAll(className + '[' + q + ']').forEach(Utils.$remove);
+      parentEl.querySelectorAll(className + '[' + q + ']').forEach(DOM.$remove);
     }
 
     this.updateActiveSelection(className);
@@ -430,7 +431,7 @@ class UIDataView extends UIElement {
   updateActiveSelection(className) {
     const active = [];
     this.$element.querySelectorAll(className + '.gui-active').forEach((cel) => {
-      active.push(Utils.$index(cel));
+      active.push(DOM.$index(cel));
     });
     this.$element._active = active;
   }
@@ -441,7 +442,7 @@ class UIDataView extends UIElement {
    */
   scrollIntoView(element) {
     const el = this.$element;
-    const pos = Utils.$position(element, el);
+    const pos = DOM.$position(element, el);
 
     let marginTop = 0;
     if ( el.tagName.toLowerCase() === 'gui-list-view' ) {
@@ -513,7 +514,7 @@ class UIDataView extends UIElement {
   getSelected(entries) {
     const selected = [];
     entries.forEach((iter, idx) => {
-      if ( Utils.$hasClass(iter, 'gui-active') ) {
+      if ( DOM.$hasClass(iter, 'gui-active') ) {
         selected.push({
           index: idx,
           data: GUI.Helpers.getViewNodeValue(iter)
@@ -557,14 +558,14 @@ class UIDataView extends UIElement {
 
     const sel = (r, idx) => {
       select.push(idx);
-      Utils.$addClass(r, 'gui-active');
+      DOM.$addClass(r, 'gui-active');
       if ( scrollIntoView ) {
         this.scrollIntoView(r);
       }
     };
 
     entries.forEach((r, idx) => {
-      Utils.$removeClass(r, 'gui-active');
+      DOM.$removeClass(r, 'gui-active');
       if ( matchValueByKey(r, val, key, idx) ) {
         sel(r, idx);
       }
@@ -581,7 +582,7 @@ class UIDataView extends UIElement {
     el._selected = [];
     el.scrollTop = 0;
 
-    Utils.$addClass(el, 'gui-data-view');
+    DOM.$addClass(el, 'gui-data-view');
 
     const singleClick = el.getAttribute('data-single-click') === 'true';
 
@@ -635,7 +636,7 @@ class UIDataView extends UIElement {
         return true;
       }
 
-      const idx = Utils.$index(row);
+      const idx = DOM.$index(row);
       el._selected = handleItemSelection(ev, row, idx, className, el._selected, el, multipleSelect);
       el.dispatchEvent(new CustomEvent('_select', {detail: {entries: this.values()}}));
 
@@ -683,39 +684,39 @@ class UIDataView extends UIElement {
       underlay.setAttribute('aria-hidden', 'true');
       underlay.setAttribute('readonly', 'true');
       underlay.className = 'gui-focus-element';
-      Utils.$bind(underlay, 'focus', (ev) => {
+      Events.$bind(underlay, 'focus', (ev) => {
         ev.preventDefault();
-        Utils.$addClass(el, 'gui-element-focused');
+        DOM.$addClass(el, 'gui-element-focused');
       });
-      Utils.$bind(underlay, 'blur', (ev) => {
+      Events.$bind(underlay, 'blur', (ev) => {
         ev.preventDefault();
-        Utils.$removeClass(el, 'gui-element-focused');
+        DOM.$removeClass(el, 'gui-element-focused');
       });
-      Utils.$bind(underlay, 'keydown', (ev) => {
+      Events.$bind(underlay, 'keydown', (ev) => {
         ev.preventDefault();
         handleKeyPress(this, el, ev);
       });
-      Utils.$bind(underlay, 'keypress', (ev) => {
+      Events.$bind(underlay, 'keypress', (ev) => {
         ev.preventDefault();
       });
 
-      Utils.$bind(el, 'mousedown', mousedown, true);
+      Events.$bind(el, 'mousedown', mousedown, true);
 
       if ( singleClick ) {
-        Utils.$bind(el, 'click', activate, true);
+        Events.$bind(el, 'click', activate, true);
       } else {
-        Utils.$bind(el, 'click', select, true);
-        Utils.$bind(el, 'dblclick', activate, true);
+        Events.$bind(el, 'click', select, true);
+        Events.$bind(el, 'dblclick', activate, true);
       }
 
-      Utils.$bind(el, 'contextmenu', (ev) => {
+      Events.$bind(el, 'contextmenu', (ev) => {
         ev.preventDefault();
         context(ev);
         return false;
       }, true);
 
       this.on('select', (ev) => {
-        if ( Utils.$hasClass(el, 'gui-element-focused') ) {
+        if ( DOM.$hasClass(el, 'gui-element-focused') ) {
           return;
         }
         // NOTE: This is a fix for Firefox stupid behaviour when focusing/blurring textboxes
@@ -770,7 +771,7 @@ class UIDataView extends UIElement {
     if ( (['activate', 'select', 'expand', 'contextmenu', 'render', 'drop', 'sort']).indexOf(evName) !== -1 ) {
       evName = '_' + evName;
     }
-    Utils.$bind(this.$element, evName, callback.bind(this), params);
+    Events.$bind(this.$element, evName, callback.bind(this), params);
     return this;
   }
 

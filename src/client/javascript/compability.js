@@ -35,6 +35,26 @@ module.exports.init = function() {
   const UIElement = require('gui/element.js');
   const UIDataView = require('gui/dataview.js');
 
+  const FS = require('utils/fs.js');
+  const DOM = require('utils/dom.js');
+  const XHR = require('utils/xhr.js');
+  const Utils = require('utils/misc.js');
+  const Events = require('utils/events.js');
+  const Compability = require('utils/compability.js');
+
+  const assignInto = (lib, ns) => {
+    return Object.keys(lib).forEach((k) => {
+      ns[k] = lib[k];
+    });
+  };
+
+  assignInto(FS, OSjs.Utils);
+  assignInto(DOM, OSjs.Utils);
+  assignInto(XHR, OSjs.Utils);
+  assignInto(Utils, OSjs.Utils);
+  assignInto(Events, OSjs.Utils);
+  assignInto(Compability, OSjs.Utils);
+
   OSjs.API = API;
   OSjs.API.killAll = Process.killAll;
   OSjs.API.kill = Process.kill;
@@ -232,6 +252,23 @@ module.exports.init = function() {
    */
   OSjs.GUI.createScheme = function(url) {
     return new UIScheme(url);
+  };
+
+  /**
+   * Gets the browser window rect (x, y, width, height)
+   *
+   * @function getRect
+   * @memberof OSjs.Utils
+   *
+   * @return {Object}
+   */
+  OSjs.Utils.getRect = function Utils_getRect() {
+    return {
+      top: 0,
+      left: 0,
+      width: document.body.offsetWidth,
+      height: document.body.offsetHeight
+    };
   };
 
 };

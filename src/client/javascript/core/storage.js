@@ -30,10 +30,8 @@
 
 'use strict';
 
-// FIXME
-const Utils = OSjs.Utils;
-
 const API = require('core/api.js');
+const Utils = require('utils/misc.js');
 const Application = require('core/application.js');
 
 let _instance;

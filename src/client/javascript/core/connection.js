@@ -30,10 +30,11 @@
 'use strict';
 
 // FIXME
-const Utils = OSjs.Utils;
 const VFS = OSjs.VFS;
 
 const API = require('core/api.js');
+const XHR = require('utils/xhr.js');
+const Events = require('utils/events.js');
 
 /*
  * Attaches options to a XHR call
@@ -102,10 +103,10 @@ class Connection {
    */
   init(callback) {
     if ( typeof navigator.onLine !== 'undefined' ) {
-      Utils.$bind(window, 'offline', (ev) => {
+      Events.$bind(window, 'offline', (ev) => {
         this.onOffline();
       });
-      Utils.$bind(window, 'online', (ev) => {
+      Events.$bind(window, 'online', (ev) => {
         this.onOnline();
       });
     }
@@ -117,8 +118,8 @@ class Connection {
    * Destroys the instance
    */
   destroy() {
-    Utils.$unbind(window, 'offline');
-    Utils.$unbind(window, 'online');
+    Events.$unbind(window, 'offline');
+    Events.$unbind(window, 'online');
 
     if ( this._evHandler ) {
       this._evHandler = this._evHandler.destroy();
@@ -267,7 +268,7 @@ class Connection {
    * @param {Object}    args        API method arguments
    * @param {Function}  cbSuccess   On success
    * @param {Function}  cbError     On error
-   * @param {Object}    [options]   Options passed on to the connection request method (ex: Utils.ajax)
+   * @param {Object}    [options]   Options passed on to the connection request method (ex: XHR.ajax)
    *
    * @return {Boolean}
    *
@@ -348,7 +349,7 @@ class Connection {
       console.warn('Connection::_requestPOST()', 'error', arguments);
     };
 
-    Utils.ajax(appendRequestOptions({
+    XHR.ajax(appendRequestOptions({
       url: VFS.Transports.OSjs.path(),
       method: 'POST',
       body: form,
@@ -381,7 +382,7 @@ class Connection {
       console.warn('Connection::_requestGET()', 'error', arguments);
     }).bind(this);
 
-    Utils.ajax(appendRequestOptions({
+    XHR.ajax(appendRequestOptions({
       url: args.url || VFS.Transports.OSjs.path(args.path),
       method: args.method || 'GET',
       responseType: 'arraybuffer',
@@ -414,7 +415,7 @@ class Connection {
       console.warn('Connection::_requestXHR()', 'error', arguments);
     };
 
-    Utils.ajax(appendRequestOptions({
+    XHR.ajax(appendRequestOptions({
       url: url,
       method: 'POST',
       json: true,

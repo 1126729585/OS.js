@@ -29,11 +29,11 @@
  */
 'use strict';
 
-// FIXME
-const Utils = OSjs.Utils;
-
 const API = require('core/api.js');
+const DOM = require('utils/dom.js');
+const Utils = require('utils/misc.js');
 const Window = require('core/window.js');
+const Events = require('utils/events.js');
 const Process = require('core/process.js');
 const DialogWindow = require('core/dialog.js');
 
@@ -120,7 +120,7 @@ BehaviourState.prototype.getRect = function() {
 };
 
 BehaviourState.prototype.calculateDirection = function() {
-  const dir = Utils.$position(this.$handle);
+  const dir = DOM.$position(this.$handle);
   const dirX = this.startX - dir.left;
   const dirY = this.startY - dir.top;
   const dirD = 20;
@@ -373,24 +373,24 @@ function createWindowBehaviour(win, wm) {
     }
     function _onMouseUp(ev, pos) {
       onMouseUp(ev, action, win, pos);
-      Utils.$unbind(document, 'mousemove:movewindow');
-      Utils.$unbind(document, 'mouseup:movewindowstop');
+      Events.$unbind(document, 'mousemove:movewindow');
+      Events.$unbind(document, 'mouseup:movewindowstop');
     }
 
-    Utils.$bind(document, 'mousemove:movewindow', _onMouseMove, false);
-    Utils.$bind(document, 'mouseup:movewindowstop', _onMouseUp, false);
+    Events.$bind(document, 'mousemove:movewindow', _onMouseMove, false);
+    Events.$bind(document, 'mouseup:movewindowstop', _onMouseUp, false);
   }
 
   /*
    * Register a window
    */
   if ( win._properties.allow_move ) {
-    Utils.$bind(win._$top, 'mousedown', (ev, pos) => {
+    Events.$bind(win._$top, 'mousedown', (ev, pos) => {
       onMouseDown(ev, 'move', win, pos);
     }, true);
   }
   if ( win._properties.allow_resize ) {
-    Utils.$bind(win._$resize, 'mousedown', (ev, pos) => {
+    Events.$bind(win._$resize, 'mousedown', (ev, pos) => {
       onMouseDown(ev, 'resize', win, pos);
     });
   }
@@ -476,8 +476,8 @@ class WindowManager extends Process {
 
     this.destroyStylesheet();
 
-    Utils.$unbind(document, 'mouseout:windowmanager');
-    Utils.$unbind(document, 'mouseenter:windowmanager');
+    Events.$unbind(document, 'mouseout:windowmanager');
+    Events.$unbind(document, 'mouseenter:windowmanager');
 
     // Destroy all windows
     this._windows.forEach((win, i) => {
@@ -513,10 +513,10 @@ class WindowManager extends Process {
 
     this._scheme = scheme;
 
-    Utils.$bind(document, 'mouseout:windowmanager', (ev) => {
+    Events.$bind(document, 'mouseout:windowmanager', (ev) => {
       this._onMouseLeave(ev);
     });
-    Utils.$bind(document, 'mouseenter:windowmanager', (ev) => {
+    Events.$bind(document, 'mouseenter:windowmanager', (ev) => {
       this._onMouseLeave(ev);
     });
 
@@ -972,7 +972,12 @@ class WindowManager extends Process {
    * @return    {Object} rectangle
    */
   getWindowSpace() {
-    return Utils.getRect();
+    return {
+      top: 0,
+      left: 0,
+      width: document.body.offsetWidth,
+      height: document.body.offsetHeight
+    };
   }
 
   /**

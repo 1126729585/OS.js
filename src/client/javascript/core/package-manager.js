@@ -30,10 +30,10 @@
 
 'use strict';
 
-// FIXME
-const Utils = OSjs.Utils;
-
+const FS = require('utils/fs.js');
 const API = require('core/api.js');
+const XHR = require('utils/xhr.js');
+const Utils = require('utils/misc.js');
 
 /**
  * This is the contents of a 'metadata.json' file for a package.
@@ -127,7 +127,7 @@ const PackageManager = (function() {
       });
 
       if ( preloads.length ) {
-        Utils.preload(preloads, (total, failed) => {
+        XHR.preload(preloads, (total, failed) => {
           callback();
         });
       } else {
@@ -160,9 +160,9 @@ const PackageManager = (function() {
           iter.preload.forEach((it) => {
             if ( it.src && !it.src.match(/^(\/)|(http)|(ftp)/) ) {
               if ( iter.scope === 'user' ) {
-                it.src = Utils.pathJoin(iter.path, it.src);
+                it.src = FS.pathJoin(iter.path, it.src);
               } else {
-                it.src = Utils.pathJoin(rootURI, key, it.src);
+                it.src = FS.pathJoin(rootURI, key, it.src);
               }
             }
           });
@@ -173,7 +173,7 @@ const PackageManager = (function() {
 
       if ( API.isStandalone() ) {
         const uri = API.getConfig('Connection.MetadataURI');
-        Utils.preload([uri], (total, failed) => {
+        XHR.preload([uri], (total, failed) => {
           if ( failed.length ) {
             callback(API._('ERR_PACKAGE_MANIFEST'), failed);
             return;
@@ -283,7 +283,7 @@ const PackageManager = (function() {
         root = paths[0];
       }
 
-      const dest = Utils.pathJoin(root, file.filename.replace(/\.zip$/i, ''));
+      const dest = FS.pathJoin(root, file.filename.replace(/\.zip$/i, ''));
       API.call('packages', {command: 'install', args: {zip: file.path, dest: dest, paths: paths}}, (e, r) => {
         if ( e ) {
           cb(e);
@@ -445,7 +445,7 @@ const PackageManager = (function() {
         if ( blacklist.indexOf(i) < 0 ) {
           const a = p[i];
           if ( a && a.mime ) {
-            if ( Utils.checkAcceptMime(mime, a.mime) ) {
+            if ( FS.checkAcceptMime(mime, a.mime) ) {
               list.push(i);
             }
           }

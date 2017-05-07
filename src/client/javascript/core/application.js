@@ -30,11 +30,9 @@
 
 'use strict';
 
-// FIXME
-const GUI = OSjs.GUI;
-
 const Process = require('core/process.js');
 const Window = require('core/window.js');
+const Scheme = require('gui/scheme.js');
 
 /**
  * Look at the 'ProcessEvent' for more.
@@ -247,7 +245,7 @@ class Application extends Process {
    * @param   {Function}      cb      Callback => fn(scheme)
    */
   _loadScheme(s, cb) {
-    const scheme = GUI.createScheme(this._getResource(s));
+    const scheme = new Scheme(this._getResource(s));
     scheme.load(function __onApplicationLoadScheme(error, result) {
       if ( error ) {
         console.error('Application::_loadScheme()', error);

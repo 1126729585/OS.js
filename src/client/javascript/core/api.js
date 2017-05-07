@@ -30,8 +30,12 @@
 'use strict';
 
 // FIXME
-const Utils = OSjs.Utils;
 const Locales = OSjs.Locales;
+
+const XHR = require('utils/xhr.js');
+const DOM = require('utils/dom.js');
+const Utils = require('utils/misc.js');
+const Compability = require('utils/compability.js');
 
 /**
  * @namespace API
@@ -463,7 +467,7 @@ module.exports.open = function(file, launchArgs) {
   console.group('API::open()', file);
 
   if ( file.mime === 'osjs/application' ) {
-    _launchApp(Utils.filename(file.path), launchArgs);
+    _launchApp(FS.filename(file.path), launchArgs);
   } else if ( file.type === 'dir' ) {
     var fm = settingsManager.instance('DefaultApplication').get('dir', 'ApplicationFileManager');
     _launchApp(fm, {path: file.path});
@@ -556,7 +560,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
   var pargs = {};
 
   var packman = OSjs.Core.getPackageManager();
-  var compability = Utils.getCompability();
+  var compability = Compability.getCompability();
   var metadata = packman.getPackage(name);
   var running = Process.getProcess(name, true);
   var launchIndex = -1;
@@ -708,7 +712,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
   }
 
   function _preload(cb) {
-    Utils.preload(preloads, function preloadIter(total, failed, succeeded, data) {
+    XHR.preload(preloads, function preloadIter(total, failed, succeeded, data) {
       if ( failed.length ) {
         cb(module.exports._('ERR_APP_PRELOAD_FAILED_FMT', name, failed.join(',')));
       } else {
@@ -962,7 +966,7 @@ module.exports.getApplicationResource = function(app, name, vfspath) {
 
     if ( pkg ) {
       if ( pkg.scope === 'user' ) {
-        path = '/user-package/' + OSjs.Utils.filename(pkg.path) + '/' + name.replace(/^\//, '');
+        path = '/user-package/' + FS.filename(pkg.path) + '/' + name.replace(/^\//, '');
       } else {
         path = 'packages/' + pkg.path + '/' + name;
       }
@@ -1041,7 +1045,7 @@ module.exports.getFileIcon = function(file, size, icon) {
     icon = 'places/user-trash.png';
   } else if ( file.type === 'application' ) {
     var pm = OSjs.Core.getPackageManager();
-    var appname = Utils.filename(file.path);
+    var appname = FS.filename(file.path);
     var meta = pm.getPackage(appname);
 
     if ( meta ) {
@@ -1123,7 +1127,7 @@ module.exports.getSound = function(name) {
     var wm = OSjs.Core.getWindowManager();
     var theme = wm ? wm.getSoundTheme() : 'default';
     var root = module.exports.getConfig('Connection.SoundURI');
-    var compability = Utils.getCompability();
+    var compability = Compability.getCompability();
     if ( !name.match(/^\//) ) {
       var ext = 'oga';
       if ( !compability.audioTypes.ogg ) {
@@ -1473,7 +1477,7 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
 
   return {
     destroy: function() {
-      splash = Utils.$remove(splash);
+      splash = DOM.$remove(splash);
 
       img = null;
       title = null;
@@ -1577,7 +1581,7 @@ module.exports.error = function(title, message, error, exception, bugreport) {
  * @return {Audio}
  */
 module.exports.playSound = function(name, volume) {
-  var compability = Utils.getCompability();
+  var compability = Compability.getCompability();
   var wm = OSjs.Core.getWindowManager();
   var filename = wm ? wm.getSoundFilename(name) : null;
 
