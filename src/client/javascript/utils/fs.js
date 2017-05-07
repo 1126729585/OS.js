@@ -398,3 +398,294 @@ module.exports.checkAcceptMime = function Utils_checkAcceptMime(mime, list) {
   }
   return false;
 };
+
+/////////////////////////////////////////////////////////////////////////////
+// HELPERS
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Filters a scandir() request
+ *
+ * @function filterScandir
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param     {Array}     list                      List of results from scandir()
+ * @param     {Object}    options                   Filter options
+ * @param     {String}    options.typeFilter        `type` filter
+ * @param     {Array}     options.mimeFilter        `mime` filter
+ * @param     {Boolean}   options.showHiddenFiles   Show dotfiles
+ * @param     {String}    [options.sortBy=null]     Sort by this key
+ * @param     {String}    [options.sortDir='asc']   Sort in this direction
+ *
+ * @return  {Boolean}
+ */
+module.exports.filterScandir = function filterScandir(list, options) {
+  const Utils = require('utils/misc.js');
+
+  var defaultOptions = Utils.cloneObject(OSjs.Core.getSettingsManager().get('VFS') || {});
+  var ioptions = Utils.cloneObject(options, true);
+  var ooptions = Utils.argumentDefaults(ioptions, defaultOptions.scandir || {});
+  ooptions = Utils.argumentDefaults(ooptions, {
+    sortBy: null,
+    sortDir: 'asc',
+    typeFilter: null,
+    mimeFilter: [],
+    showHiddenFiles: true
+  }, true);
+
+  function filterFile(iter) {
+    if ( (ooptions.typeFilter && iter.type !== ooptions.typeFilter) || (!ooptions.showHiddenFiles && iter.filename.match(/^\.\w/)) ) {
+      return false;
+    }
+    return true;
+  }
+
+  function validMime(iter) {
+    if ( ooptions.mimeFilter && ooptions.mimeFilter.length && iter.mime ) {
+      return ooptions.mimeFilter.some(function(miter) {
+        if ( iter.mime.match(miter) ) {
+          return true;
+        }
+        return false;
+      });
+    }
+    return true;
+  }
+
+  const result = list.filter(function(iter) {
+    if ( iter.filename === '..' || !filterFile(iter) ) {
+      return false;
+    }
+
+    if ( iter.type === 'file' && !validMime(iter) ) {
+      return false;
+    }
+
+    return true;
+  }).map(function(iter) {
+    if ( iter.mime === 'application/vnd.google-apps.folder' ) {
+      iter.type = 'dir';
+    }
+    return iter;
+  });
+
+  const sb = ooptions.sortBy;
+  const types = {
+    mtime: 'date',
+    ctime: 'date'
+  };
+
+  if ( ['filename', 'size', 'mime', 'ctime', 'mtime'].indexOf(sb) !== -1  ) {
+    if ( types[sb] === 'date' ) {
+      result.sort(function(a, b) {
+        a = new Date(a[sb]);
+        b = new Date(b[sb]);
+        return (a > b) ? 1 : ((b > a) ? -1 : 0);
+      });
+    } else {
+      if ( sb === 'size' || !String.prototype.localeCompare ) {
+        result.sort(function(a, b) {
+          return (a[sb] > b[sb]) ? 1 : ((b[sb] > a[sb]) ? -1 : 0);
+        });
+      } else {
+        result.sort(function(a, b) {
+          return String(a[sb]).localeCompare(String(b[sb]));
+        });
+      }
+    }
+
+    if ( ooptions.sortDir === 'desc' ) {
+      result.reverse();
+    }
+  }
+
+  return result.filter(function(iter) {
+    return iter.type === 'dir';
+  }).concat(result.filter(function(iter) {
+    return iter.type !== 'dir';
+  }));
+};
+
+/*
+ * Wrapper for converting data
+ */
+function _abToSomething(m, arrayBuffer, mime, callback) {
+  mime = mime || 'application/octet-stream';
+
+  try {
+    const blob = new Blob([arrayBuffer], {type: mime});
+    const r = new FileReader();
+    r.onerror = function(e) {
+      callback(e);
+    };
+    r.onloadend = function()  {
+      callback(false, r.result);
+    };
+    r[m](blob);
+  } catch ( e ) {
+    console.warn(e, e.stack);
+    callback(e);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CONVERSION HELPERS
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This is a helper to add a File to FormData
+ *
+ * @function addFormFile
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {FormData}                        fd      FormData instance
+ * @param   {String}                          key     FormData entry name
+ * @param   {(window.File|window.Blob)}       data    File Data (see supported types)
+ * @param   {OSjs.VFS.File}                   file    File Metadata
+ */
+module.exports.addFormFile = function addFormFile(fd, key, data, file) {
+  file = file || {mime: 'application/octet-stream', filename: 'filename'};
+
+  if ( data instanceof window.File ) {
+    fd.append(key, data);
+  } else if ( data instanceof window.ArrayBuffer ) {
+    try {
+      data = new Blob([data], {type: file.mime});
+    } catch ( e ) {
+      data = null;
+      console.warn(e, e.stack);
+    }
+
+    fd.append(key, data, file.filename);
+  } else {
+    if ( data.data && data.filename ) { // In case user defines custom
+      fd.append(key, data.data, data.filename);
+    }
+  }
+};
+
+/**
+ * Convert DataSourceURL to ArrayBuffer
+ *
+ * @function dataSourceToAb
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {String}        data        The datasource string
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.dataSourceToAb = function dataSourceToAb(data, mime, callback) {
+  const byteString = atob(data.split(',')[1]);
+  //const mimeString = data.split(',')[0].split(':')[1].split(';')[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+
+  callback(false, ab);
+};
+
+/**
+ * Convert PlainText to ArrayBuffer
+ *
+ * @function textToAb
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {String}        data        The plaintext string
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.textToAb = function textToAb(data, mime, callback) {
+  _abToSomething('readAsArrayBuffer', data, mime, callback);
+};
+
+/**
+ * Convert ArrayBuffer to DataSourceURL
+ *
+ * @function abToDataSource
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {ArrayBuffer}   arrayBuffer The ArrayBuffer
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.abToDataSource = function abToDataSource(arrayBuffer, mime, callback) {
+  _abToSomething('readAsDataURL', arrayBuffer, mime, callback);
+};
+
+/**
+ * Convert ArrayBuffer to PlainText
+ *
+ * @function abToText
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {ArrayBuffer}   arrayBuffer The ArrayBuffer
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.abToText = function abToText(arrayBuffer, mime, callback) {
+  _abToSomething('readAsText', arrayBuffer, mime, callback);
+};
+
+/**
+ * Convert ArrayBuffer to BinaryString
+ *
+ * @function abToBinaryString
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {ArrayBuffer}   arrayBuffer The ArrayBuffer
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.abToBinaryString = function abToBinaryString(arrayBuffer, mime, callback) {
+  _abToSomething('readAsBinaryString', arrayBuffer, mime, callback);
+};
+
+/**
+ * Convert ArrayBuffer to Blob
+ *
+ * @function abToBlob
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {ArrayBuffer}   arrayBuffer The ArrayBuffer
+ * @param   {String}        mime        The mime type
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.abToBlob = function abToBlob(arrayBuffer, mime, callback) {
+  mime = mime || 'application/octet-stream';
+
+  try {
+    const blob = new Blob([arrayBuffer], {type: mime});
+    callback(false, blob);
+  } catch ( e ) {
+    console.warn(e, e.stack);
+    callback(e);
+  }
+};
+
+/**
+ * Convert Blob to ArrayBuffer
+ *
+ * @function blobToAb
+ * @memberof OSjs.VFS.Helpers
+ *
+ * @param   {Blob}          data        The blob
+ * @param   {Function}      callback    Callback function => fn(error, result)
+ */
+module.exports.blobToAb = function blobToAb(data, callback) {
+  try {
+    const r = new FileReader();
+    r.onerror = function(e) {
+      callback(e);
+    };
+    r.onloadend = function() {
+      callback(false, r.result);
+    };
+    r.readAsArrayBuffer(data);
+  } catch ( e ) {
+    console.warn(e, e.stack);
+    callback(e);
+  }
+};

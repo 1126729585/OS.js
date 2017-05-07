@@ -36,6 +36,7 @@ module.exports.init = function() {
   const UIDataView = require('gui/dataview.js');
   const GUIHelpers = require('gui/helpers.js');
 
+  const VFS = require('vfs/fs.js');
   const VFSFile = require('vfs/file.js');
   const VFSFileData = require('vfs/filedata.js');
 
@@ -52,8 +53,10 @@ module.exports.init = function() {
     });
   };
 
+  assignInto(VFS, OSjs.VFS);
   OSjs.VFS.File = VFSFile;
   OSjs.VFS.FileDataURL = VFSFileData;
+  assignInto(FS, OSjs.VFS.Helpers);
 
   assignInto(FS, OSjs.Utils);
   assignInto(DOM, OSjs.Utils);
@@ -291,6 +294,69 @@ module.exports.init = function() {
    */
   OSjs.VFS.file = function createFileInstance(arg, mime) {
     return new VFSFile(arg, mime);
+  };
+
+  /**
+   * Triggers a VFS watch event
+   *
+   * @function triggerWatch
+   * @memberof OSjs.VFS.Helpers
+   *
+   * @param   {String}              method      VFS method
+   * @param   {Object}              arg         VFS file
+   * @param   {OSjs.Core.Process}   [appRef]    Optional application reference
+   */
+  OSjs.VFS.Helpers.triggerWatch = function VFS_Helpers_triggerWatch(method, arg, appRef) {
+    VFS.broadcastMessage('vfs:' + method, arg, appRef);
+  };
+
+  /**
+   * Creates a new VFS.File from an upload
+   *
+   * @function createFileFromUpload
+   * @memberof OSjs.VFS.Helpers
+   *
+   * @param     {String}      destination         Destination path
+   * @param     {File}        f                   File
+   *
+   * @return {OSjs.VFS.File}
+   */
+  OSjs.VFS.Helpers.createFileFromUpload = function(destination, f) {
+    return new VFSFile({
+      filename: f.name,
+      path: (destination + '/' + f.name).replace(/\/\/\/\/+/, '///'),
+      mime: f.mime || 'application/octet-stream',
+      size: f.size
+    });
+  };
+
+  /**
+   * Create a new Upload dialog
+   *
+   * @function createUploadDialog
+   * @memberof OSjs.VFS.Helpers
+   *
+   * @param   {Object}                                     opts                 Options
+   * @param   {String}                                     opts.destination     Destination for upload
+   * @param   {File}                                       [opts.file]          Uploads this file immediately
+   * @param   {Function}                                   cb                   Callback function => fn(error, file, event)
+   * @param   {OSjs.Core.Window|OSjs.Core.Application}     [ref]                Set reference in new window
+   */
+  OSjs.VFS.Helpers.createUploadDialog = function(opts, cb, ref) {
+    var destination = opts.destination;
+    var upload = opts.file;
+
+    OSjs.API.createDialog('FileUpload', {
+      dest: destination,
+      file: upload
+    }, function(ev, btn, ufile) {
+      if ( btn !== 'ok' && btn !== 'complete' ) {
+        cb(false, false);
+      } else {
+        var file = VFS.Helpers.createFileFromUpload(destination, ufile);
+        cb(false, file);
+      }
+    }, ref);
   };
 
   /**
