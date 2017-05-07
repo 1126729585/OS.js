@@ -39,6 +39,10 @@ module.exports.init = function() {
   const VFS = require('vfs/fs.js');
   const VFSFile = require('vfs/file.js');
   const VFSFileData = require('vfs/filedata.js');
+  const MountDropbox = require('vfs/mounts/dropbox.js');
+  const MountGoogleDrive = require('vfs/mounts/googledrive.js');
+  const MountLocalStorage = require('vfs/mounts/localstorage.js');
+  const MountOneDrive = require('vfs/mounts/onedrive.js');
 
   const FS = require('utils/fs.js');
   const DOM = require('utils/dom.js');
@@ -464,6 +468,85 @@ module.exports.init = function() {
     root: 'http:///',
     icon: 'places/google-drive.png',
     match: /^https?\:\/\//
+  });
+
+  /*
+   * This is the Dropbox VFS Abstraction for OS.js
+   */
+  OSjs.Core.getMountManager()._add({
+    readOnly: false,
+    name: 'Dropbox',
+    transport: 'Dropbox',
+    description: 'Dropbox',
+    visible: true,
+    searchable: false,
+    root: 'dropbox:///',
+    icon: 'places/dropbox.png',
+    match: /^dropbox\:\/\//,
+    mount: MountDropbox.mount,
+    enabled: MountDropbox.enabled,
+    unmount: MountDropbox.unmount,
+    request: MountDropbox.request
+  });
+
+  /*
+   * This is the Google Drive VFS Abstraction for OS.js
+   */
+  OSjs.Core.getMountManager()._add({
+    readOnly: false,
+    name: 'GoogleDrive',
+    transport: 'GoogleDrive',
+    description: 'Google Drive',
+    visible: true,
+    searchable: false,
+    root: 'google-drive:///',
+    icon: 'places/google-drive.png',
+    match: /^google-drive\:\/\//,
+    mount: MountGoogleDrive.mount,
+    enabled: MountGoogleDrive.enabled,
+    unmount: MountGoogleDrive.unmount,
+    request: MountGoogleDrive.request
+  });
+
+  /*
+   * Browser LocalStorage VFS Module
+   *
+   * This is *experimental* at best. It involves making a real-ish filesystemwhich
+   * I don't have much experience in :P This is why it is disabled by default!
+   */
+  OSjs.Core.getMountManager()._add({
+    readOnly: false,
+    name: 'LocalStorage',
+    transport: 'LocalStorage',
+    description: OSjs.API.getConfig('VFS.LocalStorage.Options.description', 'LocalStorage'),
+    visible: true,
+    searchable: false,
+    root: 'localstorage:///',
+    icon: OSjs.API.getConfig('VFS.LocalStorage.Options.icon', 'apps/web-browser.png'),
+    match: /^localstorage\:\/\//,
+    mount: MountLocalStorage.mount,
+    enabled: MountLocalStorage.enabled,
+    unmount: MountLocalStorage.unmount,
+    request: MountLocalStorage.request
+  });
+
+  /*
+   * This is the Microsoft OneDrive VFS Abstraction for OS.js
+   */
+  OSjs.Core.getMountManager()._add({
+    readOnly: false,
+    name: 'OneDrive',
+    transport: 'OneDrive',
+    description: 'OneDrive',
+    visible: true,
+    searchable: false,
+    root: 'onedrive:///',
+    icon: 'places/onedrive.png',
+    match: /^onedrive\:\/\//,
+    mount: MountOneDrive.mount,
+    enabled: MountOneDrive.enabled,
+    unmount: MountOneDrive.unmount,
+    request: MountOneDrive.request
   });
 
 };
