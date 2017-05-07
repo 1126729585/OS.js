@@ -615,9 +615,6 @@ class UIElement {
       throw new Error('GUI Element "' + name + '" already exists');
     }
 
-    const base = data.parent || UIElement;
-    const target = Utils.inherit(base, null, classRef);
-
     REGISTRY[name] = (() => {
       const metadata = Utils.argumentDefaults(Utils.cloneObject(data, true), {
         type: 'element',
@@ -637,7 +634,7 @@ class UIElement {
 
       return {
         metadata: metadata,
-        component: target
+        component: classRef
       };
     })();
   }
