@@ -29,6 +29,9 @@
  */
 'use strict';
 
+const Utils = require('utils/misc.js');
+const Events = require('utils/events.js');
+
 /////////////////////////////////////////////////////////////////////////////
 // DOM
 /////////////////////////////////////////////////////////////////////////////
@@ -89,7 +92,7 @@ module.exports.$empty = function Utils_$empty(myNode, removeEvents) {
     if ( removeEvents ) {
       removeEvents = typeof removeEvents === 'string' ? removeEvents : '*';
       myNode.querySelectorAll(removeEvents).forEach((el) => {
-        OSjs.Utils.$unbind(el);
+        Events.$unbind(el);
       });
     }
 
@@ -319,7 +322,7 @@ module.exports.$escape = function Utils_$escape(str) {
  * Creates a new DOM element
  *
  * @example
- * Utils.$create('div', {
+ * $create('div', {
  *  className: 'foo',
  *  style: {
  *    width: '200px'
@@ -421,7 +424,7 @@ module.exports.$createJS = function Utils_$createJS(src, onreadystatechange, onl
   res.onerror = onerror || function() {};
   res.onload = onload || function() {};
 
-  attrs = OSjs.Utils.mergeObject({
+  attrs = Utils.mergeObject({
     type: 'text/javascript',
     charset: 'utf-8',
     src: src
@@ -475,16 +478,16 @@ module.exports.$isFormElement = function Utils_$isFormElement(input, types) {
  * @return {String} CSS attribute value
  *
  * @example
- * Utils.$css(element, {
+ * $css(element, {
  *  backgroundColor: '#000',
  *  'font-size': '14px' // You can also use CSS attributes like normal
  * });
  *
  * @example
- * Utils.$css(element, 'font-family', 'Arial');
+ * $css(element, 'font-family', 'Arial');
  *
  * @example
- * Utils.$css(element, 'font-family'); // -> 'Arial'. Same as $getStyle
+ * $css(element, 'font-family'); // -> 'Arial'. Same as $getStyle
  *
  * @function $css
  * @memberof OSjs.Utils
@@ -499,7 +502,7 @@ module.exports.$css = function Utils_$css(el, ink, inv) {
   let obj = {};
   if ( arguments.length === 2 ) {
     if ( typeof ink === 'string' ) {
-      return el.parentNode ? OSjs.Utils.$getStyle(el, ink) : el.style[rep(ink)];
+      return el.parentNode ? module.exports.$getStyle(el, ink) : el.style[rep(ink)];
     }
     obj = ink;
   } else if ( arguments.length === 3 ) {

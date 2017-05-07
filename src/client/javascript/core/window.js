@@ -30,7 +30,6 @@
 'use strict';
 
 // FIXME
-const GUI = OSjs.GUI;
 const VFS = OSjs.VFS;
 
 const DOM = require('utils/dom.js');
@@ -39,6 +38,8 @@ const Utils = require('utils/misc.js');
 const Scheme = require('gui/scheme.js');
 const Events = require('utils/events.js');
 const Compability = require('utils/compability.js');
+const GUIElement = require('gui/element.js');
+const GUIHelpers = require('gui/helpers.js');
 
 /**
  * The predefined events are as follows:
@@ -737,7 +738,7 @@ class Window {
         const border = document.createElement('div');
         border.className = 'WindowDropRect';
 
-        GUI.Helpers.createDroppable(main, {
+        GUIHelpers.createDroppable(main, {
           onOver: (ev, el, args) => {
             main.setAttribute('data-dnd-state', 'true');
           },
@@ -1044,7 +1045,7 @@ class Window {
    */
   _create(tagName, params, parentNode, applyArgs) {
     parentNode = parentNode || this._getRoot();
-    return GUI.Element.createInto(tagName, params, parentNode, applyArgs, this);
+    return GUIElement.createInto(tagName, params, parentNode, applyArgs, this);
   }
 
   /**
@@ -1065,12 +1066,12 @@ class Window {
 
     if ( all ) {
       return root.querySelectorAll(query).map((el) => {
-        return GUI.Element.createFromNode(el, query);
+        return GUIElement.createFromNode(el, query);
       });
     }
 
     const el = root.querySelector(query);
-    return GUI.Element.createFromNode(el, query);
+    return GUIElement.createFromNode(el, query);
   }
 
   /**
@@ -1805,10 +1806,10 @@ class Window {
    * @param   {Event}     ev            DOM Event
    */
   _nextTabIndex(ev) {
-    const nextElement = GUI.Helpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
+    const nextElement = GUIHelpers.getNextElement(ev.shiftKey, document.activeElement, this._$root);
     if ( nextElement ) {
       if ( DOM.$hasClass(nextElement, 'gui-data-view') ) {
-        GUI.Element.createFromNode(nextElement).focus();
+        GUIElement.createFromNode(nextElement).focus();
       } else {
         try {
           nextElement.focus();

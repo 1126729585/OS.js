@@ -29,9 +29,6 @@
  */
 'use strict';
 
-// FIXME
-const GUI = OSjs.GUI;
-
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const Scheme = require('gui/scheme.js');
@@ -113,7 +110,7 @@ class DialogWindow extends Window {
       this.scheme = args.scheme;
       delete args.scheme;
     } else {
-      this.scheme = GUI.DialogScheme.get();
+      this.scheme = OSjs.GUI.DialogScheme.get(); // FIXME
     }
 
     this.args = args;

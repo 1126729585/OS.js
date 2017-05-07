@@ -29,6 +29,8 @@
  */
 'use strict';
 
+const DOM = require('utils/dom.js');
+
 /**
  * The callback for browser events bound by OS.js
  * @see OSjs.Utils.$bind
@@ -131,7 +133,7 @@ function getEventList(str) {
  * Gets mouse position in all cases (including touch)
  *
  * @example
- * Utils.mousePosition(ev); // -> {x:1, y:1}
+ * mousePosition(ev); // -> {x:1, y:1}
  *
  * @param {Event}   ev    DOM Event
  *
@@ -212,8 +214,8 @@ module.exports.keyCombination = (function() {
 
   function getKeyName(keyCode) {
     let result = false;
-    Object.keys(OSjs.Utils.Keys).forEach((k) => {
-      if ( !result && (keyCode === OSjs.Utils.Keys[k]) ) {
+    Object.keys(module.exports.Keys).forEach((k) => {
+      if ( !result && (keyCode === module.exports.Keys[k]) ) {
         result = k;
       }
     });
@@ -259,19 +261,19 @@ module.exports.keyCombination = (function() {
  * </code></pre>
  *
  * @example
- * Utils.$bind(el, 'click', function(ev, pos, touch) {
+ * $bind(el, 'click', function(ev, pos, touch) {
  *  // A click event
  * });
  *
  * @example
- * Utils.$bind(el, 'click:customname', function(ev, pos, touch) {
+ * $bind(el, 'click:customname', function(ev, pos, touch) {
  *  // A click event with custom namespace. Useful
  *  // for when you want to separate events with same
  *  // type.
  * });
  *
  * @example
- * Utils.$bind(el, 'click, mousedown, mouseup', function(ev, pos, touch) {
+ * $bind(el, 'click, mousedown, mouseup', function(ev, pos, touch) {
  *  // You can bind multiple events in one go
  * });
  *
@@ -311,7 +313,7 @@ module.exports.$bind = (function() {
   function createWheelHandler(el, n, t, callback, useCapture) {
 
     function _wheel(ev) {
-      const pos = OSjs.Utils.mousePosition(ev);
+      const pos = module.exports.mousePosition(ev);
       const direction = (ev.detail < 0 || ev.wheelDelta > 0) ? 1 : -1;
       pos.z = direction;
 
@@ -387,7 +389,7 @@ module.exports.$bind = (function() {
         return _done();
       }
 
-      if ( !OSjs.Utils.$isFormElement(ev) ) {
+      if ( !DOM.$isFormElement(ev) ) {
         ev.preventDefault();
       }
 
@@ -502,9 +504,9 @@ module.exports.$bind = (function() {
         }
 
         if ( noBind ) {
-          return callback(ev, OSjs.Utils.mousePosition(ev));
+          return callback(ev, module.exports.mousePosition(ev));
         }
-        return callback.call(el, ev, OSjs.Utils.mousePosition(ev));
+        return callback.call(el, ev, module.exports.mousePosition(ev));
       }, useCapture);
 
       if ( customEvents[type] ) {
@@ -557,13 +559,13 @@ module.exports.$bind = (function() {
  * </b></pre>
  *
  * @example
- * Utils.$unbind(el, 'click', function() {...}); // Unbinds spesific function
+ * $unbind(el, 'click', function() {...}); // Unbinds spesific function
  *
  * @example
- * Utils.$unbind(el, 'click'); // Unbinds all click events
+ * $unbind(el, 'click'); // Unbinds all click events
  *
  * @example
- * Utils.$unbind(el); // Unbinds all events
+ * $unbind(el); // Unbinds all events
  *
  * @function $unbind
  * @memberof OSjs.Utils

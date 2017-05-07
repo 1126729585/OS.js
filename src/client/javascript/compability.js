@@ -34,6 +34,7 @@ module.exports.init = function() {
   const UIScheme = require('gui/scheme.js');
   const UIElement = require('gui/element.js');
   const UIDataView = require('gui/dataview.js');
+  const GUIHelpers = require('gui/helpers.js');
 
   const FS = require('utils/fs.js');
   const DOM = require('utils/dom.js');
@@ -84,6 +85,7 @@ module.exports.init = function() {
   OSjs.GUI.Element = Object.seal(UIElement);
   OSjs.GUI.DataView = Object.seal(UIDataView);
   OSjs.GUI.Scheme = Object.seal(UIScheme);
+  OSjs.GUI.Helpers = Object.seal(GUIHelpers);
 
   const languages = OSjs.Core.getConfig().Languages;
   Object.keys(languages).forEach((k) => {
@@ -270,5 +272,82 @@ module.exports.init = function() {
       height: document.body.offsetHeight
     };
   };
+
+  /**
+   * Shortcut for creating a new UIScheme class
+   *
+   * @summary Helper for loading Dialog scheme files.
+   *
+   * @constructor DialogScheme
+   * @memberof OSjs.GUI
+   */
+  OSjs.GUI.DialogScheme = (function() {
+    var dialogScheme;
+
+    return {
+
+      /**
+       * Get the Dialog scheme
+       *
+       * @function get
+       * @memberof OSjs.GUI.DialogScheme#
+       *
+       * @return {OSjs.GUI.Scheme}
+       */
+      get: function() {
+        return dialogScheme;
+      },
+
+      /**
+       * Destroy the Dialog scheme
+       *
+       * @function destroy
+       * @memberof OSjs.GUI.DialogScheme#
+       */
+      destroy: function() {
+        if ( dialogScheme ) {
+          dialogScheme.destroy();
+        }
+        dialogScheme = null;
+      },
+
+      /**
+       * Initialize the Dialog scheme
+       *
+       * @function init
+       * @memberof OSjs.GUI.DialogScheme#
+       *
+       * @param   {Function}    cb      Callback function
+       */
+      init: function(cb) {
+        if ( dialogScheme ) {
+          cb();
+          return;
+        }
+
+        if ( OSjs.API.isStandalone() ) {
+          var html = OSjs.STANDALONE.SCHEMES['/dialogs.html'];
+          dialogScheme = new OSjs.GUI.Scheme();
+          dialogScheme.loadString(html);
+          cb();
+          return;
+        }
+
+        var root = API.getConfig('Connection.RootURI');
+        var url = root + 'dialogs.html';
+
+        dialogScheme = GUI.createScheme(url);
+        dialogScheme.load(function(error) {
+          if ( error ) {
+            console.warn('OSjs.GUI.initDialogScheme()', 'error loading dialog schemes', error);
+          }
+          cb();
+        });
+      }
+
+    };
+
+  })();
+
 
 };

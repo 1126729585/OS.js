@@ -29,6 +29,10 @@
  */
 'use strict';
 
+const FS = require('utils/fs.js');
+const DOM = require('utils/dom.js');
+const Utils = require('utils/misc.js');
+
 /////////////////////////////////////////////////////////////////////////////
 // EXPORTS
 /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +67,7 @@ module.exports.ajax = function Utils_ajax(args) {
   /* eslint no-invalid-this: "off" */
 
   let request;
-  args = OSjs.Utils.argumentDefaults(args, {
+  args = Utils.argumentDefaults(args, {
     onerror: function() {},
     onsuccess: function() {},
     onprogress: function() {},
@@ -113,7 +117,7 @@ module.exports.ajax = function Utils_ajax(args) {
 
   function requestJSONP() {
     let loaded  = false;
-    OSjs.Utils.$createJS(args.url, () => {
+    DOM.$createJS(args.url, () => {
       if ( (this.readyState === 'complete' || this.readyState === 'loaded') && !loaded) {
         loaded = true;
         args.onsuccess();
@@ -289,7 +293,7 @@ module.exports.preload = (function() {
         return result;
       }
 
-      OSjs.Utils.$createCSS(src, () => {
+      DOM.$createCSS(src, () => {
         _done(true);
       }, () => {
         _done(false);
@@ -323,7 +327,7 @@ module.exports.preload = (function() {
         }
       }
 
-      OSjs.Utils.$createJS(src, () => {
+      DOM.$createJS(src, () => {
         if ( (this.readyState === 'complete' || this.readyState === 'loaded') ) {
           _done(true);
         }
@@ -360,7 +364,7 @@ module.exports.preload = (function() {
           scheme = new OSjs.GUI.Scheme();
 
           preloadTypes.javascript({
-            src: OSjs.Utils.pathJoin(OSjs.Utils.dirname(item.src), '_scheme.js'),
+            src: FS.pathJoin(FS.dirname(item.src), '_scheme.js'),
             type: 'javascript'
           }, () => {
             const look = item.src.replace(OSjs.API.getBrowserPath(), '/').replace(/^\/?packages/, '');
@@ -432,7 +436,7 @@ module.exports.preload = (function() {
     console.group('Utils::preload()', len);
 
     let data = [];
-    OSjs.Utils.asyncp(list, {max: args.max || 1}, function asyncIter(item, index, next) {
+    Utils.asyncp(list, {max: args.max || 1}, function asyncIter(item, index, next) {
       function _onentryloaded(state, src, setData) {
         total++;
         (state ? succeeded : failed).push(src);

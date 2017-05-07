@@ -29,13 +29,13 @@
  */
 'use strict';
 
-// FIXME
-const Locales = OSjs.Locales;
-
+const FS = require('utils/fs.js');
 const XHR = require('utils/xhr.js');
 const DOM = require('utils/dom.js');
 const Utils = require('utils/misc.js');
 const Compability = require('utils/compability.js');
+const GUIElement = require('gui/element.js');
+const GUIHelpers = require('gui/helpers.js');
 
 /**
  * @namespace API
@@ -199,15 +199,17 @@ ServiceNotificationIcon.prototype.remove = function(name) {
  * @return {String}
  */
 module.exports._ = function() {
+  const userLocale = require('locales/' + CurrentLocale + '.js');
+  const systemLocale = require('locales/' + DefaultLocale + '.js');
+
   var s = arguments[0];
   var a = arguments;
 
   try {
-    var cl = Locales[CurrentLocale];
-    if ( cl && cl[s] ) {
-      a[0] = cl[s];
+    if ( userLocale && userLocale[s] ) {
+      a[0] = userLocale[s];
     } else {
-      a[0] = Locales[DefaultLocale][s] || s;
+      a[0] = systemLocale[s] || s;
     }
 
     return a.length > 1 ? Utils.format.apply(null, a) : a[0];
@@ -267,7 +269,8 @@ module.exports.getLocale = function() {
 module.exports.setLocale = function(l) {
   var RTL = module.exports.getConfig('LocaleOptions.RTL', []);
 
-  if ( Locales[l] ) {
+  const locale = require('locales/' + l + '.js');
+  if ( locale ) {
     CurrentLocale = l;
   } else {
     console.warn('API::setLocale()', 'Invalid locale', l, '(Using default)');
@@ -1467,7 +1470,7 @@ module.exports.createSplash = function(name, icon, label, parentEl) {
   splash.appendChild(title);
 
   try {
-    progressBar = OSjs.GUI.Element.create('gui-progress-bar');
+    progressBar = GUIElement.create('gui-progress-bar');
     splash.appendChild(progressBar.$element);
   } catch ( e ) {
     console.warn(e, e.stack);
@@ -1891,7 +1894,7 @@ module.exports.isShuttingDown = function() {
  * @return {Boolean}
  */
 module.exports.createMenu = function() {
-  return OSjs.GUI.Helpers.createMenu.apply(null, arguments);
+  return GUIHelpers.createMenu.apply(null, arguments);
 };
 
 /**
@@ -1902,6 +1905,6 @@ module.exports.createMenu = function() {
  * @return {Boolean}
  */
 module.exports.blurMenu = function() {
-  return OSjs.GUI.Helpers.blurMenu.apply(null, arguments);
+  return GUIHelpers.blurMenu.apply(null, arguments);
 };
 

@@ -29,12 +29,10 @@
  */
 'use strict';
 
-// FIXME
-const GUI = OSjs.GUI;
-
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const Utils = require('utils/misc.js');
+const GUIHelpers = require('gui/helpers.js');
 
 /**
  * @namespace Elements
@@ -76,20 +74,20 @@ function parseDynamic(node, win, args) {
 
   node.querySelectorAll('gui-label, gui-button, gui-list-view-column, gui-select-option, gui-select-list-option').forEach(function(el) {
     if ( !el.children.length && !el.getAttribute('data-no-translate') ) {
-      const lbl = GUI.Helpers.getValueLabel(el);
+      const lbl = GUIHelpers.getValueLabel(el);
       el.appendChild(document.createTextNode(translator(lbl)));
     }
   });
 
   node.querySelectorAll('gui-button').forEach(function(el) {
-    const label = GUI.Helpers.getValueLabel(el);
+    const label = GUIHelpers.getValueLabel(el);
     if ( label ) {
       el.appendChild(document.createTextNode(API._(label)));
     }
   });
 
   node.querySelectorAll('*[data-icon]').forEach(function(el) {
-    const image = GUI.Helpers.getIcon(el, win);
+    const image = GUIHelpers.getIcon(el, win);
     el.setAttribute('data-icon', image);
   });
 
@@ -318,7 +316,7 @@ class UIElement {
    */
   set(param, value, arg, arg2) {
     if ( this.$element ) {
-      GUI.Helpers.setProperty(this.$element, param, value, arg, arg2);
+      GUIHelpers.setProperty(this.$element, param, value, arg, arg2);
     }
     return this;
   }
@@ -332,7 +330,7 @@ class UIElement {
    */
   get(param) {
     if ( this.$element ) {
-      return GUI.Helpers.getProperty(this.$element, param);
+      return GUIHelpers.getProperty(this.$element, param);
     }
     return null;
   }
@@ -405,7 +403,7 @@ class UIElement {
   querySelector(q, rui) {
     const el = this.$element.querySelector(q);
     if ( rui ) {
-      return GUI.Element.createFromNode(el, q);
+      return UIElement.createFromNode(el, q);
     }
     return el;
   }
@@ -422,7 +420,7 @@ class UIElement {
     let el = this.$element.querySelectorAll(q);
     if ( rui ) {
       el = el.map((i) => {
-        return GUI.Element.createFromNode(i, q);
+        return UIElement.createFromNode(i, q);
       });
     }
     return el;
@@ -493,11 +491,11 @@ class UIElement {
    * @return  {OSjs.GUI.Element}
    */
   static createInto(tagName, params, parentNode, applyArgs, win) {
-    if ( parentNode instanceof GUI.Element ) {
+    if ( parentNode instanceof UIElement ) {
       parentNode = parentNode.$element;
     }
 
-    const gel = GUI.Element.create(tagName, params, applyArgs, win);
+    const gel = UIElement.create(tagName, params, applyArgs, win);
     parentNode.appendChild(gel.$element);
     return gel;
   }
@@ -518,7 +516,7 @@ class UIElement {
         return instance;
       }
     }
-    return new GUI.Element(el, q);
+    return new UIElement(el, q);
   }
 
   /**
@@ -536,7 +534,7 @@ class UIElement {
     applyArgs = applyArgs || {};
     params = params || {};
 
-    const el = GUI.Helpers.createElement(tagName, params);
+    const el = GUIHelpers.createElement(tagName, params);
     return createElementInstance(null, el, null, [applyArgs, win]);
   }
 
@@ -617,7 +615,7 @@ class UIElement {
       throw new Error('GUI Element "' + name + '" already exists');
     }
 
-    const base = data.parent || GUI.Element;
+    const base = data.parent || UIElement;
     const target = Utils.inherit(base, null, classRef);
 
     REGISTRY[name] = (() => {

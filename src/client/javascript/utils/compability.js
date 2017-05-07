@@ -36,9 +36,6 @@
 /**
  * Gets browser compability flags
  *
- * @function getCompability
- * @memberof OSjs.Utils
- *
  * @return    {Object}      List of compability
  */
 module.exports.getCompability = (function() {
@@ -289,8 +286,6 @@ module.exports.getCompability = (function() {
  * Check if browser is IE
  *
  * @return    boolean       If IE
- *
- * @api       OSjs.Utils.isIE()
  */
 module.exports.isIE = function Utils_isIE() {
   const dm = parseInt(document.documentMode, 10);
@@ -301,9 +296,6 @@ module.exports.isIE = function Utils_isIE() {
  * Gets the browser Locale
  *
  * For example 'en_EN'
- *
- * @function getUserLocale
- * @memberof OSjs.Utils
  *
  * @return  {String}          Locale string
  */

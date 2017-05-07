@@ -77,7 +77,7 @@ module.exports.getPathProtocol = function Utils_getPathProtocol(orig) {
  * @return  {String}            The file extension
  */
 module.exports.filext = function Utils_filext(d) {
-  const ext = OSjs.Utils.filename(d).split('.').pop();
+  const ext = module.exports.filename(d).split('.').pop();
   return ext ? ext.toLowerCase() : null;
 };
 

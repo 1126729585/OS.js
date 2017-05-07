@@ -199,7 +199,7 @@ module.exports.mergeObject = function Utils_mergeObject(obj1, obj2, opts) {
         }
 
         if ( obj2[p].constructor === Object ) {
-          obj1[p] = OSjs.Utils.mergeObject(obj1[p], obj2[p]);
+          obj1[p] = module.exports.mergeObject(obj1[p], obj2[p]);
         } else {
           obj1[p] = obj2[p];
         }
@@ -259,7 +259,7 @@ module.exports.cloneObject = function Utils_cloneObject(o, alternative) {
  * </pre>
  *
  * @example
- * Utils.extend({
+ * extend({
  *  a: 'foo'
  * }, {
  *  b: 'bar'
@@ -283,7 +283,7 @@ module.exports.extend = function Utils_extend(obj, methods) {
  * Extends the given object by prototype chain
  *
  * @example
- * var MyApp = Utils.inherit(OSjs.Core.Application, function(name, args, metadata) {
+ * var MyApp = inherit(OSjs.Core.Application, function(name, args, metadata) {
  *  Application.apply(this, arguments);
  * }, {
  *  init: function() {
@@ -310,7 +310,7 @@ module.exports.inherit = function Utils_inherit(to, from, extend) {
   from.constructor = to;
 
   if ( extend ) {
-    OSjs.Utils.extend(from.prototype, extend);
+    module.exports.extend(from.prototype, extend);
   }
 
   return from;

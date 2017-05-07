@@ -30,13 +30,13 @@
 'use strict';
 
 // FIXME
-const GUI = OSjs.GUI;
 const VFS = OSjs.VFS;
 
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const Events = require('utils/events.js');
 const UIElement = require('gui/element.js');
+const GUIHelpers = require('gui/helpers.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // ABSTRACTION HELPERS
@@ -342,7 +342,6 @@ class UIDataView extends UIElement {
    */
   patch(entries, className, body, oncreate, oninit) {
     let single = false;
-    let remove = GUI.DataView.prototype.remove;
 
     if ( !(entries instanceof Array) ) {
       entries = [entries];
@@ -373,7 +372,7 @@ class UIDataView extends UIElement {
             }
 
             body.insertBefore(row, insertBefore);
-            remove.call(this, null, className, insertBefore, body);
+            this.remove(null, className, insertBefore, body);
           } else {
             body.appendChild(row);
           }
@@ -384,7 +383,7 @@ class UIDataView extends UIElement {
 
     if ( !single ) {
       Object.keys(inView).forEach((k) => {
-        remove.call(this, null, className, inView[k]);
+        this.remove(null, className, inView[k]);
       });
     }
 
@@ -480,13 +479,13 @@ class UIDataView extends UIElement {
 
       let source = row.getAttribute('data-draggable-source');
       if ( source === null ) {
-        source = GUI.Helpers.getWindowId(el);
+        source = GUIHelpers.getWindowId(el);
         if ( source !== null ) {
           source = {wid: source};
         }
       }
 
-      GUI.Helpers.createDraggable(row, {
+      GUIHelpers.createDraggable(row, {
         type: el.getAttribute('data-draggable-type') || row.getAttribute('data-draggable-type'),
         source: source,
         data: value
@@ -500,7 +499,7 @@ class UIDataView extends UIElement {
 
     el.dispatchEvent(new CustomEvent('_render', {detail: {
       element: row,
-      data: GUI.Helpers.getViewNodeValue(row)
+      data: GUIHelpers.getViewNodeValue(row)
     }}));
 
     if ( el.getAttribute('data-draggable') === 'true' ) {
@@ -517,7 +516,7 @@ class UIDataView extends UIElement {
       if ( DOM.$hasClass(iter, 'gui-active') ) {
         selected.push({
           index: idx,
-          data: GUI.Helpers.getViewNodeValue(iter)
+          data: GUIHelpers.getViewNodeValue(iter)
         });
       }
     });
