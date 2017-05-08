@@ -36,6 +36,8 @@ const DialogWindow = require('core/dialog.js');
 const GUIElement = require('gui/element.js');
 const VFS = require('vfs/fs.js');
 const VFSFile = require('vfs/file.js');
+const SettingsManager = require('core/settings-manager.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * An 'File' dialog
@@ -108,14 +110,14 @@ class FileDialog extends DialogWindow {
     this.selected = null;
     this.path = args.path;
 
-    this.settingsWatch = OSjs.Core.getSettingsManager().watch('VFS', () => {
+    this.settingsWatch = SettingsManager.watch('VFS', () => {
       this.changePath();
     });
   }
 
   destroy() {
     try {
-      OSjs.Core.getSettingsManager().unwatch(this.settingsWatch);
+      SettingsManager.unwatch(this.settingsWatch);
     } catch ( e ) {}
 
     return super.destroy(...arguments);
@@ -237,9 +239,8 @@ class FileDialog extends DialogWindow {
       this._find('FileInput').hide();
     }
 
-    const mm = OSjs.Core.getMountManager();
-    const rootPath = mm.getRootFromPath(this.path);
-    const modules = mm.getModules().filter((m) => {
+    const rootPath = MountManager.getRootFromPath(this.path);
+    const modules = MountManager.getModules().filter((m) => {
       if ( this.args.mfilter.length ) {
         let success = false;
 
@@ -276,8 +277,7 @@ class FileDialog extends DialogWindow {
     const lastDir = this.path;
 
     const resetLastSelected = () => {
-      const mm = OSjs.Core.getMountManager();
-      const rootPath = mm.getRootFromPath(lastDir);
+      const rootPath = MountManager.getRootFromPath(lastDir);
       try {
         this._find('ModuleSelect').set('value', rootPath);
       } catch ( e ) {

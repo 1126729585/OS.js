@@ -31,6 +31,7 @@
 
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace GoogleAPI
@@ -236,7 +237,7 @@ class GoogleAPI {
       }
     }
 
-    OSjs.Core.getMountManager().remove('GoogleDrive');
+    MountManager.remove('GoogleDrive');
 
     cb(false, true);
   }

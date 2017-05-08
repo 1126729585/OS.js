@@ -32,6 +32,7 @@
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
+const PackageManager = require('core/package-manager.js');
 
 /**
  * An 'Application Chooser' dialog
@@ -64,7 +65,7 @@ class ApplicationChooserDialog extends DialogWindow {
 
     const cols = [{label: API._('LBL_NAME')}];
     const rows = [];
-    const metadata = OSjs.Core.getPackageManager().getPackages();
+    const metadata = PackageManager.getPackages();
 
     (this.args.list || []).forEach((name) => {
       const iter = metadata[name];

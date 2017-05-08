@@ -32,6 +32,7 @@
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace WebDAV
@@ -43,8 +44,7 @@ const Utils = require('utils/misc.js');
 /////////////////////////////////////////////////////////////////////////////
 
 function getModule(item) {
-  const mm = OSjs.Core.getMountManager();
-  const module = mm.getModuleFromPath(item.path, false, true);
+  const module = MountManager.getModuleFromPath(item.path, false, true);
   if ( !module ) {
     throw new Error(API._('ERR_VFSMODULE_INVALID_FMT', item.path));
   }
@@ -161,13 +161,12 @@ function davCall(method, args, callback, raw) {
  */
 const Transport = {
   scandir: function(item, callback, options) {
-    const mm = OSjs.Core.getMountManager();
 
     function parse(doc) {
       const ns = getNamespace(item);
       const list = [];
       const reqpath = resolvePath(item);
-      const root = mm.getRootFromPath(item.path);
+      const root = MountManager.getRootFromPath(item.path);
 
       doc.children.forEach((c) => {
         let type = 'file';

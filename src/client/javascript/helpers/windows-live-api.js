@@ -32,6 +32,7 @@
 
 const XHR = require('utils/xhr.js');
 const API = require('core/api.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace OSjs.Helpers.WindowsLiveAPI
@@ -230,7 +231,7 @@ class WindowsLiveAPI {
 
     WL.logout();
 
-    OSjs.Core.getMountManager().remove('OneDrive');
+    MountManager.remove('OneDrive');
   }
 
   /*

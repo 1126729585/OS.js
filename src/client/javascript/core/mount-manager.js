@@ -31,6 +31,7 @@
 
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
+const SettingsManager = require('core/settings-manager.js');
 
 /**
  * A mountpoint object for use in MountManager
@@ -302,8 +303,7 @@ const MountManager = (() => {
      * @param {Function} callback Callback when done
      */
     restore: function(callback) {
-      const sm = OSjs.Core.getSettingsManager();
-      Utils.asyncs(sm.instance('VFS').get('mounts', []), (iter, idx, next) => {
+      Utils.asyncs(SettingsManager.instance('VFS').get('mounts', []), (iter, idx, next) => {
         try {
           MountManager.add(iter, next);
         } catch ( e ) {

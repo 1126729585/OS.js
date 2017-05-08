@@ -34,6 +34,7 @@ const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const Utils = require('utils/misc.js');
+const SettingsManager = require('core/settings-manager.js');
 
 /**
  * This is the contents of a 'metadata.json' file for a package.
@@ -192,7 +193,7 @@ const PackageManager = (function() {
         return;
       }
 
-      const paths = OSjs.Core.getSettingsManager().instance('PackageManager').get('PackagePaths', []);
+      const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
       API.call('packages', {command: 'list', args: {paths: paths}}, (err, res) => {
         if ( res ) {
           packages = {};
@@ -218,7 +219,7 @@ const PackageManager = (function() {
      * @param  {Function} callback      callback
      */
     generateUserMetadata: function(callback) {
-      const paths = OSjs.Core.getSettingsManager().instance('PackageManager').get('PackagePaths', []);
+      const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
       API.call('packages', {command: 'cache', args: {action: 'generate', scope: 'user', paths: paths}}, () => {
         this._loadMetadata(callback);
       });
@@ -278,7 +279,7 @@ const PackageManager = (function() {
      * @param {Function}        cb          Callback function
      */
     install: function(file, root, cb) {
-      const paths = OSjs.Core.getSettingsManager().instance('PackageManager').get('PackagePaths', []);
+      const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
       if ( typeof root !== 'string' ) {
         root = paths[0];
       }
@@ -334,8 +335,7 @@ const PackageManager = (function() {
      * @param {Function}  callback  Callback => fn(error, result)
      */
     getStorePackages: function(opts, callback) {
-      const sm = OSjs.Core.getSettingsManager();
-      const repos = sm.instance('PackageManager').get('Repositories', []);
+      const repos = SettingsManager.instance('PackageManager').get('Repositories', []);
 
       let entries = [];
 
@@ -392,7 +392,7 @@ const PackageManager = (function() {
      * @return {Metadata[]}
      */
     getPackages: function(filtered) {
-      const hidden = OSjs.Core.getSettingsManager().instance('PackageManager').get('Hidden', []);
+      const hidden = SettingsManager.instance('PackageManager').get('Hidden', []);
       const p = Utils.cloneObject(packages);
 
       function allowed(i, iter) {

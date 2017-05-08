@@ -34,9 +34,11 @@ const API = require('core/api.js');
 const GUI = require('utils/gui.js');
 const Scheme = require('gui/scheme.js');
 const Events = require('utils/events.js');
+const Application = require('core/application.js');
 const Compability = require('utils/compability.js');
 const GUIElement = require('gui/element.js');
 const VFSFile = require('vfs/file.js');
+const WindowManager = require('core/windowmanager.js');
 
 /**
  * The predefined events are as follows:
@@ -103,7 +105,7 @@ const getNextZindex = (function() {
  * @api OSjs.API.getWindowSpace()
  */
 function getWindowSpace() {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = WindowManager.instance;
   if ( wm ) {
     return wm.getWindowSpace();
   }
@@ -120,7 +122,7 @@ function getWindowSpace() {
  * Wrapper to wait for animations to finish
  */
 function waitForAnimation(win, cb) {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = WindowManager.instance;
   const anim = wm ? wm.getSetting('animations') : false;
   if ( anim ) {
     win._animationCallback = cb;
@@ -138,7 +140,7 @@ const createMediaQueries = (function() {
   function _createQueries() {
     let result = {};
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( wm ) {
       const qs = wm.getDefaultSetting('mediaQueries') || {};
 
@@ -166,7 +168,7 @@ const createMediaQueries = (function() {
  * Checks window dimensions and makes media queries dynamic
  */
 function checkMediaQueries(win) {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = WindowManager.instance;
   if ( !win._$element || !wm ) {
     return;
   }
@@ -255,7 +257,7 @@ class Window {
       throw new Error(API._('ERR_WIN_DUPLICATE_FMT', name));
     }
 
-    if ( appRef && !(appRef instanceof OSjs.Core.Application) ) {
+    if ( appRef && !(appRef instanceof Application) ) {
       throw new TypeError('appRef given was not instance of Core.Application');
     }
 
@@ -534,7 +536,7 @@ class Window {
 
     ((properties, position) => {
       if ( !properties.gravity && (typeof position.x === 'undefined') || (typeof position.y === 'undefined') ) {
-        const wm = OSjs.Core.getWindowManager();
+        const wm = WindowManager.instance;
         const np = wm ? wm.getWindowPosition() : {x: 0, y: 0};
 
         position.x = np.x;
@@ -870,7 +872,7 @@ class Window {
 
     this._destroyed = true;
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
 
     console.group('Window::destroy()');
 
@@ -1141,7 +1143,7 @@ class Window {
     console.debug('Window::_addChild()');
     w._parent = this;
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( wmAdd && wm ) {
       wm.addWindow(w, wmFocus);
     }
@@ -1308,7 +1310,7 @@ class Window {
 
     this._onChange('minimize');
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     const win = wm ? wm.getCurrentWindow() : null;
     if ( win && win._wid === this._wid ) {
       wm.setCurrentWindow(null);
@@ -1437,7 +1439,7 @@ class Window {
     this._$element.style.zIndex = getNextZindex(this._state.ontop);
     this._$element.setAttribute('data-focused', 'true');
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     const win = wm ? wm.getCurrentWindow() : null;
     if ( win && win._wid !== this._wid ) {
       win._blur();
@@ -1484,7 +1486,7 @@ class Window {
     // Force all standard HTML input elements to loose focus
     this._blurGUI();
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     const win = wm ? wm.getCurrentWindow() : null;
     if ( win && win._wid === this._wid ) {
       wm.setCurrentWindow(null);
@@ -1575,7 +1577,7 @@ class Window {
     };
 
     const _resizeFinished = () => {
-      const wm = OSjs.Core.getWindowManager();
+      const wm = WindowManager.instance;
       const anim = wm ? wm.getSetting('animations') : false;
       if ( anim ) {
         this._animationCallback = () => {
@@ -1653,7 +1655,7 @@ class Window {
    * @param   {Object}      pos       Position rectangle
    */
   _moveTo(pos) {
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( !wm ) {
       return;
     }
@@ -2006,7 +2008,7 @@ class Window {
     ev = ev || '';
     if ( ev ) {
       console.debug(this._name, '>', 'Window::_onChange()', ev);
-      const wm = OSjs.Core.getWindowManager();
+      const wm = WindowManager.instance;
       if ( wm ) {
         wm.eventWindow(ev, this);
       }
@@ -2031,7 +2033,7 @@ class Window {
     let topMargin = 23;
     let borderSize = 0;
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( wm ) {
       const theme = wm.getStyleTheme(true, true);
       if ( theme && theme.style && theme.style.window ) {

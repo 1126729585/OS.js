@@ -31,6 +31,7 @@
 
 const FS = require('utils/fs.js');
 const XHR = require('utils/xhr.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace Web
@@ -65,9 +66,8 @@ const XHR = require('utils/xhr.js');
  * @memberof OSjs.VFS.Transports.Web
  */
 function makePath(file) {
-  const mm = OSjs.Core.getMountManager();
-  const rel = mm.getPathProtocol(file.path);
-  const module = mm.getModuleFromPath(file.path, false, true);
+  const rel = MountManager.getPathProtocol(file.path);
+  const module = MountManager.getModuleFromPath(file.path, false, true);
   const base = (module.options || {}).url;
   return base + rel.replace(/^\/+/, '/');
 }
@@ -111,8 +111,7 @@ function httpCall(func, item, callback) {
  */
 const Transport = {
   scandir: function(item, callback, options) {
-    const mm = OSjs.Core.getMountManager();
-    const root = mm.getRootFromPath(item.path);
+    const root = MountManager.getRootFromPath(item.path);
 
     httpCall('scandir', item, (error, response) => {
       let list = null;
@@ -153,7 +152,7 @@ const Transport = {
     httpCall('read', item, (error, response) => {
       if ( !error ) {
         if ( options.type === 'text' ) {
-          OSjs.VFS.Helpers.abToText(response, mime, (error, text) => {
+          FS.abToText(response, mime, (error, text) => {
             callback(error, text);
           });
           return;

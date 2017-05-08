@@ -35,6 +35,7 @@ const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const VFSFile = require('vfs/file.js');
 const VFSFileData = require('vfs/filedata.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace GoogleDrive
@@ -745,8 +746,7 @@ GoogleDriveStorage.mkdir = function(dir, callback) {
     });
   }
 
-  const mm = OSjs.Core.getMountManager();
-  if ( FS.getPathFromVirtual(FS.dirname(dir.path)) !== FS.getPathFromVirtual(mm.getModuleProperty('GoogleDrive', 'root')) ) {
+  if ( FS.getPathFromVirtual(FS.dirname(dir.path)) !== FS.getPathFromVirtual(MountManager.getModuleProperty('GoogleDrive', 'root')) ) {
     getParentPathId(dir, (error, id) => {
       console.debug('GoogleDrive::mkdir()->getParentPathId()', id, 'of', dir);
       if ( error || !id ) {

@@ -421,8 +421,9 @@ module.exports.checkAcceptMime = function Utils_checkAcceptMime(mime, list) {
  */
 module.exports.filterScandir = function filterScandir(list, options) {
   const Utils = require('utils/misc.js');
+  const SettingsManager = require('core/settings-manager.js');
 
-  var defaultOptions = Utils.cloneObject(OSjs.Core.getSettingsManager().get('VFS') || {});
+  var defaultOptions = Utils.cloneObject(SettingsManager.get('VFS') || {});
   var ioptions = Utils.cloneObject(options, true);
   var ooptions = Object.assign({}, defaultOptions.scandir || {}, ioptions);
   ooptions = Object.assign({}, {

@@ -32,10 +32,9 @@
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const Utils = require('utils/misc.js');
-const Window = require('core/window.js');
 const Events = require('utils/events.js');
 const Process = require('core/process.js');
-const DialogWindow = require('core/dialog.js');
+const SettingsManager = require('core/settings-manager.js');
 
 let _LNEWX = 0;
 let _LNEWY = 0;
@@ -446,7 +445,7 @@ class WindowManager extends Process {
 
     this._$notifications = null;
     this._windows        = [];
-    this._settings       = OSjs.Core.getSettingsManager().instance(name, settings);
+    this._settings       = SettingsManager.instance(name, settings);
     this._currentWin     = null;
     this._lastWin        = null;
     this._mouselock      = true;
@@ -572,6 +571,9 @@ class WindowManager extends Process {
    * @return  {OSjs.Core.Window}                The added window
    */
   addWindow(w, focus) {
+    const Window = require('core/window.js');
+    const DialogWindow = require('core/dialog.js');
+
     if ( !(w instanceof Window) ) {
       console.warn('WindowManager::addWindow()', 'Got', w);
       throw new TypeError('given argument was not instance of Core.Window');
@@ -608,6 +610,8 @@ class WindowManager extends Process {
    * @return  {Boolean}               On success
    */
   removeWindow(w) {
+    const Window = require('core/window.js');
+
     if ( !(w instanceof Window) ) {
       console.warn('WindowManager::removeWindow()', 'Got', w);
       throw new TypeError('given argument was not instance of Core.Window');

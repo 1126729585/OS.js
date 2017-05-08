@@ -981,7 +981,7 @@ module.exports.createMenu = function createMenu(items, ev, customInstance) {
     root = root.$element;
   }
 
-  var wm = OSjs.Core.getWindowManager();
+  var wm = require('core/windowmanager.js').instance;
   var space = wm.getWindowSpace(true);
   var pos = Events.mousePosition(ev);
 

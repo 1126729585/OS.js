@@ -33,6 +33,7 @@
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const Application = require('core/application.js');
+const SettingsManager = require('core/settings-manager.js');
 
 let _instance;
 
@@ -110,7 +111,7 @@ class Storage {
         data.push(proc._getSessionData());
       }
     });
-    OSjs.Core.getSettingsManager().set('UserSession', null, data, callback);
+    SettingsManager.set('UserSession', null, data, callback);
   }
 
   /**
@@ -121,7 +122,7 @@ class Storage {
   getLastSession(callback) {
     callback = callback || function() {};
 
-    const res = OSjs.Core.getSettingsManager().get('UserSession');
+    const res = SettingsManager.get('UserSession');
     const list = [];
     (res || []).forEach((iter, i) => {
       const args = iter.args;

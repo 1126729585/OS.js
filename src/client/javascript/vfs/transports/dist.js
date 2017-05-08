@@ -30,6 +30,7 @@
 'use strict';
 
 const API = require('core/api.js');
+const MountManager = require('core/mount-manager.js');
 
 /**
  * @namespace Dist
@@ -48,9 +49,8 @@ const API = require('core/api.js');
 const Transport = {
   url: function(item, callback) {
     const root = API.getBrowserPath();
-    const mm = OSjs.Core.getMountManager();
-    const module = mm.getModuleFromPath(item.path, false, true);
-    const url = item.path.replace(module.match, root);
+    const module = MountManager.getModuleFromPath(item.path, false, true);
+    const url = item.path.replace(module.match, root).replace(/^\/+/, '/');
 
     callback(false, url);
   },

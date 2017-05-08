@@ -32,6 +32,7 @@
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const Events = require('utils/events.js');
+const WindowManager = require('core/windowmanager.js');
 
 /*
  * Attaches options to a XHR call
@@ -225,7 +226,7 @@ class Connection {
     console.warn('Connection::onOnline()', 'Going online...');
     this.offline = false;
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( wm ) {
       wm.notification({title: API._('LBL_INFO'), message: API._('CONNECTION_RESTORED')});
     }
@@ -249,7 +250,7 @@ class Connection {
 
     this.offline = true;
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( wm ) {
       wm.notification({title: API._('LBL_WARNING'), message: API._(reconnecting ? 'CONNECTION_RESTORE_FAILED' : 'CONNECTION_LOST')});
     }

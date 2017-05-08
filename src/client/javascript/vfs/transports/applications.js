@@ -29,6 +29,8 @@
  */
 'use strict';
 
+const PackageManager = require('core/package-manager.js');
+
 /**
  * @namespace Applications
  * @memberof OSjs.VFS.Transports
@@ -45,7 +47,7 @@
  */
 const Transport = {
   scandir: function(item, callback, options) {
-    const metadata = OSjs.Core.getPackageManager().getPackages();
+    const metadata = PackageManager.getPackages();
     const files = [];
 
     Object.keys(metadata).forEach((m) => {

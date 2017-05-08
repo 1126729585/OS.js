@@ -34,6 +34,8 @@ const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const VFS = require('vfs/fs.js');
 const VFSFile = require('vfs/file.js');
+const PackageManager = require('core/package-manager.js');
+const SettingsManager = require('core/settings-manager.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // HELPERS
@@ -84,7 +86,7 @@ function SearchObject(obj) {
  */
 const ApplicationModule = (function() {
   function query() {
-    const packages = OSjs.Core.getPackageManager().getPackages();
+    const packages = PackageManager.getPackages();
 
     return Object.keys(packages).map((pn) => {
       const p = packages[pn];
@@ -219,8 +221,7 @@ const SearchEngine = (function() {
         return;
       }
 
-      const manager = OSjs.Core.getSettingsManager();
-      settings = manager.get('SearchEngine') || {};
+      settings = SettingsManager.get('SearchEngine') || {};
 
       inited = true;
 

@@ -30,6 +30,8 @@
 
 'use strict';
 
+const SettingsFragment = require('helpers/settings-fragment.js');
+
 /**
  * Settings Manager Class
  *
@@ -166,7 +168,7 @@ SettingsManager.instance = function(pool, defaults) {
     this.storage[pool] = {};
   }
 
-  const instance = new OSjs.Helpers.SettingsFragment(this.storage[pool], pool);
+  const instance = new SettingsFragment(this.storage[pool], pool);
   if ( arguments.length > 1 ) {
     SettingsManager.defaults(pool, defaults);
     instance.mergeDefaults(defaults);

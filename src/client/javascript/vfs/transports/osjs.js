@@ -32,6 +32,7 @@
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const VFSFile = require('vfs/file.js');
+const Connection = require('core/connection.js');
 
 /**
  * @namespace OSjs
@@ -57,7 +58,7 @@ function makePath(item, options) {
   if ( typeof item === 'string' ) {
     item = new VFSFile(item);
   }
-  return OSjs.Core.getConnection().getVFSPath(item, options);
+  return Connection.instance.getVFSPath(item, options);
 }
 
 /**
@@ -130,7 +131,7 @@ function internalUpload(file, dest, callback, options, vfsfile) {
 
   FS.addFormFile(fd, 'upload', file, options.meta);
 
-  OSjs.Core.getConnection().request('FS:upload', fd, callback, null, options);
+  Connection.instance.request('FS:upload', fd, callback, null, options);
 }
 
 /**

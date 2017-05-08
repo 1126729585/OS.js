@@ -39,6 +39,7 @@ const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
 const GUIElement = require('gui/element.js');
 const GUIDataView = require('gui/dataview.js');
+const SettingsManager = require('core/settings-manager.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // ABSTRACTION HELPERS
@@ -164,7 +165,7 @@ function getListViewColumns(cls, iter, opts) {
   let useColumns = defColumns;
 
   if ( !opts.defaultcolumns ) {
-    const vfsOptions = Utils.cloneObject(OSjs.Core.getSettingsManager().get('VFS') || {});
+    const vfsOptions = Utils.cloneObject(SettingsManager.get('VFS') || {});
     const scandirOptions = vfsOptions.scandir || {};
     useColumns = scandirOptions.columns || defColumns;
   }
@@ -248,7 +249,7 @@ function readdir(cls, dir, done, sopts) {
   }
   sopts = sopts || {};
 
-  const vfsOptions = Utils.cloneObject(OSjs.Core.getSettingsManager().get('VFS') || {});
+  const vfsOptions = Utils.cloneObject(SettingsManager.get('VFS') || {});
   const scandirOptions = vfsOptions.scandir || {};
 
   const el = cls.$element;
@@ -460,7 +461,7 @@ class GUIFileView extends GUIElement {
   }
 
   contextmenu(ev) {
-    const vfsOptions = OSjs.Core.getSettingsManager().instance('VFS');
+    const vfsOptions = SettingsManager.instance('VFS');
     const scandirOptions = (vfsOptions.get('scandir') || {});
 
     function setOption(opt, toggle) {

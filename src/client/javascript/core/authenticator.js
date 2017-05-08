@@ -168,8 +168,8 @@ class Authenticator {
    * @param   {CallbackHandler}      callback        Callback function
    */
   onLogin(data, callback) {
-    const sm = OSjs.Core.getSettingsManager();
-    const pm = OSjs.Core.getPackageManager();
+    const sm = require('core/settings-manager.js');
+    const pm = require('core/package-manager.js');
 
     let userSettings = data.userSettings;
     if ( !userSettings || userSettings instanceof Array ) {

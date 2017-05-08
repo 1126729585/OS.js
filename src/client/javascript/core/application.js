@@ -31,8 +31,8 @@
 'use strict';
 
 const Process = require('core/process.js');
-const Window = require('core/window.js');
-const Scheme = require('gui/scheme.js');
+const SettingsManager = require('core/settings-manager.js');
+const WindowManager = require('core/windowmanager.js');
 
 /**
  * Look at the 'ProcessEvent' for more.
@@ -116,11 +116,11 @@ class Application extends Process {
     this.__destroying = false;
 
     try {
-      this.__settings = OSjs.Core.getSettingsManager().instance(name, settings || {});
+      this.__settings = SettingsManager.instance(name, settings || {});
     } catch ( e ) {
       console.warn('Application::construct()', 'An error occured while loading application settings', e);
       console.warn(e.stack);
-      this.__settings = OSjs.Core.getSettingsManager().instance(name, {});
+      this.__settings = SettingsManager.instance(name, {});
     }
 
     console.groupEnd();
@@ -135,7 +135,7 @@ class Application extends Process {
    */
   init(settings, metadata, scheme) {
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
 
     const focusLastWindow = () => {
       let last;
@@ -241,18 +241,21 @@ class Application extends Process {
    * @function _loadScheme
    * @memberof OSjs.Core.Application#
    *
-   * @param   {String}        s       Scheme filename
+   * @param   {String}        str     Scheme filename
    * @param   {Function}      cb      Callback => fn(scheme)
    */
-  _loadScheme(s, cb) {
-    const scheme = new Scheme(this._getResource(s));
-    scheme.load(function __onApplicationLoadScheme(error, result) {
+  _loadScheme(str, cb) {
+    const Scheme = require('gui/scheme.js');
+
+    const s = new Scheme(this._getResource(str));
+    s.load(function __onApplicationLoadScheme(error, result) {
       if ( error ) {
         console.error('Application::_loadScheme()', error);
       }
-      cb(scheme);
+      cb(s);
     });
-    this._setScheme(scheme);
+
+    this._setScheme(s);
   }
 
   /**
@@ -267,6 +270,7 @@ class Application extends Process {
    * @return  {OSjs.Core.Window}
    */
   _addWindow(w, cb, setmain) {
+    const Window = require('core/window.js');
     if ( !(w instanceof Window) ) {
       throw new TypeError('Application::_addWindow() expects Core.Window');
     }
@@ -278,7 +282,7 @@ class Application extends Process {
       this.__mainwindow = w._name;
     }
 
-    const wm = OSjs.Core.getWindowManager();
+    const wm = WindowManager.instance;
     if ( this.__inited ) {
       if ( wm ) {
         wm.addWindow(w);
@@ -304,6 +308,7 @@ class Application extends Process {
    * @return  {Boolean}
    */
   _removeWindow(w) {
+    const Window = require('core/window.js');
     if ( !(w instanceof Window) ) {
       throw new TypeError('Application::_removeWindow() expects Core.Window');
     }

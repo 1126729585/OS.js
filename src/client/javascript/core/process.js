@@ -188,12 +188,14 @@ class Process {
    * @param   {Object}    [opts]    Message options
    */
   _onMessage(msg, obj, opts) {
+    const Window = require('core/window.js');
+
     opts = opts || {};
 
     let sourceId = opts.source;
     if ( sourceId instanceof Process ) {
       sourceId = sourceId.__pid;
-    } else if ( sourceId instanceof OSjs.Core.Window ) {
+    } else if ( sourceId instanceof Window ) {
       sourceId = sourceId._app ? sourceId._app.__pid : -1;
     }
 

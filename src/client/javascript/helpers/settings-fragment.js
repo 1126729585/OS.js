@@ -99,6 +99,8 @@ class SettingsFragment {
    * @return  {OSjs.Helpers.SettingsFragment}  Itself `this`
    */
   set(key, value, save, triggerWatch) {
+    const SettingsManager = require('core/settings-manager.js');
+
     // Key here is actually the value
     // So you can update the whole object if you want.
     if ( key === null ) {
@@ -112,11 +114,11 @@ class SettingsFragment {
     }
 
     if (save) {
-      OSjs.Core.getSettingsManager().save(this._pool, save);
+      SettingsManager.save(this._pool, save);
     }
 
     if ( typeof triggerWatch === 'undefined' || triggerWatch === true ) {
-      OSjs.Core.getSettingsManager().changed(this._pool);
+      SettingsManager.changed(this._pool);
     }
 
     return this;
@@ -134,7 +136,8 @@ class SettingsFragment {
    * @return  Boolean
    */
   save(callback) {
-    return OSjs.Core.getSettingsManager().save(this._pool, callback);
+    const SettingsManager = require('core/settings-manager.js');
+    return SettingsManager.save(this._pool, callback);
   }
 
   getChained() {
@@ -182,7 +185,7 @@ class SettingsFragment {
       throw new Error('The object doesn\'t contain that key. SettingsFragment will not work.');
     }
 
-    return new OSjs.Helpers.SettingsFragment(this._settings[key], this._pool);
+    return new SettingsFragment(this._settings[key], this._pool);
   }
 
 }

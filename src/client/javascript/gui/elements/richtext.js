@@ -81,7 +81,7 @@ function setDocumentData(el, text) {
 
   text = text || '';
 
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
   const theme = (wm ? wm.getSetting('theme') : 'default') || 'default';
   const themeSrc = OSjs.API.getThemeCSS(theme);
 
