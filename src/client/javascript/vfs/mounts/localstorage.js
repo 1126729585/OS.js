@@ -34,7 +34,6 @@ const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const VFS = require('vfs/fs.js');
-const VFSFile = require('vfs/file.js');
 
 /**
  * @namespace LocalStorage
@@ -94,7 +93,7 @@ function createMetadata(i, path, p) {
   }
   i.path = p + i.filename;
 
-  return new VFSFile(i);
+  return new VFS.File(i);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -451,7 +450,7 @@ const LocalStorageStorage = {
             if ( list && list.length ) {
               Utils.asyncs(list, (entry, idx, next) => {
                 const rp = entry.path.substr(src.path.length);
-                const nd = new VFSFile(dest.path + rp);
+                const nd = new VFS.File(dest.path + rp);
 
                 //console.warn('----->', 'source root', s);
                 //console.warn('----->', 'dest root', d);
@@ -571,7 +570,7 @@ const LocalStorageStorage = {
   },
 
   upload: function(file, dest, callback) {
-    const check = new VFSFile(FS.pathJoin((new VFSFile(dest)).path, file.name), file.type);
+    const check = new VFS.File(FS.pathJoin((new VFS.File(dest)).path, file.name), file.type);
     check.size = file.size;
     check.type = 'file';
 

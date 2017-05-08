@@ -35,7 +35,6 @@ const API = require('core/api.js');
 const VFS = require('vfs/fs.js');
 const XHR = require('utils/xhr.js');
 const Utils = require('utils/misc.js');
-const VFSFile = require('vfs/file.js');
 
 /**
  * @namespace ZipArchiver
@@ -496,7 +495,7 @@ class ZipArchiver {
 
         console.log('Extract', item, dest);
         if ( item.directory ) {
-          VFS.mkdir(new VFSFile(dest), (error, result) => {
+          VFS.mkdir(new VFS.File(dest), (error, result) => {
             if ( error ) {
               warnings.push(Utils.format('Could not create directory "{0}": {1}', item.filename, error));
             } else {

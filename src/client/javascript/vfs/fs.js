@@ -32,9 +32,7 @@
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
-const VFSFile = require('vfs/file.js');
-const VFSFileData = require('vfs/filedata.js');
-const Connection = require('core/connection.js');
+const VFS = require('vfs/fs.js');
 const MountManager = require('core/mount-manager.js');
 const PackageManager = require('core/package-manager.js');
 const SettingsManager = require('core/settings-manager.js');
@@ -162,7 +160,7 @@ function request(test, method, args, callback, options, appRef) {
     throw new TypeError(API._('ERR_ARGUMENT_FMT', 'VFS::' + method, 'options', 'Object', typeof options));
   }
 
-  const conn = Connection.instance;
+  const conn = require('core/connection.js').instance;
   conn.onVFSRequest(d, method, args, function vfsRequestCallback(err, response) {
     if ( arguments.length === 2 ) {
       console.warn('VFS::request()', 'Core::onVFSRequest hijacked the VFS request');
@@ -246,12 +244,12 @@ function isReadOnly(item) {
  */
 function checkMetadataArgument(item, err, checkRo) {
   if ( typeof item === 'string' ) {
-    item = new VFSFile(item);
+    item = new VFS.File(item);
   } else if ( typeof item === 'object' && item.path ) {
-    item = new VFSFile(item);
+    item = new VFS.File(item);
   }
 
-  if ( !(item instanceof VFSFile) ) {
+  if ( !(item instanceof VFS.File) ) {
     throw new TypeError(err || API._('ERR_VFS_EXPECT_FILE'));
   }
 
@@ -332,7 +330,7 @@ function createBackLink(item, result, alias, oitem) {
     });
 
     if ( !foundBack ) {
-      return new VFSFile({
+      return new VFS.File({
         filename: '..',
         path: FS.dirname(item.path),
         mime: null,
@@ -408,8 +406,8 @@ function broadcastMessage(msg, item, appRef) {
   // Makes sure aliased paths are called for
   const aliased = (function() {
     function _transform(i) {
-      if ( i instanceof VFSFile ) {
-        const n = new VFSFile(i);
+      if ( i instanceof VFS.File ) {
+        const n = new VFS.File(i);
         const alias = findAlias(n);
         if ( alias ) {
           n.path = n.path.replace(alias.options.alias, alias.root);
@@ -420,7 +418,7 @@ function broadcastMessage(msg, item, appRef) {
       return false;
     }
 
-    if ( item instanceof VFSFile ) {
+    if ( item instanceof VFS.File ) {
       return _transform(item);
     } else if ( item && item.destination && item.source ) {
       return {
@@ -435,7 +433,7 @@ function broadcastMessage(msg, item, appRef) {
   _message(item);
 
   const tuple = aliased.source || aliased.destination;
-  if ( aliased && (aliased instanceof VFSFile || tuple) ) {
+  if ( aliased && (aliased instanceof VFS.File || tuple) ) {
     if ( tuple ) {
       aliased.source = aliased.source || item.source;
       aliased.destination = aliased.destination || item.destination;
@@ -512,7 +510,7 @@ module.exports.scandir = function VFS_scandir(item, callback, options) {
     return;
   }
 
-  const oitem = new VFSFile(item);
+  const oitem = new VFS.File(item);
   const alias = hasAlias(oitem, true);
 
   try {
@@ -527,7 +525,7 @@ module.exports.scandir = function VFS_scandir(item, callback, options) {
     if ( alias && result ) {
       result = result.map(function(iter) {
         const isShortcut = iter.shortcut === true;
-        const niter = new VFSFile(iter);
+        const niter = new VFS.File(iter);
         if ( !isShortcut ) {
           const str = iter.path.replace(/\/?$/, '');
           const tmp = alias.options.alias.replace(/\/?$/, '');
@@ -615,7 +613,7 @@ module.exports.write = function VFS_write(item, data, callback, options, appRef)
         _converted(null, data);
       }
     } else {
-      if ( data instanceof VFSFileData ) {
+      if ( data instanceof VFS.FileData ) {
         FS.dataSourceToAb(data.toString(), item.mime, function(error, response) {
           _converted(error, response);
         });
@@ -963,7 +961,7 @@ module.exports.unlink = function VFS_unlink(item, callback, options, appRef) {
     const pkgdir = SettingsManager.instance('PackageManager').get('PackagePaths', []);
 
     const found = pkgdir.some(function(i) {
-      const chkdir = new VFSFile(i);
+      const chkdir = new VFS.File(i);
       const idir = FS.dirname(item.path);
       return idir === chkdir.path;
     });
@@ -1177,14 +1175,14 @@ module.exports.upload = function VFS_upload(args, callback, options, appRef) {
     return;
   }
 
-  if ( isReadOnly(new VFSFile(args.destination)) ) {
+  if ( isReadOnly(new VFS.File(args.destination)) ) {
     callback(API._('ERR_VFSMODULE_READONLY_FMT', mm.getModuleFromPath(args.destination)));
     return;
   }
 
   args.files.forEach(function(f, i) {
     const filename = (f instanceof window.File) ? f.name : f.filename;
-    const dest = new VFSFile(FS.pathJoin(args.destination, filename));
+    const dest = new VFS.File(FS.pathJoin(args.destination, filename));
 
     existsWrapper(dest, function(error) {
       if ( error ) {
@@ -1193,7 +1191,7 @@ module.exports.upload = function VFS_upload(args, callback, options, appRef) {
       }
 
       try {
-        let realDest = new VFSFile(args.destination);
+        let realDest = new VFS.File(args.destination);
 
         const tmpPath = hasAlias(realDest);
         if ( tmpPath ) {
@@ -1270,8 +1268,8 @@ module.exports.download = (function download() {
     const dmodule = mm.getModuleFromPath(args.path);
     if ( !mm.isInternal(args.path) ) {
       let file = args;
-      if ( !(file instanceof VFSFile) ) {
-        file = new VFSFile(args.path);
+      if ( !(file instanceof VFS.File) ) {
+        file = new VFS.File(args.path);
         if ( args.id ) {
           file.id = args.id;
         }
@@ -1480,3 +1478,338 @@ module.exports.unwatch = function VFS_unwatch(idx) {
 };
 
 module.exports.broadcastMessage = broadcastMessage;
+
+/////////////////////////////////////////////////////////////////////////////
+// FILE ABSTRACTION
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This is the Metadata object you have to use when passing files around
+ * in the VFS API.
+ *
+ * This object has the same properties as in the option list below
+ *
+ * If you construct without a MIME type, OS.js will try to guess what it is.
+ *
+ * @constructor File
+ * @memberof OSjs.VFS
+ * @see OSjs.VFS.file
+ */
+class FileMetadata {
+  /*eslint valid-jsdoc: "off"*/
+
+  /**
+   * @param   {(String|Object)} arg           Either a 'path' or 'object' (filled with properties)
+   * @param   {String}          arg.path      Full path
+   * @param   {String}          arg.filename  Filename (automatically detected)
+   * @param   {String}          arg.type      File type (file/dir)
+   * @param   {Number}          arg.size      File size (in bytes)
+   * @param   {String}          arg.mime      File MIME (ex: application/json)
+   * @param   {Mixed}           arg.id        Unique identifier (not required)
+   * @param   {String}          [mime]        MIME type of File Type (ex: 'application/json' or 'dir')
+   */
+  constructor(arg, mime) {
+    if ( !arg ) {
+      throw new Error(API._('ERR_VFS_FILE_ARGS'));
+    }
+
+    /**
+     * Full path
+     * @type {String}
+     * @example home:///foo/bar.baz
+     */
+    this.path     = null;
+
+    /**
+     * Filename
+     * @type {String}
+     * @example foo.baz
+     */
+    this.filename = null;
+
+    /**
+     * Type (dir or file)
+     * @type {String}
+     * @example file
+     */
+    this.type     = null;
+
+    /**
+     * Size in bytes
+     * @type {Number}
+     * @example 1234
+     */
+    this.size     = null;
+
+    /**
+     * MIME type
+     * @type {String}
+     * @example application/octet-stream
+     */
+    this.mime     = null;
+
+    /**
+     * Unique identifier (Only used for external services requring it)
+     * @type {String}
+     */
+    this.id       = null;
+
+    /**
+     * Internal boolean for a shortcut type file
+     * @type {Boolean}
+     */
+    this.shortcut = false;
+
+    if ( typeof arg === 'object' ) {
+      this.setData(arg);
+    } else if ( typeof arg === 'string' ) {
+      this.path = arg;
+      this.setData();
+    }
+
+    if ( typeof mime === 'string' ) {
+      if ( mime.match(/\//) ) {
+        this.mime = mime;
+      } else {
+        this.type = mime;
+      }
+    }
+
+    this._guessMime();
+  }
+
+  /**
+   * Set data from Object (key/value pair)
+   *
+   * @param {Object}    o     Object
+   */
+  setData(o) {
+    if ( o ) {
+      Object.keys(o).forEach((k) => {
+        if ( k !== '_element' ) {
+          this[k] = o[k];
+        }
+      });
+    }
+
+    if ( !this.filename ) {
+      this.filename = FS.filename(this.path);
+    }
+  }
+
+  /**
+   * Get object data as key/value pair.
+   *
+   * @return {Object}
+   */
+  getData() {
+    return {
+      path: this.path,
+      filename: this.filename,
+      type: this.type,
+      size: this.size,
+      mime: this.mime,
+      id: this.id
+    };
+  }
+
+  /**
+   * Copies the file to given destination.
+   *
+   * @alias OSjs.VFS.copy
+   * @see OSjs.VFS.copy
+   */
+  copy(dest, callback, options, appRef) {
+    return require('vfs/fs.js').copy(this, dest, callback, options, appRef);
+  }
+
+  /**
+   * Downloads the file to computer
+   *
+   * @alias OSjs.VFS.download
+   * @see OSjs.VFS.download
+   */
+  download(callback) {
+    return require('vfs/fs.js').download(this, callback);
+  }
+
+  /**
+   * Deletes the file
+   *
+   * @alias OSjs.VFS.File#unlink
+   * @see OSjs.VFS.File#unlink
+   */
+  delete() {
+    return this.unlink.apply(this, arguments);
+  }
+
+  /**
+   * Removes the file
+   *
+   * @alias OSjs.VFS.unlink
+   * @see OSjs.VFS.unlink
+   */
+  unlink(callback, options, appRef) {
+    return require('vfs/fs.js').unlink(this, callback, options, appRef);
+  }
+
+  /**
+   * Checks if file exists
+   *
+   * @alias OSjs.VFS.exists
+   * @see OSjs.VFS.exists
+   */
+  exists(callback) {
+    return require('vfs/fs.js').exists(this, callback);
+  }
+
+  /**
+   * Creates a directory
+   *
+   * @alias OSjs.VFS.mkdir
+   * @see OSjs.VFS.mkdir
+   */
+  mkdir(callback, options, appRef) {
+    return require('vfs/fs.js').mkdir(this, callback, options, appRef);
+  }
+
+  /**
+   * Moves the file to given destination
+   *
+   * @alias OSjs.VFS.move
+   * @see OSjs.VFS.move
+   */
+  move(dest, callback, options, appRef) {
+    return require('vfs/fs.js').move(this, dest, (err, res, newDest) => {
+      if ( !err && newDest ) {
+        self.setData(newDest);
+      }
+      callback.call(this, err, res, newDest);
+    }, options, appRef);
+  }
+
+  /**
+   * Reads the file contents
+   *
+   * @alias OSjs.VFS.read
+   * @see OSjs.VFS.read
+   */
+  read(callback, options) {
+    return require('vfs/fs.js').read(this, callback, options);
+  }
+
+  /**
+   * Renames the file
+   *
+   * @alias OSjs.VFS.File#move
+   * @see OSjs.VFS.File#move
+   */
+  rename() {
+    return this.move.apply(this, arguments);
+  }
+
+  /**
+   * Scans the folder contents
+   *
+   * @alias OSjs.VFS.scandir
+   * @see OSjs.VFS.scandir
+   */
+  scandir(callback, options) {
+    return require('vfs/fs.js').scandir(this, callback, options);
+  }
+
+  /**
+   * Sends the file to the trash
+   *
+   * @alias OSjs.VFS.trash
+   * @see OSjs.VFS.trash
+   */
+  trash(callback) {
+    return require('vfs/fs.js').trash(this, callback);
+  }
+
+  /**
+   * Restores the file from trash
+   *
+   * @alias OSjs.VFS.untrash
+   * @see OSjs.VFS.untrash
+   */
+  untrash(callback) {
+    return require('vfs/fs.js').untrash(this, callback);
+  }
+
+  /**
+   * Gets the URL for physical file
+   *
+   * @alias OSjs.VFS.url
+   * @see OSjs.VFS.url
+   */
+  url(callback) {
+    return require('vfs/fs.js').url(this, callback);
+  }
+
+  /**
+   * Writes data to the file
+   *
+   * @alias OSjs.VFS.write
+   * @see OSjs.VFS.write
+   */
+  write(data, callback, options, appRef) {
+    return require('vfs/fs.js').write(this, data, callback, options, appRef);
+  }
+
+  _guessMime() {
+    if ( this.mime || this.type === 'dir' || (!this.path || this.path.match(/\/$/)) ) {
+      return;
+    }
+
+    const ext = FS.filext(this.path);
+    this.mime = API.getConfig('MIME.mapping')['.' + ext] || 'application/octet-stream';
+  }
+
+}
+
+/**
+ * This is a object you can pass around in VFS when
+ * handling DataURL()s (strings). Normally you would
+ * use a File, Blob or ArrayBuffer, but this is an alternative.
+ *
+ * Useful for canvas data etc.
+ *
+ * @constructor
+ * @memberof OSjs.VFS
+ */
+class FileDataURL {
+
+  /**
+   * @param {String}    dataURL     Data URI
+   */
+  constructor(dataURL) {
+    /**
+     * File URI data (base64 encoded)
+     * @type {String}
+     */
+    this.dataURL = dataURL;
+  }
+
+  /**
+   * Get base64 data
+   * @return {String}
+   */
+  toBase64() {
+    return this.data.split(',')[1];
+  }
+
+  /**
+   * Get raw data URI
+   * @override
+   * @return {String}
+   */
+  toString() {
+    return this.dataURL;
+  }
+
+}
+
+module.exports.FileData = FileDataURL;
+module.exports.File = FileMetadata;

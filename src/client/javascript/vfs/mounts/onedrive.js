@@ -34,7 +34,6 @@ const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const VFS = require('vfs/fs.js');
-const VFSFile = require('vfs/file.js');
 
 /**
  * @namespace OneDrive
@@ -88,7 +87,7 @@ function getItemType(iter) {
 function getMetadataFromItem(dir, item) {
   const path = 'onedrive://' + dir.replace(/^\/+/, '').replace(/\/+$/, '') + '/' + item.name; // FIXME
 
-  const itemFile = new VFSFile({
+  const itemFile = new VFS.File({
     id: item.id,
     filename: item.name,
     size: item.size || 0,
@@ -129,7 +128,7 @@ function createDirectoryList(dir, list, item, options) {
   const result = [];
 
   if ( dir !== '/' ) {
-    result.push(new VFSFile({
+    result.push(new VFS.File({
       id: item.id,
       filename: '..',
       path: FS.dirname(item.path),
@@ -339,7 +338,7 @@ OneDriveStorage.read = function(item, callback, options) {
       return;
     }
 
-    const file = new VFSFile(url, item.mime);
+    const file = new VFS.File(url, item.mime);
     VFS.read(file, (error, response) => {
       if ( error ) {
         callback(error);
@@ -533,9 +532,9 @@ OneDriveStorage.mkdir = function(dir, callback) {
 OneDriveStorage.upload = function(file, dest, callback) {
   console.info('OneDrive::upload()', file, dest);
 
-  const item = new VFSFile({
+  const item = new VFS.File({
     filename: file.name,
-    path: FS.pathJoin((new VFSFile(dest)).path, file.name),
+    path: FS.pathJoin((new VFS.File(dest)).path, file.name),
     mime: file.type,
     size: file.size
   });

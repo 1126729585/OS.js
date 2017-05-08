@@ -35,7 +35,6 @@ const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
 const GUIElement = require('gui/element.js');
 const VFS = require('vfs/fs.js');
-const VFSFile = require('vfs/file.js');
 const SettingsManager = require('core/settings-manager.js');
 const MountManager = require('core/mount-manager.js');
 
@@ -81,7 +80,7 @@ class FileDialog extends DialogWindow {
 
     args.multiple = (args.type === 'save' ? false : args.multiple === true);
 
-    if ( args.path && args.path instanceof VFSFile ) {
+    if ( args.path && args.path instanceof VFS.File ) {
       args.path = FS.dirname(args.path.path);
     }
 
@@ -150,7 +149,7 @@ class FileDialog extends DialogWindow {
       API.createDialog('Input', {message: API._('DIALOG_FILE_MKDIR_MSG', this.path), value: 'New folder'}, (ev, btn, value) => {
         if ( btn === 'ok' && value ) {
           const path = FS.pathJoin(this.path, value);
-          VFS.mkdir(new VFSFile(path, 'dir'), (err) => {
+          VFS.mkdir(new VFS.File(path, 'dir'), (err) => {
             if ( err ) {
               API.error(API._('DIALOG_FILE_ERROR'), API._('ERR_VFSMODULE_MKDIR'), err);
             } else {
@@ -175,7 +174,7 @@ class FileDialog extends DialogWindow {
       if ( ev && ev.detail && ev.detail.entries ) {
         const activated = ev.detail.entries[0];
         if ( activated ) {
-          this.selected = new VFSFile(activated.data);
+          this.selected = new VFS.File(activated.data);
           if ( this.selected.type !== 'dir' ) {
             filename.set('value', this.selected.filename);
           }
@@ -191,7 +190,7 @@ class FileDialog extends DialogWindow {
       if ( ev && ev.detail && ev.detail.entries ) {
         const activated = ev.detail.entries[0];
         if ( activated ) {
-          this.selected = new VFSFile(activated.data);
+          this.selected = new VFS.File(activated.data);
 
           if ( this.selected.type !== 'dir' ) {
             filename.set('value', this.selected.filename);
@@ -357,7 +356,7 @@ class FileDialog extends DialogWindow {
         return false;
       }
 
-      this.selected = new VFSFile(this.path.replace(/^\//, '') + '/' + check.filename, check.mime);
+      this.selected = new VFS.File(this.path.replace(/^\//, '') + '/' + check.filename, check.mime);
       this._toggleDisabled(true);
 
       VFS.exists(this.selected, (error, result) => {
@@ -401,7 +400,7 @@ class FileDialog extends DialogWindow {
 
       let res = this.selected;
       if ( !res && this.args.select === 'dir' ) {
-        res = new VFSFile({
+        res = new VFS.File({
           filename: FS.filename(this.path),
           path: this.path,
           type: 'dir'

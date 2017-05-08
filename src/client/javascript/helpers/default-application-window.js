@@ -32,8 +32,8 @@
 'use strict';
 
 const API = require('core/api.js');
+const VFS = require('vfs/fs.js');
 const Window = require('core/window.js');
-const VFSFile = require('vfs/file.js');
 const Scheme = require('gui/scheme.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ class DefaultApplicationWindow extends Window {
   constructor(name, app, args, scheme, file) {
     super(...arguments);
     this.hasClosingDialog = false;
-    this.currentFile = file ? new VFSFile(file) : null;
+    this.currentFile = file ? new VFS.File(file) : null;
     this.hasChanged = false;
   }
 
@@ -131,7 +131,7 @@ class DefaultApplicationWindow extends Window {
     if ( type === 'itemDrop' && item ) {
       const data = item.data;
       if ( data && data.type === 'file' && data.mime ) {
-        this._app.openFile(new VFSFile(data), this);
+        this._app.openFile(new VFS.File(data), this);
       }
     }
   }

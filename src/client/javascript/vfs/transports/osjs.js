@@ -31,7 +31,7 @@
 
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
-const VFSFile = require('vfs/file.js');
+const VFS = require('vfs/fs.js');
 const Connection = require('core/connection.js');
 
 /**
@@ -46,7 +46,7 @@ const Connection = require('core/connection.js');
 /**
  * Make a OS.js Server HTTP URL for VFS
  *
- * @param   {(String|OSjs.VFSFile)}    item        VFS File
+ * @param   {(String|OSjs.VFS.File)}    item        VFS File
  * @param   {Object}                    [options]   Options
  *
  * @return  {String}                  URL based on input
@@ -56,7 +56,7 @@ const Connection = require('core/connection.js');
  */
 function makePath(item, options) {
   if ( typeof item === 'string' ) {
-    item = new VFSFile(item);
+    item = new VFS.File(item);
   }
   return Connection.instance.getVFSPath(item, options);
 }
@@ -87,7 +87,7 @@ function internalRequest(name, args, callback) {
  * @param   {Object}        dest        Destination file info (VFS Object if possible)
  * @param   {Function}      callback    Callback function
  * @param   {Object}        options     Options
- * @param   {OSjs.VFSFile} [vfsfile]   Optional file metadata
+ * @param   {OSjs.VFS.File} [vfsfile]   Optional file metadata
  *
  * @function upload
  * @memberof OSjs.VFS.Transports.OSjs
@@ -95,7 +95,7 @@ function internalRequest(name, args, callback) {
 function internalUpload(file, dest, callback, options, vfsfile) {
   options = options || {};
 
-  if ( dest instanceof VFSFile ) {
+  if ( dest instanceof VFS.File ) {
     dest = dest.path;
   }
 
@@ -219,7 +219,7 @@ const Transport = {
       if ( result ) {
         result = FS.filterScandir(result, options);
         result.forEach((iter) => {
-          list.push(new VFSFile(iter));
+          list.push(new VFS.File(iter));
         });
       }
       callback(error, list);
@@ -253,7 +253,7 @@ const Transport = {
       return;
     }
 
-    const parentItem = new VFSFile(FS.dirname(item.path), item.mime);
+    const parentItem = new VFS.File(FS.dirname(item.path), item.mime);
     internalUpload(data, parentItem, () => {
       callback(null, true);
     }, options, item);

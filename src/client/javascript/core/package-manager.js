@@ -193,8 +193,10 @@ const PackageManager = (function() {
         return;
       }
 
+      const Connection = require('core/connection.js');
+
       const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
-      API.call('packages', {command: 'list', args: {paths: paths}}, (err, res) => {
+      Connection.request('packages', {command: 'list', args: {paths: paths}}, (err, res) => {
         if ( res ) {
           packages = {};
 
@@ -219,8 +221,10 @@ const PackageManager = (function() {
      * @param  {Function} callback      callback
      */
     generateUserMetadata: function(callback) {
+      const Connection = require('core/connection.js');
+
       const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
-      API.call('packages', {command: 'cache', args: {action: 'generate', scope: 'user', paths: paths}}, () => {
+      Connection.request('packages', {command: 'cache', args: {action: 'generate', scope: 'user', paths: paths}}, () => {
         this._loadMetadata(callback);
       });
     },
@@ -279,13 +283,15 @@ const PackageManager = (function() {
      * @param {Function}        cb          Callback function
      */
     install: function(file, root, cb) {
+      const Connection = require('core/connection.js');
+
       const paths = SettingsManager.instance('PackageManager').get('PackagePaths', []);
       if ( typeof root !== 'string' ) {
         root = paths[0];
       }
 
       const dest = FS.pathJoin(root, file.filename.replace(/\.zip$/i, ''));
-      API.call('packages', {command: 'install', args: {zip: file.path, dest: dest, paths: paths}}, (e, r) => {
+      Connection.request('packages', {command: 'install', args: {zip: file.path, dest: dest, paths: paths}}, (e, r) => {
         if ( e ) {
           cb(e);
         } else {
@@ -304,7 +310,9 @@ const PackageManager = (function() {
      * @param {Function}        cb          Callback function
      */
     uninstall: function(file, cb) {
-      API.call('packages', {command: 'uninstall', args: {path: file.path}}, (e, r) => {
+      const Connection = require('core/connection.js');
+
+      Connection.request('packages', {command: 'uninstall', args: {path: file.path}}, (e, r) => {
         if ( e ) {
           cb(e);
         } else {

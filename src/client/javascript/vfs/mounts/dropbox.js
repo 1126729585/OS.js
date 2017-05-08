@@ -32,7 +32,7 @@
 
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
-const VFSFile = require('vfs/file.js');
+const VFS = require('vfs/fs.js');
 const MountManager = require('core/mount-manager.js');
 
 /**
@@ -124,7 +124,7 @@ DropboxVFS.prototype.scandir = function(item, callback) {
   function _finish(entries) {
     const result = entries.map((iter) => {
       console.info(iter);
-      return new VFSFile({
+      return new VFS.File({
         filename: iter.name,
         path: MountManager.getModuleProperty('Dropbox', 'root').replace(/\/$/, '') + iter.path,
         size: iter.size,
@@ -240,9 +240,9 @@ DropboxVFS.prototype.url = function(item, callback) {
 DropboxVFS.prototype.upload = function(file, dest, callback) {
   console.info('DropboxVFS::upload()', file, dest);
 
-  const item = new VFSFile({
+  const item = new VFS.File({
     filename: file.name,
-    path: FS.pathJoin((new VFSFile(dest)).path, file.name),
+    path: FS.pathJoin((new VFS.File(dest)).path, file.name),
     mime: file.type,
     size: file.size
   });

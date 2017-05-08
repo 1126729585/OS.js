@@ -29,8 +29,6 @@
  */
 'use strict';
 
-const Events = require('utils/events.js');
-
 /////////////////////////////////////////////////////////////////////////////
 // DOM
 /////////////////////////////////////////////////////////////////////////////
@@ -84,17 +82,9 @@ module.exports.$remove = function Utils_$remove(node) {
  * @memberof OSjs.Utils
  *
  * @param   {Node}             myNode                 The DOM Element
- * @param   {Boolean|String}   [removeEvents=false]   Force removal of event handlers (on given elements)
  */
-module.exports.$empty = function Utils_$empty(myNode, removeEvents) {
+module.exports.$empty = function Utils_$empty(myNode) {
   if ( myNode ) {
-    if ( removeEvents ) {
-      removeEvents = typeof removeEvents === 'string' ? removeEvents : '*';
-      myNode.querySelectorAll(removeEvents).forEach((el) => {
-        Events.$unbind(el);
-      });
-    }
-
     while ( myNode.firstChild ) {
       myNode.removeChild(myNode.firstChild);
     }

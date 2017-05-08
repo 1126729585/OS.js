@@ -35,7 +35,6 @@ const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const Application = require('core/application.js');
 const VFS = require('vfs/fs.js');
-const VFSFile = require('vfs/file.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // Default Application Helper
@@ -91,7 +90,7 @@ class DefaultApplication extends Application {
           message: API._('MSG_FILE_CHANGED')
         }, (ev, button) => {
           if ( button === 'ok' || button === 'yes' ) {
-            this.openFile(new VFSFile(args.file), win);
+            this.openFile(new VFS.File(args.file), win);
           }
         }, {parent: win, modal: true});
       }
@@ -243,7 +242,7 @@ class DefaultApplication extends Application {
         filter: this.__metadata.mime
       }, (ev, button, result) => {
         if ( button === 'ok' && result ) {
-          this.openFile(new VFSFile(result), win);
+          this.openFile(new VFS.File(result), win);
         }
       }, {parent: win, modal: true});
     };

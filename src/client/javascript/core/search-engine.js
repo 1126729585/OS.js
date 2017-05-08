@@ -33,7 +33,6 @@
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const VFS = require('vfs/fs.js');
-const VFSFile = require('vfs/file.js');
 const PackageManager = require('core/package-manager.js');
 const SettingsManager = require('core/settings-manager.js');
 
@@ -95,7 +94,7 @@ const ApplicationModule = (function() {
         value: {
           title: p.name,
           description: p.description,
-          icon: API.getFileIcon(new VFSFile('applications:///' + p.className, 'application'), '16x16'),
+          icon: API.getFileIcon(new VFS.File('applications:///' + p.className, 'application'), '16x16'),
           launch: {application: pn, args: {}}
         },
         fields: [
@@ -151,7 +150,7 @@ const FilesystemModule = {
             return {
               title: iter.filename,
               description: iter.path,
-              icon: API.getFileIcon(new VFSFile(iter)),
+              icon: API.getFileIcon(new VFS.File(iter)),
               launch: {application: '', args: '', file: iter}
             };
           });

@@ -30,8 +30,8 @@
 'use strict';
 
 const API = require('core/api.js');
+const VFS = require('vfs/fs.js');
 const Connection = require('core/connection.js');
-const VFSFile = require('vfs/file.js');
 
 class WSConnection extends Connection {
   constructor() {
@@ -142,7 +142,7 @@ class WSConnection extends Connection {
   message(data) {
     // Emit a VFS event when a change occures
     if ( data.action === 'vfs:watch' ) {
-      OSjs.VFS.Helpers.triggerWatch(data.args.event, new VFSFile(data.args.file));
+      OSjs.VFS.Helpers.triggerWatch(data.args.event, new VFS.File(data.args.file));
     }
 
     // Emit a subscription event
@@ -151,12 +151,12 @@ class WSConnection extends Connection {
     }
   }
 
-  request(method, args, onsuccess, onerror, options) {
+  createRequest(method, args, onsuccess, onerror, options) {
     onerror = onerror || function() {
       console.warn('Connection::callWS()', 'error', arguments);
     };
 
-    const res = super.request(...arguments);
+    const res = super.createRequest(...arguments);
     if ( res !== false ) {
       return res;
     }

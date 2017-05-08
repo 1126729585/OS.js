@@ -33,6 +33,7 @@ const FS = require('utils/fs.js');
 const XHR = require('utils/xhr.js');
 const DOM = require('utils/dom.js');
 const GUI = require('utils/gui.js');
+const VFS = require('vfs/fs.js');
 const Utils = require('utils/misc.js');
 const Compability = require('utils/compability.js');
 const GUIElement = require('gui/element.js');
@@ -333,40 +334,9 @@ module.exports.curl = function(args, callback) {
  * @param   {Object}    [options]                   Options (all options except the ones listed below are sent to Connection)
  * @param   {Boolean}   [options.indicator=true]    Show loading indicator
  */
-let _CALL_INDEX = 1;
 module.exports.call = function(m, a, cb, options) {
-  a = a || {};
-  options = options || {};
-
-  const lname = 'APICall_' + _CALL_INDEX;
-
-  if ( typeof cb !== 'function' ) {
-    throw new TypeError('call() expects a function as callback');
-  }
-
-  if ( options && typeof options !== 'object' ) {
-    throw new TypeError('call() expects an object as options');
-  }
-
-  if ( options.indicator !== false ) {
-    module.exports.createLoading(lname, {className: 'BusyNotification', tooltip: 'API Call'});
-  }
-
-  if ( typeof options.indicator !== 'undefined' ) {
-    delete options.indicator;
-  }
-
-  _CALL_INDEX++;
-
-  const conn = require('core/connection.js').instance;
-  return conn.request(m, a, function API_call_success(response) {
-    module.exports.destroyLoading(lname);
-    response = response || {};
-    cb(response.error || false, response.result);
-  }, function API_call_error(err) {
-    module.exports.destroyLoading(lname);
-    cb(err);
-  }, options);
+  const Connection = require('core/connection.js');
+  Connection.request(m, a, cb, options);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -385,8 +355,6 @@ module.exports.call = function(m, a, cb, options) {
  * @param   {Object}          launchArgs    Arguments to send to process launch function
  */
 module.exports.open = function(file, launchArgs) {
-  const VFSFile = require('vfs/file.js');
-
   launchArgs = launchArgs || {};
 
   if ( !file.path ) {
@@ -398,7 +366,7 @@ module.exports.open = function(file, launchArgs) {
   const args = {file: file};
 
   function getApplicationNameByFile(file, forceList, callback) {
-    if ( !(file instanceof VFSFile) ) {
+    if ( !(file instanceof VFS.File) ) {
       throw new Error('This function excepts a OSjs.VFS.File object');
     }
 
@@ -936,51 +904,7 @@ module.exports.launchList = function(list, onSuccess, onError, onFinished) {
  */
 module.exports.getApplicationResource = function(app, name, vfspath) {
   const Process = require('core/process.js');
-
-  if ( name.match(/^(https?:)?\//) ) {
-    return name;
-  }
-  name = name.replace(/^\.\//, '');
-
-  function getName() {
-    let appname = null;
-    if ( app instanceof Process ) {
-      appname = app.__pname;
-    } else if ( typeof app === 'string' ) {
-      appname = app;
-    }
-
-    return appname;
-  }
-
-  function getResultPath(path, userpkg) {
-    if ( vfspath ) {
-      if ( userpkg ) {
-        path = path.substr(module.exports.getConfig('Connection.FSURI').length);
-      } else {
-        path = 'osjs:///' + path;
-      }
-    }
-
-    return path;
-  }
-
-  return (() => {
-    const pacman = require('core/package-manager.js');
-    const appname = getName();
-    const pkg = pacman.getPackage(appname);
-
-    let path = '';
-    if ( pkg ) {
-      if ( pkg.scope === 'user' ) {
-        path = '/user-package/' + FS.filename(pkg.path) + '/' + name.replace(/^\//, '');
-      } else {
-        path = 'packages/' + pkg.path + '/' + name;
-      }
-    }
-
-    return getResultPath(path, pkg.scope === 'user');
-  })();
+  return Process.getResource(app, name, vfspath);
 };
 
 /**
@@ -1016,12 +940,10 @@ module.exports.getThemeCSS = function(name) {
  * @return  {String}            The absolute URL to the icon
  */
 module.exports.getFileIcon = function(file, size, icon) {
-  const VFSFile = require('vfs/file.js');
-
   icon = icon || 'mimetypes/text-x-preview.png';
 
-  if ( typeof file === 'object' && !(file instanceof VFSFile) ) {
-    file = new VFSFile(file);
+  if ( typeof file === 'object' && !(file instanceof VFS.File) ) {
+    file = new VFS.File(file);
   }
 
   if ( !file.filename ) {

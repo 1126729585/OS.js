@@ -33,8 +33,7 @@
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
-const VFSFile = require('vfs/file.js');
-const VFSFileData = require('vfs/filedata.js');
+const VFS = require('vfs/fs.js');
 const MountManager = require('core/mount-manager.js');
 
 /**
@@ -96,7 +95,7 @@ function createBoundary(file, data, callback) {
 
   const reqContentType = 'multipart/mixed; boundary=\'' + boundary + '\'';
 
-  if ( data instanceof VFSFileData ) {
+  if ( data instanceof VFS.FileData ) {
     callback(false, {
       contentType: reqContentType,
       body: createBody(data.toBase64())
@@ -115,11 +114,11 @@ function createBoundary(file, data, callback) {
  * Scans entire file tree for given path
  */
 function getFileFromPath(dir, type, callback) {
-  if ( dir instanceof VFSFile ) {
+  if ( dir instanceof VFS.File ) {
     dir = dir.path;
   }
 
-  const tmpItem = new VFSFile({
+  const tmpItem = new VFS.File({
     filename: FS.filename(dir),
     type: 'dir',
     path: FS.dirname(dir)
@@ -193,7 +192,7 @@ function createDirectoryList(dir, list, item, options) {
       fileType = 'trash';
     }
 
-    return new VFSFile({
+    return new VFS.File({
       filename: iter.title,
       path: path,
       id: iter.id,
@@ -653,7 +652,7 @@ GoogleDriveStorage.move = function(src, dest, callback) {
 GoogleDriveStorage.exists = function(item, callback) {
   console.info('GoogleDrive::exists()', item);
 
-  const req = new VFSFile(FS.dirname(item.path));
+  const req = new VFS.File(FS.dirname(item.path));
 
   this.scandir(req, (error, result) => {
     if ( error ) {
@@ -665,7 +664,7 @@ GoogleDriveStorage.exists = function(item, callback) {
     if ( result ) {
       result.forEach((iter) => {
         if ( iter.path === item.path ) {
-          found = new VFSFile(item.path, iter.mimeType);
+          found = new VFS.File(item.path, iter.mimeType);
           found.id = iter.id;
           found.title = iter.title;
           return false;
@@ -766,9 +765,9 @@ GoogleDriveStorage.mkdir = function(dir, callback) {
 GoogleDriveStorage.upload = function(file, dest, callback) {
   console.info('GoogleDrive::upload()', file, dest);
 
-  const item = new VFSFile({
+  const item = new VFS.File({
     filename: file.name,
-    path: FS.pathJoin((new VFSFile(dest)).path, file.name),
+    path: FS.pathJoin((new VFS.File(dest)).path, file.name),
     mime: file.type,
     size: file.size
   });

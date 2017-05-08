@@ -32,7 +32,7 @@
 const API = require('core/api.js');
 const GUI = require('utils/gui.js');
 const DOM = require('utils/dom.js');
-const VFSFile = require('vfs/file.js');
+const VFS = require('vfs/fs.js');
 const Events = require('utils/events.js');
 const UIElement = require('gui/element.js');
 
@@ -141,7 +141,7 @@ function handleKeyPress(cls, el, ev) {
 
         selected.forEach(function(s) {
           if ( s && s.data ) {
-            data.push(new VFSFile(s.data.path, s.data.mime));
+            data.push(new VFS.File(s.data.path, s.data.mime));
           }
         });
 

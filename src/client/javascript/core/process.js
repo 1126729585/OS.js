@@ -30,7 +30,8 @@
 
 'use strict';
 
-const API = require('core/api.js');
+const FS = require('utils/fs.js');
+const Connection = require('core/connection.js');
 
 /**
  * The predefined events are as follows:
@@ -294,7 +295,7 @@ class Process {
 
     this._emit('api', [method]);
 
-    return API.call('application', {
+    return Connection.request('application', {
       application: this.__iter,
       path: this.__path,
       method: method,
@@ -325,9 +326,7 @@ class Process {
   /**
    * Get full path to a resorce belonging to this process (package)
    *
-   * This is a shortcut for API.getApplicationResource()
-   *
-   * @see API.getApplicationResource()
+   * @see Process::getResource()
    *
    * @param   {String}      src       Resource name (path)
    * @param   {Boolean}     [vfspath] Return a valid VFS path
@@ -335,7 +334,7 @@ class Process {
    * @return  {String}
    */
   _getResource(src, vfspath) {
-    return API.getApplicationResource(this, src, vfspath);
+    return Process.getResource(this, src, vfspath);
   }
 
   /**
@@ -476,6 +475,53 @@ class Process {
    */
   static getProcesses() {
     return _PROCS;
+  }
+
+  static getResource(app, name, vfspath) {
+    if ( name.match(/^(https?:)?\//) ) {
+      return name;
+    }
+    name = name.replace(/^\.\//, '');
+
+    function getName() {
+      let appname = null;
+      if ( app instanceof Process ) {
+        appname = app.__pname;
+      } else if ( typeof app === 'string' ) {
+        appname = app;
+      }
+
+      return appname;
+    }
+
+    function getResultPath(path, userpkg) {
+      if ( vfspath ) {
+        if ( userpkg ) {
+          path = path.substr(module.exports.getConfig('Connection.FSURI').length);
+        } else {
+          path = 'osjs:///' + path;
+        }
+      }
+
+      return path;
+    }
+
+    return (() => {
+      const pacman = require('core/package-manager.js');
+      const appname = getName();
+      const pkg = pacman.getPackage(appname);
+
+      let path = '';
+      if ( pkg ) {
+        if ( pkg.scope === 'user' ) {
+          path = '/user-package/' + FS.filename(pkg.path) + '/' + name.replace(/^\//, '');
+        } else {
+          path = 'packages/' + pkg.path + '/' + name;
+        }
+      }
+
+      return getResultPath(path, pkg.scope === 'user');
+    })();
   }
 
 }

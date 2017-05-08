@@ -32,12 +32,12 @@
 const DOM = require('utils/dom.js');
 const API = require('core/api.js');
 const GUI = require('utils/gui.js');
+const VFS = require('vfs/fs.js');
 const Scheme = require('gui/scheme.js');
 const Events = require('utils/events.js');
 const Application = require('core/application.js');
 const Compability = require('utils/compability.js');
 const GUIElement = require('gui/element.js');
-const VFSFile = require('vfs/file.js');
 const WindowManager = require('core/windowmanager.js');
 
 /**
@@ -1845,7 +1845,7 @@ class Window {
       if ( type === 'filesDrop' ) {
         this._emit('drop:upload', [ev, item, args, el]);
       } else if ( type === 'itemDrop' && item.type === 'file' && item.data ) {
-        this._emit('drop:file', [ev, new VFSFile(item.data || {}), args, el]);
+        this._emit('drop:file', [ev, new VFS.File(item.data || {}), args, el]);
       }
     }
 

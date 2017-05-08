@@ -32,6 +32,7 @@
 
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
+const Connection = require('core/connection.js');
 const Application = require('core/application.js');
 const SettingsManager = require('core/settings-manager.js');
 
@@ -81,7 +82,7 @@ class Storage {
    * @param   {CallbackHandler}      callback        Callback function
    */
   _settings(pool, storage, callback) {
-    API.call('settings', {pool: pool, settings: Utils.cloneObject(storage)}, callback);
+    Connection.request('settings', {pool: pool, settings: Utils.cloneObject(storage)}, callback);
   }
 
   /**

@@ -32,7 +32,8 @@
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const Events = require('utils/events.js');
-const WindowManager = require('core/windowmanager.js');
+
+let _CALL_INDEX = 1;
 
 /*
  * Attaches options to a XHR call
@@ -226,7 +227,7 @@ class Connection {
     console.warn('Connection::onOnline()', 'Going online...');
     this.offline = false;
 
-    const wm = WindowManager.instance;
+    const wm = require('core/windowmanager.js').instance;
     if ( wm ) {
       wm.notification({title: API._('LBL_INFO'), message: API._('CONNECTION_RESTORED')});
     }
@@ -250,7 +251,7 @@ class Connection {
 
     this.offline = true;
 
-    const wm = WindowManager.instance;
+    const wm = require('core/windowmanager.js').instance;
     if ( wm ) {
       wm.notification({title: API._('LBL_WARNING'), message: API._(reconnecting ? 'CONNECTION_RESTORE_FAILED' : 'CONNECTION_LOST')});
     }
@@ -272,7 +273,7 @@ class Connection {
    *
    * @see OSjs.Core.API.call
    */
-  request(method, args, cbSuccess, cbError, options) {
+  createRequest(method, args, cbSuccess, cbError, options) {
     args = args || {};
     cbSuccess = cbSuccess || function() {};
     cbError = cbError || function() {};
@@ -453,6 +454,41 @@ class Connection {
    */
   unsubscribe(k, idx) {
     return this._evHandler.off(k, idx);
+  }
+
+  static request(m, a, cb, options) {
+    a = a || {};
+    options = options || {};
+
+    const lname = 'APICall_' + _CALL_INDEX;
+
+    if ( typeof cb !== 'function' ) {
+      throw new TypeError('call() expects a function as callback');
+    }
+
+    if ( options && typeof options !== 'object' ) {
+      throw new TypeError('call() expects an object as options');
+    }
+
+    if ( options.indicator !== false ) {
+      API.createLoading(lname, {className: 'BusyNotification', tooltip: 'API Call'});
+    }
+
+    if ( typeof options.indicator !== 'undefined' ) {
+      delete options.indicator;
+    }
+
+    _CALL_INDEX++;
+
+    return Connection.instance.createRequest(m, a, function API_call_success(response) {
+      API.destroyLoading(lname);
+      response = response || {};
+      cb(response.error || false, response.result);
+    }, function API_call_error(err) {
+      API.destroyLoading(lname);
+      cb(err);
+    }, options);
+
   }
 }
 

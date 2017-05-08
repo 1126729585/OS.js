@@ -52,8 +52,6 @@ module.exports.init = function() {
   const GUIHelpers = require('utils/gui.js');
 
   const VFS = require('vfs/fs.js');
-  const VFSFile = require('vfs/file.js');
-  const VFSFileData = require('vfs/filedata.js');
   const MountDropbox = require('vfs/mounts/dropbox.js');
   const MountGoogleDrive = require('vfs/mounts/googledrive.js');
   const MountLocalStorage = require('vfs/mounts/localstorage.js');
@@ -73,8 +71,7 @@ module.exports.init = function() {
   };
 
   assignInto(VFS, OSjs.VFS);
-  OSjs.VFS.File = VFSFile;
-  OSjs.VFS.FileDataURL = VFSFileData;
+  OSjs.VFS.FileDataURL = VFS.FileData;
   assignInto(FS, OSjs.VFS.Helpers);
 
   OSjs.VFS.Transports.Applications = require('vfs/transports/applications.js');
@@ -339,7 +336,7 @@ module.exports.init = function() {
    * OSjs.VFS.file('home:///foo').read(<fn>);
    */
   OSjs.VFS.file = function createFileInstance(arg, mime) {
-    return new VFSFile(arg, mime);
+    return new VFS.File(arg, mime);
   };
 
   /**
@@ -368,7 +365,7 @@ module.exports.init = function() {
    * @return {OSjs.VFS.File}
    */
   OSjs.VFS.Helpers.createFileFromUpload = function(destination, f) {
-    return new VFSFile({
+    return new VFS.File({
       filename: f.name,
       path: (destination + '/' + f.name).replace(/\/\/\/\/+/, '///'),
       mime: f.mime || 'application/octet-stream',

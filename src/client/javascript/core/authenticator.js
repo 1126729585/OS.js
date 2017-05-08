@@ -31,7 +31,7 @@
 'use strict';
 
 const API = require('core/api.js');
-const Utils = require('utils/misc.js');
+const Connection = require('core/connection.js');
 const Compability = require('utils/compability.js');
 
 let _instance;
@@ -99,7 +99,7 @@ class Authenticator {
    * @return  {Object}      JSON With user data
    */
   getUser() {
-    return Utils.cloneObject(this.userData || {}, true);
+    return Object.assign({}, this.userData);
   }
 
   /**
@@ -118,7 +118,7 @@ class Authenticator {
    * @param   {CallbackHandler}      callback        Callback function
    */
   login(data, callback) {
-    API.call('login', data, function onLoginResponse(error, result) {
+    Connection.request('login', data, function onLoginResponse(error, result) {
       if ( result ) {
         callback(false, result);
       } else {
@@ -136,7 +136,7 @@ class Authenticator {
   logout(callback) {
     const opts = {};
 
-    API.call('logout', opts, function onLogoutResponse(error, result) {
+    Connection.request('logout', opts, function onLogoutResponse(error, result) {
       if ( result ) {
         callback(false, true);
       } else {

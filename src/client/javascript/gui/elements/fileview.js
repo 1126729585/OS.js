@@ -34,7 +34,6 @@ const VFS = require('vfs/fs.js');
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const GUI = require('utils/gui.js');
-const VFSFile = require('vfs/file.js');
 const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
 const GUIElement = require('gui/element.js');
@@ -200,7 +199,7 @@ function getListViewColumns(cls, iter, opts) {
 }
 
 function scandir(dir, opts, cb, oncreate) {
-  const file = new VFSFile(dir);
+  const file = new VFS.File(dir);
   file.type  = 'dir';
 
   const scanopts = {
