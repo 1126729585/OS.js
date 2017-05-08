@@ -31,6 +31,16 @@ module.exports.init = function() {
   const Storage = require('core/storage.js');
   const API = require('core/api.js');
 
+  const ExtendedDate = require('helpers/date.js');
+  const DefaultApplicationWindow = require('helpers/default-application-window.js');
+  const DefaultApplication = require('helpers/default-application.js');
+  const EventHandler = require('helpers/event-handler.js');
+  const IFrameApplication = require('helpers/iframe-application.js');
+  const GoogleAPI = require('helpers/google-api.js');
+  const WindowsLiveAPI = require('helpers/windows-live-api.js');
+  const SettingsFragment = require('helpers/settings-fragment.js');
+  const ZipArchiver = require('helpers/zip-archiver.js');
+
   const UIScheme = require('gui/scheme.js');
   const UIElement = require('gui/element.js');
   const UIDataView = require('gui/dataview.js');
@@ -75,6 +85,17 @@ module.exports.init = function() {
   assignInto(Utils, OSjs.Utils);
   assignInto(Events, OSjs.Utils);
   assignInto(Compability, OSjs.Utils);
+
+  OSjs.Helpers.Date = ExtendedDate;
+  OSjs.Helpers.DefaultApplicationWindow = DefaultApplicationWindow;
+  OSjs.Helpers.DefaultApplication = DefaultApplication;
+  OSjs.Helpers.EventHandler = EventHandler;
+  OSjs.Helpers.IFrameApplication = IFrameApplication.IFrameApplication;
+  OSjs.Helpers.IFrameApplicationWindow = IFrameApplication.IFrameApplicationWindow;
+  OSjs.Helpers.SettingsFragment = SettingsFragment;
+  OSjs.Helpers.GoogleAPI = OSjs.Helpers.GoogleAPI || {};
+  OSjs.Helpers.WindowsLiveAPI = OSjs.Helpers.WindowsLiveAPI || {};
+  OSjs.Helpers.ZipArchiver = OSjs.Helpers.ZipArchiver || {};
 
   OSjs.API = API;
   OSjs.API.killAll = Process.killAll;
@@ -368,6 +389,90 @@ module.exports.init = function() {
         cb(false, file);
       }
     }, ref);
+  };
+
+  /**
+   * Gets the currently running instance
+   *
+   * @function getInstance
+   * @memberof OSjs.Helpers.GoogleAPI
+   *
+   * @return  {OSjs.Helpers.GoogleAPI.Class}       Can also be null
+   */
+  OSjs.Helpers.GoogleAPI.getInstance = function() {
+    return GoogleAPI.instance();
+  };
+
+  /**
+   * Create an instance of GoogleAPI
+   *
+   * @example
+   * The 'load' Array can be filled with either strings, or arrays. ex:
+   * - ['drive-realtime', 'drive-share']
+   * - [['calendar', 'v1'], 'drive-share']
+   *
+   * @function createInstance
+   * @memberof OSjs.Helpers.GoogleAPI
+   *
+   * @param   {Object}    args                   Arguments
+   * @param   {Array}     args.load              What functions/apis to load
+   * @param   {Array}     args.scope             What scopes to load
+   * @param   {boolean}   [args.client=false]    Load using gapi.client WILL BE REPLACED!
+   * @param   {Function}  callback               Callback function => fn(error, instance)
+   */
+  OSjs.Helpers.GoogleAPI.createInstance = function(args, callback) {
+    return GoogleAPI.craete(args, callback);
+  };
+
+  /**
+   * Gets the currently running instance
+   *
+   * @function getInstance
+   * @memberof OSjs.Helpers.WindowsLiveAPI
+   *
+   * @return  {OSjs.Helpers.WindowsLiveAPI.Class}       Can also be null
+   */
+  OSjs.Helpers.WindowsLiveAPI.getInstance = function() {
+    return WindowsLiveAPI.instance();
+  };
+
+  /**
+   * Create an instance of WindowsLiveAPI
+   *
+   * @function createInstance
+   * @memberof OSjs.Helpers.WindowsLiveAPI
+   *
+   * @param   {Object}    args           Arguments
+   * @param   {Array}     args.load      What functions/apis to load
+   * @param   {Function}  callback       Callback function => fn(error, instance)
+   */
+  OSjs.Helpers.WindowsLiveAPI.createInstance = function(args, callback) {
+    return WindowsLiveAPI.create(args, callback);
+  };
+
+  /**
+   * Gets the currently running instance
+   *
+   * @function getInstance
+   * @memberof OSjs.Helpers.ZipArchiver
+   *
+   * @return  {OSjs.Helpers.ZipArchiver.Class}       Can also be null
+   */
+  OSjs.Helpers.ZipArchiver.getInstance = function() {
+    return ZipArchiver.instance();
+  };
+
+  /**
+   * Create an instance of ZipArchiver
+   *
+   * @function createInstance
+   * @memberof OSjs.Helpers.ZipArchiver
+   *
+   * @param   {Object}    args      Arguments
+   * @param   {Function}  callback  Callback function => fn(error, instance)
+   */
+  OSjs.Helpers.ZipArchiver.createInstance = function(args, callback) {
+    ZipArchiver.create(args, callback);
   };
 
   /**

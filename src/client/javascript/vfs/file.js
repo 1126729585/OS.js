@@ -33,7 +33,6 @@
 
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
-const VFS = require('vfs/fs.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // FILE ABSTRACTION
@@ -175,7 +174,7 @@ class FileMetadata {
    * @see OSjs.VFS.copy
    */
   copy(dest, callback, options, appRef) {
-    return VFS.copy(this, dest, callback, options, appRef);
+    return require('vfs/fs.js').copy(this, dest, callback, options, appRef);
   }
 
   /**
@@ -185,7 +184,7 @@ class FileMetadata {
    * @see OSjs.VFS.download
    */
   download(callback) {
-    return VFS.download(this, callback);
+    return require('vfs/fs.js').download(this, callback);
   }
 
   /**
@@ -205,7 +204,7 @@ class FileMetadata {
    * @see OSjs.VFS.unlink
    */
   unlink(callback, options, appRef) {
-    return VFS.unlink(this, callback, options, appRef);
+    return require('vfs/fs.js').unlink(this, callback, options, appRef);
   }
 
   /**
@@ -215,7 +214,7 @@ class FileMetadata {
    * @see OSjs.VFS.exists
    */
   exists(callback) {
-    return VFS.exists(this, callback);
+    return require('vfs/fs.js').exists(this, callback);
   }
 
   /**
@@ -225,7 +224,7 @@ class FileMetadata {
    * @see OSjs.VFS.mkdir
    */
   mkdir(callback, options, appRef) {
-    return VFS.mkdir(this, callback, options, appRef);
+    return require('vfs/fs.js').mkdir(this, callback, options, appRef);
   }
 
   /**
@@ -235,7 +234,7 @@ class FileMetadata {
    * @see OSjs.VFS.move
    */
   move(dest, callback, options, appRef) {
-    return VFS.move(this, dest, (err, res, newDest) => {
+    return require('vfs/fs.js').move(this, dest, (err, res, newDest) => {
       if ( !err && newDest ) {
         self.setData(newDest);
       }
@@ -250,7 +249,7 @@ class FileMetadata {
    * @see OSjs.VFS.read
    */
   read(callback, options) {
-    return VFS.read(this, callback, options);
+    return require('vfs/fs.js').read(this, callback, options);
   }
 
   /**
@@ -270,7 +269,7 @@ class FileMetadata {
    * @see OSjs.VFS.scandir
    */
   scandir(callback, options) {
-    return VFS.scandir(this, callback, options);
+    return require('vfs/fs.js').scandir(this, callback, options);
   }
 
   /**
@@ -280,7 +279,7 @@ class FileMetadata {
    * @see OSjs.VFS.trash
    */
   trash(callback) {
-    return VFS.trash(this, callback);
+    return require('vfs/fs.js').trash(this, callback);
   }
 
   /**
@@ -290,7 +289,7 @@ class FileMetadata {
    * @see OSjs.VFS.untrash
    */
   untrash(callback) {
-    return VFS.untrash(this, callback);
+    return require('vfs/fs.js').untrash(this, callback);
   }
 
   /**
@@ -300,7 +299,7 @@ class FileMetadata {
    * @see OSjs.VFS.url
    */
   url(callback) {
-    return VFS.url(this, callback);
+    return require('vfs/fs.js').url(this, callback);
   }
 
   /**
@@ -310,7 +309,7 @@ class FileMetadata {
    * @see OSjs.VFS.write
    */
   write(data, callback, options, appRef) {
-    return VFS.write(this, data, callback, options, appRef);
+    return require('vfs/fs.js').write(this, data, callback, options, appRef);
   }
 
   _guessMime() {

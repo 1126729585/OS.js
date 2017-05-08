@@ -144,19 +144,6 @@ function createInputOfType(el, type) {
   _create();
 }
 
-function bindInputEvents(evName, callback, params) {
-  /* eslint no-invalid-this: "off" */
-  if ( evName === 'enter' ) {
-    evName = '_enter';
-  } else if ( evName === 'change' ) {
-    evName = '_change';
-  }
-
-  const target = this.$element.querySelector('textarea, input, select');
-  Events.$bind(target, evName, callback.bind(this), params);
-  return this;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // SELECT HELPERS
 /////////////////////////////////////////////////////////////////////////////
@@ -254,6 +241,21 @@ function setSwitchValue(val, input, button) {
 // CLASSES
 /////////////////////////////////////////////////////////////////////////////
 
+class _GUIInput extends GUIElement {
+  on(evName, callback, params) {
+    /* eslint no-invalid-this: "off" */
+    if ( evName === 'enter' ) {
+      evName = '_enter';
+    } else if ( evName === 'change' ) {
+      evName = '_change';
+    }
+
+    const target = this.$element.querySelector('textarea, input, select');
+    Events.$bind(target, evName, callback.bind(this), params);
+    return this;
+  }
+}
+
 /**
  * Element: 'gui-label'
  *
@@ -323,10 +325,7 @@ class GUILabel extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUITextarea extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
+class GUITextarea extends _GUIInput {
 
   build() {
     createInputOfType(this.$element, 'textarea');
@@ -369,11 +368,7 @@ class GUITextarea extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUIText extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUIText extends _GUIInput {
   build() {
     createInputOfType(this.$element, 'text');
     return this;
@@ -402,11 +397,7 @@ class GUIText extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUIPassword extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUIPassword extends _GUIInput {
   build() {
     createInputOfType(this.$element, 'password');
     return this;
@@ -432,11 +423,7 @@ class GUIPassword extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUIFileUpload extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUIFileUpload extends _GUIInput {
   build() {
     const input = document.createElement('input');
     input.setAttribute('role', 'button');
@@ -471,11 +458,7 @@ class GUIFileUpload extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUIRadio extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUIRadio extends _GUIInput {
   build() {
     createInputOfType(this.$element, 'radio');
     return this;
@@ -503,11 +486,7 @@ class GUIRadio extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUICheckbox extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUICheckbox extends _GUIInput {
   build() {
     createInputOfType(this.$element, 'checkbox');
     return this;
@@ -533,11 +512,7 @@ class GUICheckbox extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUISwitch extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUISwitch extends _GUIInput {
   set(param, value) {
     if ( param === 'value' ) {
       const input = this.$element.querySelector('input');
@@ -746,10 +721,7 @@ class GUIButton extends GUIElement {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUISelect extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
+class GUISelect extends _GUIInput {
 
   add(arg) {
     addToSelectBox(this.$element, arg);
@@ -823,11 +795,7 @@ class GUISelectList extends GUISelect {
  * @extends OSjs.GUI.Element
  * @memberof OSjs.GUI.Elements
  */
-class GUISlider extends GUIElement {
-  on() {
-    bindInputEvents.apply(this, arguments);
-  }
-
+class GUISlider extends _GUIInput {
   get(param) {
     const val = GUI.getProperty(this.$element, param);
     if ( param === 'value' ) {
