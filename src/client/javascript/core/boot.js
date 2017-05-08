@@ -436,16 +436,19 @@ function initExtensions(config, callback) {
   }
 
   if ( OSjs.API.getConfig('Broadway.enabled') ) {
+    const Broadway = require('broadway/broadway.js');
+    const BroadwayConnection = require('broadway/connection.js');
+
     OSjs.API.addHook('onSessionLoaded', function() {
-      OSjs.Broadway.Connection.init();
+      BroadwayConnection.init();
     });
 
     OSjs.API.addHook('onLogout', function() {
-      OSjs.Broadway.Connection.disconnect();
+      BroadwayConnection.disconnect();
     });
 
     OSjs.API.addHook('onBlurMenu', function() {
-      OSjs.Broadway.GTK.inject(null, 'blur');
+      Broadway.inject(null, 'blur');
     });
   }
 

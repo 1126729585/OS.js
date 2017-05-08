@@ -31,6 +31,11 @@ module.exports.init = function() {
   const Storage = require('core/storage.js');
   const API = require('core/api.js');
 
+  const BroadwayKeytable = require('broadway/unicode.js');
+  const BroadwayConnection = require('broadway/connection.js');
+  const BroadwayWindow = require('broadway/window.js');
+  const Broadway = require('broadway/broadway.js');
+
   const ExtendedDate = require('helpers/date.js');
   const DefaultApplicationWindow = require('helpers/default-application-window.js');
   const DefaultApplication = require('helpers/default-application.js');
@@ -132,6 +137,15 @@ module.exports.init = function() {
   Object.keys(languages).forEach((k) => {
     OSjs.Locales[k] = require('locales/' + k + '.js');
   });
+
+  /**
+   * @namespace Connection
+   * @memberof OSjs.Broadway
+   */
+  OSjs.Broadway.Keytable = BroadwayKeytable;
+  OSjs.Broadway.Connection = BroadwayConnection;
+  OSjs.Broadway.Window = BroadwayWindow;
+  OSjs.Broadway.GTK = Broadway;
 
   /**
    * Get the current SettingsManager  instance

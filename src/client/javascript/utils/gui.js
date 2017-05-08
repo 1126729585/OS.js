@@ -44,7 +44,7 @@ const Compability = require('utils/compability.js');
  * @memberof OSjs.GUI
  */
 
-var lastMenu;
+let lastMenu;
 
 /////////////////////////////////////////////////////////////////////////////
 // HELPERS
@@ -62,7 +62,7 @@ var lastMenu;
  */
 module.exports.getWindowId = function getWindowId(el) {
   while ( el.parentNode ) {
-    var attr = el.getAttribute('data-window-id');
+    const attr = el.getAttribute('data-window-id');
     if ( attr !== null ) {
       return parseInt(attr, 10);
     }
@@ -82,7 +82,7 @@ module.exports.getWindowId = function getWindowId(el) {
  * @return  {String}
  */
 module.exports.getLabel = function getLabel(el) {
-  var label = el.getAttribute('data-label');
+  const label = el.getAttribute('data-label');
   return label || '';
 };
 
@@ -98,7 +98,7 @@ module.exports.getLabel = function getLabel(el) {
  * @return  {String}
  */
 module.exports.getValueLabel = function getValueLabel(el, attr) {
-  var label = attr ? el.getAttribute('data-label') : null;
+  let label = attr ? el.getAttribute('data-label') : null;
 
   if ( el.childNodes.length && el.childNodes[0].nodeType === 3 && el.childNodes[0].nodeValue ) {
     label = el.childNodes[0].nodeValue;
@@ -119,7 +119,7 @@ module.exports.getValueLabel = function getValueLabel(el, attr) {
  * @return  {String}
  */
 module.exports.getViewNodeValue = function getViewNodeValue(el) {
-  var value = el.getAttribute('data-value');
+  let value = el.getAttribute('data-value');
   if ( typeof value === 'string' && value.match(/^\[|\{/) ) {
     try {
       value = JSON.parse(value);
@@ -142,17 +142,17 @@ module.exports.getViewNodeValue = function getViewNodeValue(el) {
  * @return  {String}
  */
 module.exports.getIcon = function getIcon(el, win) {
-  var image = el.getAttribute('data-icon');
+  let image = el.getAttribute('data-icon');
 
   if ( image && image !== 'undefined') {
     if ( image.match(/^stock:\/\//) ) {
       image = image.replace('stock://', '');
 
-      var size  = '16x16';
+      let size  = '16x16';
       try {
-        var spl = image.split('/');
-        var tmp = spl.shift();
-        var siz = tmp.match(/^\d+x\d+/);
+        let spl = image.split('/');
+        let tmp = spl.shift();
+        let siz = tmp.match(/^\d+x\d+/);
         if ( siz ) {
           size = siz[0];
           image = spl.join('/');
@@ -186,7 +186,7 @@ module.exports.getProperty = function getProperty(el, param, tagName) {
   const GUIElement = require('gui/element.js');
 
   tagName = tagName || el.tagName.toLowerCase();
-  var isDataView = tagName.match(/^gui\-(tree|icon|list|file)\-view$/);
+  const isDataView = tagName.match(/^gui\-(tree|icon|list|file)\-view$/);
 
   if ( param === 'value' && !isDataView) {
     if ( (['gui-text', 'gui-password', 'gui-textarea', 'gui-slider', 'gui-select', 'gui-select-list']).indexOf(tagName) >= 0 ) {
@@ -243,13 +243,14 @@ module.exports.setProperty = function setProperty(el, param, value, tagName) {
   }
 
   // Generics for input elements
-  var inner = el.children[0];
-  var accept = ['gui-slider', 'gui-text', 'gui-password', 'gui-textarea', 'gui-checkbox', 'gui-radio', 'gui-select', 'gui-select-list', 'gui-button'];
+  const inner = el.children[0];
+
+  let accept = ['gui-slider', 'gui-text', 'gui-password', 'gui-textarea', 'gui-checkbox', 'gui-radio', 'gui-select', 'gui-select-list', 'gui-button'];
 
   (function() {
-    var firstChild;
+    let firstChild;
 
-    var params = {
+    const params = {
       readonly: function() {
         _setKnownAttribute(firstChild, 'readonly', value, true);
       },
@@ -320,8 +321,8 @@ module.exports.createInputLabel = function createInputLabel(el, type, input, lab
   label = label || module.exports.getLabel(el);
 
   if ( label ) {
-    var lbl = document.createElement('label');
-    var span = document.createElement('span');
+    const lbl = document.createElement('label');
+    const span = document.createElement('span');
     span.appendChild(document.createTextNode(label));
 
     if ( type === 'checkbox' || type === 'radio' ) {
@@ -352,9 +353,9 @@ module.exports.createInputLabel = function createInputLabel(el, type, input, lab
 module.exports.createElement = function createElement(tagName, params, ignoreParams) {
   ignoreParams = ignoreParams || [];
 
-  var el = document.createElement(tagName);
+  const el = document.createElement(tagName);
 
-  var classMap = {
+  const classMap = {
     textalign: function(v) {
       DOM.$addClass(el, 'gui-align-' + v);
     },
@@ -381,14 +382,14 @@ module.exports.createElement = function createElement(tagName, params, ignorePar
         return;
       }
 
-      var value = params[k];
+      const value = params[k];
       if ( typeof value !== 'undefined' && typeof value !== 'function' ) {
         if ( classMap[k] ) {
           classMap[k](value);
           return;
         }
 
-        var fvalue = getValue(k, value);
+        const fvalue = getValue(k, value);
         el.setAttribute('data-' + k, fvalue);
       }
     });
@@ -429,12 +430,12 @@ module.exports.setFlexbox = function setFlexbox(el, grow, shrink, basis, checkel
     }
   })();
 
-  var flex = [grow, shrink];
+  const flex = [grow, shrink];
   if ( basis.length ) {
     flex.push(basis);
   }
 
-  var style = flex.join(' ');
+  const style = flex.join(' ');
   el.style.webkitBoxFlex = style;
   el.style.mozBoxFlex = style;
   el.style.webkitFlex = style;
@@ -443,7 +444,7 @@ module.exports.setFlexbox = function setFlexbox(el, grow, shrink, basis, checkel
   el.style.oFlex = style;
   el.style.flex = style;
 
-  var align = el.getAttribute('data-align');
+  const align = el.getAttribute('data-align');
   DOM.$removeClass(el, 'gui-flex-align-start');
   DOM.$removeClass(el, 'gui-flex-align-end');
   if ( align ) {
@@ -467,8 +468,8 @@ module.exports.createDrag = function createDrag(el, onDown, onMove, onUp) {
   onMove = onMove || function() {};
   onUp = onUp || function() {};
 
-  var startX, startY, currentX, currentY;
-  var dragging = false;
+  let startX, startY, currentX, currentY;
+  let dragging = false;
 
   function _onMouseMove(ev, pos, touchDevice) {
     ev.preventDefault();
@@ -477,8 +478,8 @@ module.exports.createDrag = function createDrag(el, onDown, onMove, onUp) {
       currentX = pos.x;
       currentY = pos.y;
 
-      var diffX = currentX - startX;
-      var diffY = currentY - startY;
+      const diffX = currentX - startX;
+      const diffY = currentY - startY;
 
       onMove(ev, {x: diffX, y: diffY}, {x: currentX, y: currentY});
     }
@@ -524,8 +525,8 @@ module.exports.createDrag = function createDrag(el, onDown, onMove, onUp) {
  */
 module.exports.getNextElement = function getNextElement(prev, current, root) {
   function getElements() {
-    var ignore_roles = ['menu', 'menuitem', 'grid', 'gridcell', 'listitem'];
-    var list = [];
+    const ignore_roles = ['menu', 'menuitem', 'grid', 'gridcell', 'listitem'];
+    const list = [];
 
     root.querySelectorAll('.gui-element').forEach(function(e) {
       // Ignore focused and disabled elements, and certain aria roles
@@ -542,7 +543,7 @@ module.exports.getNextElement = function getNextElement(prev, current, root) {
   }
 
   function getCurrentIndex(els, m) {
-    var found = -1;
+    let found = -1;
 
     // Simply get index from array, it seems indexOf is a bit iffy here ?!
     if ( m ) {
@@ -559,7 +560,7 @@ module.exports.getNextElement = function getNextElement(prev, current, root) {
 
   function getCurrentParent(els, m) {
     if ( m ) {
-      var cur = m;
+      let cur = m;
       while ( cur.parentNode ) {
         if ( DOM.$hasClass(cur, 'gui-element') ) {
           return cur;
@@ -585,7 +586,7 @@ module.exports.getNextElement = function getNextElement(prev, current, root) {
   }
 
   function getNext(els, i) {
-    var next = els[i];
+    let next = els[i];
 
     // Get "real" elements from input wrappers
     if ( next.tagName.match(/^GUI\-(BUTTON|TEXT|PASSWORD|SWITCH|CHECKBOX|RADIO|SELECT)/) ) {
@@ -601,13 +602,13 @@ module.exports.getNextElement = function getNextElement(prev, current, root) {
   }
 
   if ( root ) {
-    var elements = getElements();
+    const elements = getElements();
     if ( elements.length ) {
-      var currentParent = getCurrentParent(elements, current);
-      var currentIndex = getCurrentIndex(elements, currentParent);
+      const currentParent = getCurrentParent(elements, current);
+      const currentIndex = getCurrentIndex(elements, currentParent);
 
       if ( currentIndex >= 0 ) {
-        var nextIndex = getNextIndex(elements, currentParent, currentIndex);
+        const nextIndex = getNextIndex(elements, currentParent, currentIndex);
         return getNext(elements, nextIndex);
       }
     }
@@ -666,10 +667,10 @@ module.exports.createDraggable = function createDraggable(el, args) {
       ev.dataTransfer.effectAllowed = args.effect;
       if ( args.dragImage && (typeof args.dragImage === 'function') ) {
         if ( ev.dataTransfer.setDragImage ) {
-          var dragImage = args.dragImage(ev, el);
+          const dragImage = args.dragImage(ev, el);
           if ( dragImage ) {
-            var dragEl    = dragImage.element;
-            var dragPos   = dragImage.offset;
+            const dragEl = dragImage.element;
+            const dragPos = dragImage.offset;
 
             document.body.appendChild(dragEl);
             ev.dataTransfer.setDragImage(dragEl, dragPos.x, dragPos.y);
@@ -759,7 +760,7 @@ module.exports.createDroppable = function createDroppable(el, args) {
       return true;
     }
 
-    var i = 10;
+    let i = 10;
 
     while ( start && i > 0 ) {
       if ( start === matcher ) {
@@ -777,15 +778,15 @@ module.exports.createDroppable = function createDroppable(el, args) {
     }
 
     if ( args.files ) {
-      var files = ev.dataTransfer.files;
+      const files = ev.dataTransfer.files;
       if ( files && files.length ) {
         return args.onFilesDropped(ev, el, files, args);
       }
     }
 
     try {
-      var data = ev.dataTransfer.getData(args.mime);
-      var item = JSON.parse(data);
+      const data = ev.dataTransfer.getData(args.mime);
+      const item = JSON.parse(data);
       if ( args.accept === null || args.accept === item.type ) {
         return args.onItemDropped(ev, el, item, args);
       }
@@ -800,7 +801,7 @@ module.exports.createDroppable = function createDroppable(el, args) {
     ev.stopPropagation();
     ev.preventDefault();
 
-    var result = _doDrop(ev, el);
+    const result = _doDrop(ev, el);
     args.onDrop(ev, el);
     return result;
   }
@@ -839,7 +840,7 @@ module.exports._menuSetActive = function(menu) {
 };
 
 module.exports._menuClickWrapper = function(ev, pos, onclick, original) {
-  var t = ev.isTrusted ? ev.target : (ev.relatedTarget || ev.target);
+  let t = ev.isTrusted ? ev.target : (ev.relatedTarget || ev.target);
 
   if ( t && t.tagName === 'LABEL' ) {
     t = t.parentNode;
@@ -847,9 +848,9 @@ module.exports._menuClickWrapper = function(ev, pos, onclick, original) {
 
   ev.preventDefault();
   if ( t && t.tagName === 'GUI-MENU-ENTRY' ) {
-    var subMenu = t.querySelector('gui-menu');
-    var isExpander = !!subMenu;
-    var hasInput = t.querySelector('input');
+    let subMenu = t.querySelector('gui-menu');
+    let isExpander = !!subMenu;
+    let hasInput = t.querySelector('input');
 
     if ( hasInput || isExpander ) {
       ev.stopPropagation();
@@ -874,7 +875,7 @@ module.exports._menuClickWrapper = function(ev, pos, onclick, original) {
 module.exports._menuClamp = function(r) {
   function _clamp(rm) {
     rm.querySelectorAll('gui-menu-entry').forEach(function(srm) {
-      var sm = srm.querySelector('gui-menu');
+      const sm = srm.querySelector('gui-menu');
       if ( sm ) {
         sm.style.left = String(-parseInt(sm.offsetWidth, 10)) + 'px';
         _clamp(sm);
@@ -882,7 +883,7 @@ module.exports._menuClamp = function(r) {
     });
   }
 
-  var pos = DOM.$position(r);
+  const pos = DOM.$position(r);
   if ( pos && (window.innerWidth - pos.right) < r.offsetWidth ) {
     DOM.$addClass(r, 'gui-overflowing');
     _clamp(r);
@@ -935,20 +936,20 @@ module.exports.createMenu = function createMenu(items, ev, customInstance) {
 
   module.exports.blurMenu(ev);
 
-  var root = customInstance;
-  var callbackMap = [];
+  let root = customInstance;
+  let callbackMap = [];
 
   function resolveItems(arr, par) {
     arr.forEach(function(iter) {
-      var props = {label: iter.title, icon: iter.icon, disabled: iter.disabled, labelHTML: iter.titleHTML, type: iter.type, checked: iter.checked};
-      var entry = module.exports.createElement('gui-menu-entry', props);
+      const props = {label: iter.title, icon: iter.icon, disabled: iter.disabled, labelHTML: iter.titleHTML, type: iter.type, checked: iter.checked};
+      const entry = module.exports.createElement('gui-menu-entry', props);
       if ( iter.menu ) {
-        var nroot = module.exports.createElement('gui-menu', {});
+        const nroot = module.exports.createElement('gui-menu', {});
         resolveItems(iter.menu, nroot);
         entry.appendChild(nroot);
       }
       if ( iter.onClick ) {
-        var index = callbackMap.push(iter.onClick);
+        const index = callbackMap.push(iter.onClick);
         entry.setAttribute('data-callback-id', String(index - 1));
       }
       par.appendChild(entry);
@@ -963,7 +964,7 @@ module.exports.createMenu = function createMenu(items, ev, customInstance) {
 
     Events.$bind(root, 'mousedown', function(ev, pos) {
       module.exports._menuClickWrapper(ev, pos, function(ev, pos, t) {
-        var index = parseInt(t.getAttribute('data-callback-id'), 10);
+        const index = parseInt(t.getAttribute('data-callback-id'), 10);
         if ( callbackMap[index] ) {
           callbackMap[index](ev, pos);
 
@@ -981,9 +982,9 @@ module.exports.createMenu = function createMenu(items, ev, customInstance) {
     root = root.$element;
   }
 
-  var wm = require('core/windowmanager.js').instance;
-  var space = wm.getWindowSpace(true);
-  var pos = Events.mousePosition(ev);
+  const wm = require('core/windowmanager.js').instance;
+  const space = wm.getWindowSpace(true);
+  const pos = Events.mousePosition(ev);
 
   DOM.$addClass(root, 'gui-root-menu');
   root.style.left = pos.x + 'px';
@@ -992,14 +993,14 @@ module.exports.createMenu = function createMenu(items, ev, customInstance) {
 
   // Make sure it stays within viewport
   setTimeout(function() {
-    var pos = DOM.$position(root);
+    const pos = DOM.$position(root);
     if ( pos ) {
       if ( pos.right > space.width ) {
-        var newLeft = Math.round(space.width - pos.width);
+        const newLeft = Math.round(space.width - pos.width);
         root.style.left = Math.max(0, newLeft) + 'px';
       }
       if ( pos.bottom > space.height ) {
-        var newTop = Math.round(space.height - pos.height);
+        const newTop = Math.round(space.height - pos.height);
         root.style.top = Math.max(0, newTop) + 'px';
       }
     }

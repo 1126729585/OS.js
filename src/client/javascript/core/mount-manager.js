@@ -395,7 +395,7 @@ const MountManager = (() => {
       if ( test !== null ) {
         Object.keys(m).forEach((name) => {
           if ( d !== true ) {
-            var i = m[name];
+            const i = m[name];
             if ( i.internal === true && i.match && test.match(i.match) ) {
               d = true;
             }

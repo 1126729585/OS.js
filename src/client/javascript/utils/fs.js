@@ -423,9 +423,10 @@ module.exports.filterScandir = function filterScandir(list, options) {
   const Utils = require('utils/misc.js');
   const SettingsManager = require('core/settings-manager.js');
 
-  var defaultOptions = Utils.cloneObject(SettingsManager.get('VFS') || {});
-  var ioptions = Utils.cloneObject(options, true);
-  var ooptions = Object.assign({}, defaultOptions.scandir || {}, ioptions);
+  const defaultOptions = Utils.cloneObject(SettingsManager.get('VFS') || {});
+  const ioptions = Utils.cloneObject(options, true);
+
+  let ooptions = Object.assign({}, defaultOptions.scandir || {}, ioptions);
   ooptions = Object.assign({}, {
     sortBy: null,
     sortDir: 'asc',
