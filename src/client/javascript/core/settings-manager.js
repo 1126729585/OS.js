@@ -30,26 +30,20 @@
 
 'use strict';
 
+/**
+ * @module core/settings-manager
+ */
+
 const SettingsFragment = require('helpers/settings-fragment.js');
 
 /**
  * Settings Manager Class
  *
- * @summary Class for maintaining settings
- *
- * <pre><b>
- * YOU CAN ONLY GET AN INSTANCE WITH `Core.getSettingsManager()`
- * </b></pre>
- *
- * @example
- * OSjs.Core.getSettingsManager()
- *
  * @summary Used for managing Settings across all applications and modules.
  *
  * @constructor
- * @memberof OSjs.Core
- * @see OSjs.Helpers.EventHandler
- * @see OSjs.Core.getSettingsManager
+ * @see helpers/event-handler~EventHandler
+ * @see core/settings-manager~SettingsManager
  */
 let SettingsManager = {
   storage: {},

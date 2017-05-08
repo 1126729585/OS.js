@@ -29,6 +29,10 @@
  */
 'use strict';
 
+/**
+ * @module core/windowmanager
+ */
+
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const Utils = require('utils/misc.js');
@@ -403,22 +407,14 @@ let _instance;
 
 /**
  * WindowManager Process Class
- * The default implementation of this is in apps/CoreWM/main.js
- *
- * <pre><code>
- * NEVER CONSTRUCT YOUR OWN INTANCE! To get one use:
- * OSjs.Core.getWindowManager();
- * </code></pre>
  *
  * @example
- * OSjs.Core.getWindowManager()
+ * require(...).instance
  *
  * @summary Class used for basis as a Window Manager.
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @extends OSjs.Core.Process
+ * @extends core/process~Process
  */
 class WindowManager extends Process {
 

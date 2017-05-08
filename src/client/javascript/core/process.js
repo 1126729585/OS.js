@@ -30,6 +30,10 @@
 
 'use strict';
 
+/**
+ * @module core/process
+ */
+
 const FS = require('utils/fs.js');
 const Connection = require('core/connection.js');
 
@@ -88,9 +92,7 @@ function _kill(pid) {
  * @summary Class used for basis as a Process.
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @mixes OSjs.Helpers.EventHandler
+ * @mixes EventHandler
  */
 class Process {
 

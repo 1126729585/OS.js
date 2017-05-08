@@ -29,6 +29,10 @@
  */
 'use strict';
 
+/**
+ * @module core/mount-manager
+ */
+
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const SettingsManager = require('core/settings-manager.js');
@@ -67,17 +71,6 @@ let DefaultModule = 'home';
  * Mount Manager Class
  *
  * @summary Class for maintaining mountpoints
- *
- * <pre><b>
- * YOU CAN ONLY GET AN INSTANCE WITH `Core.getMountManager()`
- * </b></pre>
- *
- * @example
- * OSjs.Core.getMountManager()
- *
- * @constructor
- * @memberof OSjs.Core
- * @see OSjs.Core.getMountManager
  */
 const MountManager = (() => {
   let _queue = [];

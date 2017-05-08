@@ -29,14 +29,6 @@
  */
 'use strict';
 
-/**
- * @namespace Bootstrap
- * @memberof OSjs
- */
-
-// FIXME
-require('compability.js').init();
-
 // Globals
 
 var inited = false;
@@ -335,9 +327,9 @@ function initHandler(config, callback) {
   var conf = OSjs.API.getConfig('Connection');
   var ctype = conf.Type === 'standalone' ? 'http' : conf.Type;
 
-  const connection = new (require('core/connections/' + ctype + '.js'));
-  const authenticator = new (require('core/auth/' + conf.Authenticator + '.js'));
-  const storage = new (require('core/storage/' + conf.Storage + '.js'));
+  const connection = new (require('core/connections/' + ctype + '.js'))();
+  const authenticator = new (require('core/auth/' + conf.Authenticator + '.js'))();
+  const storage = new (require('core/storage/' + conf.Storage + '.js'))();
 
   OSjs.API.setLocale(OSjs.API.getConfig('Locale'));
 
@@ -730,7 +722,7 @@ function init(opts) {
   }, _done);
 }
 
-OSjs.Bootstrap = {
+module.exports = {
 
   /**
    * Restart OS.js

@@ -64,17 +64,10 @@ const Events = require('utils/events.js');
  *
  * A simple wrapper with some pre-defined options
  *
- * <pre><b>
- * YOU CANNOT CANNOT USE THIS VIA 'new' KEYWORD.
- * </b></pre>
- *
  * @summary Class used for basis as a Dialog.
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @extends OSjs.Core.Window
- * @see OSjs.API.createDialog
+ * @extends core/window~Window
  */
 class DialogWindow extends Window {
 

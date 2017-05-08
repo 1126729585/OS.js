@@ -1,12 +1,8 @@
 'use strict';
 
-const _fs = require('fs-extra');
 const _path = require('path');
 const _config = require('./src/build/config.js');
 const _build = require('./src/build/core.js');
-const _webpack = require('webpack');
-
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const getAbsolute = (iter) => _path.join(__dirname, iter);
 
@@ -37,8 +33,9 @@ module.exports = new Promise((resolve) => {
       },
 
       entry: {
-        osjs: bf.javascript.filter(getFiltered).map(getAbsolute),
-        locales: bf.locales.filter(getFiltered).map(getAbsolute)
+        locales: bf.locales.filter(getFiltered).map(getAbsolute),
+        osjs: getAbsolute(bf.javascript)
+          //bf.javascript.filter(getFiltered).map(getAbsolute),
       },
 
       output: {

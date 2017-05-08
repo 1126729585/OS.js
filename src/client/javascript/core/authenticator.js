@@ -30,6 +30,10 @@
 
 'use strict';
 
+/**
+ * @module core/authenticator
+ */
+
 const API = require('core/api.js');
 const Connection = require('core/connection.js');
 const Compability = require('utils/compability.js');
@@ -40,8 +44,6 @@ let _instance;
  * Authenticator Base Class
  *
  * @abstract
- * @constructor Authenticator
- * @memberof OSjs.Core
  */
 class Authenticator {
 

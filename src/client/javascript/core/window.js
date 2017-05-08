@@ -29,6 +29,10 @@
  */
 'use strict';
 
+/**
+ * @module core/window
+ */
+
 const DOM = require('utils/dom.js');
 const API = require('core/api.js');
 const GUI = require('utils/gui.js');
@@ -210,9 +214,7 @@ let _NAMES              = [];
  * @summary Class used for basis as a Window.
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @mixes OSjs.Helpers.EventHandler
+ * @mixes EventHandler
  * @throws {Error} On invalid arguments
  */
 class Window {

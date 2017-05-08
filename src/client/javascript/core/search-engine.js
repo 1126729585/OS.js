@@ -30,6 +30,10 @@
 
 'use strict';
 
+/**
+ * @module core/search-engine
+ */
+
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const VFS = require('vfs/fs.js');
@@ -178,20 +182,7 @@ const FilesystemModule = {
 /**
  * Settings Manager Class
  *
- * For maintaining settings
- *
- * <pre><b>
- * You can only get an instance with `Core.getSearchEngine()`
- * </b></pre>
- *
- * @example
- * OSjs.Core.getSearchEngine()
- *
  * @summary The Search Engine for location files and application.
- *
- * @constructor
- * @memberof OSjs.Core
- * @see OSjs.Core.getSearchEngine
  */
 const SearchEngine = (function() {
 

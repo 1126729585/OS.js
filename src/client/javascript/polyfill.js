@@ -27,8 +27,9 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function() {
-  'use strict';
+'use strict';
+
+module.exports = function() {
 
   //
   // For browsers without "console" for some reason
@@ -123,4 +124,4 @@
 
   })();
 
-})();
+};

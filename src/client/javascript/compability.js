@@ -1,4 +1,8 @@
-module.exports.init = function() {
+module.exports = function() {
+  /**
+   * @namespace Bootstrap
+   * @memberof OSjs
+   */
 
   // Make sure these namespaces exist
   (['Bootstrap', 'Utils', 'API', 'GUI', 'Core', 'Dialogs', 'Helpers', 'Applications', 'Locales', 'VFS', 'Extensions', 'Auth', 'Storage', 'Connections', 'Broadway']).forEach(function(ns) {

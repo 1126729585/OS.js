@@ -27,8 +27,11 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-
 'use strict';
+
+/**
+ * @module core/package-manager
+ */
 
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
@@ -50,18 +53,7 @@ const SettingsManager = require('core/settings-manager.js');
  *
  * For maintaining packages
  *
- * <pre><b>
- * YOU CAN ONLY GET AN INSTANCE WITH `Core.getPackageManager()`
- * </b></pre>
- *
- * @example
- * OSjs.Core.getPackageManager()
- *
  * @summary Used for managing packages
- *
- * @constructor
- * @memberof OSjs.Core
- * @see OSjs.Core.getPackageManager
  */
 const PackageManager = (function() {
   let blacklist = [];

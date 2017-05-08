@@ -30,6 +30,10 @@
 
 'use strict';
 
+/**
+ * @module core/storage
+ */
+
 const API = require('core/api.js');
 const Utils = require('utils/misc.js');
 const Connection = require('core/connection.js');
@@ -42,8 +46,6 @@ let _instance;
  * Storage Base Class
  *
  * @abstract
- * @constructor Storage
- * @memberof OSjs.Core
  */
 class Storage {
 

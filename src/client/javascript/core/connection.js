@@ -29,6 +29,10 @@
  */
 'use strict';
 
+/**
+ * @module core/connection
+ */
+
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
 const Events = require('utils/events.js');
@@ -69,8 +73,7 @@ let _instance;
  * @summary Wrappers for communicating over HTTP, WS and NW
  *
  * @constructor Connection
- * @memberof OSjs.Core
- * @mixes OSjs.Helpers.EventHandler
+ * @mixes utils/event-handler~EventHandler
  */
 class Connection {
 

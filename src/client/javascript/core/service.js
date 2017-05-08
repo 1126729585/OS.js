@@ -29,6 +29,10 @@
  */
 'use strict';
 
+/**
+ * @module core/service
+ */
+
 const Process = require('core/process.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -49,9 +53,7 @@ const Process = require('core/process.js');
  * @param   {Object}    metadata    Package metadata
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @extends OSjs.Core.Process
+ * @extends core/process~Process
  */
 class Service extends Process {
 

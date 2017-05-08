@@ -46,33 +46,15 @@
     <link type="text/css" rel="stylesheet" href="themes/fonts.min.css" />
 %STYLES%
 
-    <!-- Scripts -->
-    <script type="text/javascript" charset="utf-8" src="settings.js"></script>
-%SCRIPTS%
-
   </head>
   <body>
 %SPLASH%
 
 %LOGIN%
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        if ( typeof OSjs !== 'object' || typeof OSjs.Bootstrap !== 'object' ) {
-          alert('OS.js was not loaded, most likely due to network or parsing error(s).');
-          return;
-        }
-
-        OSjs.Bootstrap.run({});
-      });
-      document.addEventListener('unload', function() {
-        try {
-          OSjs.Bootstrap.stop();
-        } catch ( e ) {
-          console.warn(e.stack, e);
-        }
-      });
-    </script>
+    <!-- Scripts -->
+    <script type="text/javascript" charset="utf-8" src="settings.js"></script>
+%SCRIPTS%
 
   </body>
 </html>

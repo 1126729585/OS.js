@@ -30,6 +30,10 @@
 
 'use strict';
 
+/**
+ * @module core/application
+ */
+
 const Process = require('core/process.js');
 const SettingsManager = require('core/settings-manager.js');
 const WindowManager = require('core/windowmanager.js');
@@ -68,9 +72,7 @@ const WindowManager = require('core/windowmanager.js');
  * @link https://os-js.org/manual/package/application/
  *
  * @abstract
- * @constructor
- * @memberof OSjs.Core
- * @extends OSjs.Core.Process
+ * @extends core/process~Process
  */
 class Application extends Process {
 
