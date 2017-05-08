@@ -98,7 +98,7 @@ function ServiceNotificationIcon() {
 }
 
 ServiceNotificationIcon.prototype.init = function() {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
 
   const show = (ev) => {
     this.displayMenu(ev);
@@ -123,7 +123,7 @@ ServiceNotificationIcon.prototype.init = function() {
  * Destroys the notification icon
  */
 ServiceNotificationIcon.prototype.destroy = function() {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
   if ( wm ) {
     wm.removeNotificationIcon('ServiceNotificationIcon');
   }
@@ -358,7 +358,7 @@ module.exports.call = function(m, a, cb, options) {
 
   _CALL_INDEX++;
 
-  const conn = OSjs.Core.getConnection();
+  const conn = require('core/connection.js').instance;
   return conn.request(m, a, function API_call_success(response) {
     module.exports.destroyLoading(lname);
     response = response || {};
@@ -393,8 +393,8 @@ module.exports.open = function(file, launchArgs) {
     throw new Error('Cannot API::open() without a path');
   }
 
-  const settingsManager = OSjs.Core.getSettingsManager();
-  const wm = OSjs.Core.getWindowManager();
+  const settingsManager = require('core/settings-manager.js');
+  const wm = require('core/windowmanager.js').instance;
   const args = {file: file};
 
   function getApplicationNameByFile(file, forceList, callback) {
@@ -402,7 +402,7 @@ module.exports.open = function(file, launchArgs) {
       throw new Error('This function excepts a OSjs.VFS.File object');
     }
 
-    const pacman = OSjs.Core.getPackageManager();
+    const pacman = require('core/package-manager.js');
     const val = settingsManager.get('DefaultApplication', file.mime);
 
     console.debug('getApplicationNameByFile()', 'default application', val);
@@ -565,7 +565,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
   let instance = null;
   let pargs = {};
 
-  const packman = OSjs.Core.getPackageManager();
+  const packman = require('core/package-manager.js');
   const compability = Compability.getCompability();
   const metadata = packman.getPackage(name);
   const running = Process.getProcess(name, true);
@@ -772,7 +772,7 @@ module.exports.launch = function(name, args, ondone, onerror, onconstruct) {
       }
 
       try {
-        const settings = OSjs.Core.getSettingsManager().get(instance.__pname) || {};
+        const settings = require('core/settings-manager.js').get(instance.__pname) || {};
         instance.init(settings, metadata, scheme);
 
         module.exports.triggerHook('onApplicationLaunched', [{
@@ -966,7 +966,7 @@ module.exports.getApplicationResource = function(app, name, vfspath) {
   }
 
   return (() => {
-    const pacman = OSjs.Core.getPackageManager();
+    const pacman = require('core/package-manager.js');
     const appname = getName();
     const pkg = pacman.getPackage(appname);
 
@@ -1053,7 +1053,7 @@ module.exports.getFileIcon = function(file, size, icon) {
   } else if ( file.type === 'trash' ) {
     icon = 'places/user-trash.png';
   } else if ( file.type === 'application' ) {
-    const pm = OSjs.Core.getPackageManager();
+    const pm = require('core/package-manager.js');
     const appname = FS.filename(file.path);
     const meta = pm.getPackage(appname);
 
@@ -1112,7 +1112,7 @@ module.exports.getThemeResource = function(name, type) {
   }
 
   if ( name ) {
-    const wm = OSjs.Core.getWindowManager();
+    const wm = require('core/windowmanager.js').instance;
     const theme = (wm ? wm.getSetting('theme') : 'default') || 'default';
     name = getName(name, theme);
   }
@@ -1133,7 +1133,7 @@ module.exports.getThemeResource = function(name, type) {
 module.exports.getSound = function(name) {
   name = name || null;
   if ( name ) {
-    const wm = OSjs.Core.getWindowManager();
+    const wm = require('core/windowmanager.js').instance;
     const theme = wm ? wm.getSoundTheme() : 'default';
     const root = module.exports.getConfig('Connection.SoundURI');
     const compability = Compability.getCompability();
@@ -1168,7 +1168,7 @@ module.exports.getIcon = function(name, size, app) {
   app  = app  || null;
 
   const root = module.exports.getConfig('Connection.IconURI');
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
   const theme = wm ? wm.getIconTheme() : 'default';
 
   function checkIcon() {
@@ -1273,7 +1273,7 @@ module.exports.getDefaultPath = function(fallback) {
  * @return {Object}   The created notification instance
  */
 module.exports.createNotification = function(opts) {
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
   return wm.notification(opts);
 };
 
@@ -1333,7 +1333,7 @@ module.exports.createDialog = function(className, args, callback, options) {
   const win = typeof className === 'string' ? new OSjs.Dialogs[className](args, cb) : className(args, cb);
 
   if ( !parentObj ) {
-    const wm = OSjs.Core.getWindowManager();
+    const wm = require('core/windowmanager.js').instance;
     wm.addWindow(win, true);
   } else if ( parentObj instanceof Window ) {
     win._on('destroy', () => {
@@ -1371,8 +1371,8 @@ module.exports.createDialog = function(className, args, callback, options) {
  */
 module.exports.createLoading = function(name, opts, panelId) {
   try {
-    const wm = OSjs.Core.getWindowManager();
-    if ( wm.createNotificationIcon(name, opts, panelId) ) {
+    const wm = require('core/windowmanager.js').instance;
+    if ( wm && wm.createNotificationIcon(name, opts, panelId) ) {
       return name;
     }
   } catch ( e ) {
@@ -1395,8 +1395,8 @@ module.exports.createLoading = function(name, opts, panelId) {
  */
 module.exports.destroyLoading = function(name, panelId) {
   try {
-    const wm = OSjs.Core.getWindowManager();
-    if ( wm.removeNotificationIcon(name, panelId) ) {
+    const wm = require('core/windowmanager.js').instance;
+    if ( wm && wm.removeNotificationIcon(name, panelId) ) {
       return true;
     }
   } catch ( e ) {
@@ -1417,7 +1417,7 @@ module.exports.destroyLoading = function(name, panelId) {
  * @return {Boolean}
  */
 module.exports.checkPermission = function(group) {
-  const user = OSjs.Core.getAuthenticator().getUser();
+  const user = require('core/authenticator.js').instance.getUser();
   const userGroups = user.groups || [];
 
   if ( !(group instanceof Array) ) {
@@ -1536,7 +1536,7 @@ module.exports.error = function(title, message, error, exception, bugreport) {
   })();
 
   function _dialog() {
-    const wm = OSjs.Core.getWindowManager();
+    const wm = require('core/windowmanager.js').instance;
     if ( wm && wm._fullyLoaded ) {
       try {
         module.exports.createDialog('Error', {
@@ -1594,7 +1594,7 @@ module.exports.error = function(title, message, error, exception, bugreport) {
  */
 module.exports.playSound = function(name, volume) {
   const compability = Compability.getCompability();
-  const wm = OSjs.Core.getWindowManager();
+  const wm = require('core/windowmanager.js').instance;
   const filename = wm ? wm.getSoundFilename(name) : null;
 
   if ( !wm || !compability.audio || !wm.getSetting('enableSounds') || !filename ) {
@@ -1764,9 +1764,9 @@ module.exports.getBrowserPath = function(app) {
  * @memberof OSjs.API
  */
 module.exports.signOut = function() {
-  const auth = OSjs.Core.getAuthenticator();
-  const storage = OSjs.Core.getStorage();
-  const wm = OSjs.Core.getWindowManager();
+  const auth = require('core/authenticator.js').instance;
+  const storage = require('core/storage.js').instance;
+  const wm = require('core/windowmanager.js').instance;
 
   function signOut(save) {
     module.exports.playSound('LOGOUT');

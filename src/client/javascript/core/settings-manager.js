@@ -141,7 +141,7 @@ SettingsManager.save = function(pool, callback) {
     callback = function() {};
   }
 
-  const storage = OSjs.Core.getStorage();
+  const storage = require('core/storage.js');
   storage.saveSettings(pool, this.storage, callback);
 };
 
