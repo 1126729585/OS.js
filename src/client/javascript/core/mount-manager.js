@@ -335,7 +335,7 @@ const MountManager = (() => {
       const mount = (() => {
         let isMounted = true;
 
-        return Utils.argumentDefaults(Utils.cloneObject(opts, true), {
+        return Object.assign({}, {
           icon: 'places/network-server.png',
           searchable: false,
           unmount: (done) => {
@@ -346,7 +346,7 @@ const MountManager = (() => {
           mounted: () => {
             return isMounted;
           }
-        });
+        }, opts);
       })();
 
       const module = createMountPoint(null, mount, true);
@@ -370,7 +370,7 @@ const MountManager = (() => {
         throw new Error(API._('ERR_VFSMODULE_NOT_MOUNTED_FMT', moduleName));
       }
 
-      _modules[moduleName].unmount(() => {
+      _modules[moduleName].unmount(function() {
         delete _modules[moduleName];
         cb.apply(MountManager, arguments);
       });
@@ -418,10 +418,10 @@ const MountManager = (() => {
      * @return  {Object[]}                   List of all Modules found
      */
     getModules: function(opts) {
-      opts = Utils.argumentDefaults(opts, {
+      opts = Object.assign({}, {
         visible: true,
         special: false
-      });
+      }, opts);
 
       const m = _modules;
       const a = [];

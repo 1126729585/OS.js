@@ -424,14 +424,14 @@ module.exports.filterScandir = function filterScandir(list, options) {
 
   var defaultOptions = Utils.cloneObject(OSjs.Core.getSettingsManager().get('VFS') || {});
   var ioptions = Utils.cloneObject(options, true);
-  var ooptions = Utils.argumentDefaults(ioptions, defaultOptions.scandir || {});
-  ooptions = Utils.argumentDefaults(ooptions, {
+  var ooptions = Object.assign({}, defaultOptions.scandir || {}, ioptions);
+  ooptions = Object.assign({}, {
     sortBy: null,
     sortDir: 'asc',
     typeFilter: null,
     mimeFilter: [],
     showHiddenFiles: true
-  }, true);
+  }, ooptions);
 
   function filterFile(iter) {
     if ( (ooptions.typeFilter && iter.type !== ooptions.typeFilter) || (!ooptions.showHiddenFiles && iter.filename.match(/^\.\w/)) ) {

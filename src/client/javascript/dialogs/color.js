@@ -75,8 +75,7 @@ class ColorDialog extends DialogWindow {
    * @param  {CallbackDialog}  callback          Callback when done
    */
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {
-    });
+    args = Object.assign({}, {}, args);
 
     const [rgb, hex] = getColor(args.color);
 

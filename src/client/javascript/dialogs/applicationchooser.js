@@ -50,7 +50,7 @@ class ApplicationChooserDialog extends DialogWindow {
    * @param  {CallbackDialog}  callback          Callback when done
    */
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {});
+    args = Object.assign({}, {}, args);
 
     super('ApplicationChooserDialog', {
       title: args.title || API._('DIALOG_APPCHOOSER_TITLE'),

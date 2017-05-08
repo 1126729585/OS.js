@@ -30,7 +30,6 @@
 'use strict';
 
 const API = require('core/api.js');
-const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
 
 /**
@@ -53,9 +52,9 @@ class ConfirmDialog extends DialogWindow {
    * @param  {CallbackDialog}  callback          Callback when done
    */
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {
+    args = Object.assign({}, {
       buttons: ['yes', 'no', 'cancel']
-    });
+    }, args);
 
     super('ConfirmDialog', {
       title: args.title || API._('DIALOG_CONFIRM_TITLE'),

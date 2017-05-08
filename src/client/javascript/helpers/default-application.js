@@ -49,14 +49,14 @@
    * @see OSjs.Core.Application
    */
   function DefaultApplication(name, args, metadata, opts) {
-    this.defaultOptions = Utils.argumentDefaults(opts, {
+    this.defaultOptions = Object.assign({}, {
       readData: true,
       rawData: false,
       extension: '',
       mime: 'application/octet-stream',
       filetypes: [],
       filename: 'New file'
-    });
+    }, opts);
 
     Application.apply(this, [name, args, metadata]);
   }

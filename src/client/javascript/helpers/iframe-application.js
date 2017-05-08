@@ -64,7 +64,7 @@
    * @link https://os-js.org/manual/package/iframe/
    */
   function IFrameApplicationWindow(name, opts, app) {
-    opts = Utils.argumentDefaults(opts, {
+    opts = Object.assign({}, {
       src: 'about:blank',
       focus: function() {},
       blur: function() {},
@@ -75,7 +75,7 @@
       allow_resize: false,
       allow_restore: false,
       allow_maximize: false
-    });
+    }, opts);
 
     Window.apply(this, ['IFrameApplicationWindow', opts, app]);
 
@@ -237,10 +237,10 @@
   function IFrameApplication(name, args, metadata, opts) {
     Application.call(this, name, args, metadata);
 
-    this.options = Utils.argumentDefaults(opts, {
+    this.options = Object.assign({}, {
       icon: '',
       title: 'IframeApplicationWindow'
-    });
+    }, opts);
     this.options.src = this._getResource(this.options.src);
   }
 

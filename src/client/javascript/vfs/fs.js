@@ -32,7 +32,6 @@
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
 const XHR = require('utils/xhr.js');
-const Utils = require('utils/misc.js');
 const VFSFile = require('vfs/file.js');
 const VFSFileData = require('vfs/filedata.js');
 
@@ -753,10 +752,10 @@ module.exports.copy = function VFS_copy(src, dest, callback, options, appRef) {
     return;
   }
 
-  options = Utils.argumentDefaults(options, {
+  options = Object.assign({}, {
     type: 'binary',
     dialog: null
-  });
+  }, options);
 
   options.arrayBuffer = true;
 

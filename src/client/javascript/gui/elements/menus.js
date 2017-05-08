@@ -207,7 +207,7 @@ class GUIMenu extends GUIElement {
   on(evName, callback, params) {
     evName = getEventName(evName);
 
-    Events.$bind(this.$element, evName, (ev) => {
+    Events.$bind(this.$element, evName, function(ev) {
       const t = ev.isTrusted ? ev.target : (ev.relatedTarget || ev.target);
       if ( t.tagName === 'LABEL' ) {
         callback.apply(new GUIElement(t.parentNode), arguments);

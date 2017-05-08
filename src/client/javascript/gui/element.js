@@ -32,7 +32,6 @@
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
 const GUI = require('utils/gui.js');
-const Utils = require('utils/misc.js');
 
 /**
  * @namespace Elements
@@ -616,11 +615,11 @@ class UIElement {
     }
 
     REGISTRY[name] = (() => {
-      const metadata = Utils.argumentDefaults(Utils.cloneObject(data, true), {
+      const metadata = Object.assign({}, {
         type: 'element',
         allowedChildren: [],
         allowedParents: []
-      });
+      }, data);
 
       if ( metadata.parent ) {
         delete metadata.parent;

@@ -31,7 +31,6 @@
 
 const API = require('core/api.js');
 const DOM = require('utils/dom.js');
-const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
 const Compability = require('utils/compability.js');
 
@@ -635,7 +634,7 @@ module.exports.getNextElement = function getNextElement(prev, current, root) {
 module.exports.createDraggable = function createDraggable(el, args) {
   /* eslint no-invalid-this: "off" */
 
-  args = Utils.argumentDefaults(args, {
+  args = Object.assign({}, {
     type: null,
     effect: 'move',
     data: null,
@@ -647,7 +646,7 @@ module.exports.createDraggable = function createDraggable(el, args) {
     onEnd: function() {
       return true;
     }
-  });
+  }, args);
 
   if ( Compability.isIE() ) {
     args.mime = 'text';
@@ -726,7 +725,7 @@ module.exports.createDraggable = function createDraggable(el, args) {
 module.exports.createDroppable = function createDroppable(el, args) {
   /* eslint no-invalid-this: "off" */
 
-  args = Utils.argumentDefaults(args, {
+  args = Object.assign({}, {
     accept: null,
     effect: 'move',
     mime: 'application/json',
@@ -749,7 +748,7 @@ module.exports.createDroppable = function createDroppable(el, args) {
     onDrop: function() {
       return true;
     }
-  });
+  }, args);
 
   if ( Compability.isIE() ) {
     args.mime = 'text';

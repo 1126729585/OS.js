@@ -63,7 +63,7 @@ const VFSFile = require('vfs/file.js');
  */
 class FileDialog extends DialogWindow {
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {
+    args = Object.assign({}, {
       file: null,
       type: 'open',
       path: API.getDefaultPath(),
@@ -75,7 +75,7 @@ class FileDialog extends DialogWindow {
       mfilter: [],
       select: null,
       multiple: false
-    });
+    }, args);
 
     args.multiple = (args.type === 'save' ? false : args.multiple === true);
 

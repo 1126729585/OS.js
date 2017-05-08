@@ -31,7 +31,6 @@
 
 const API = require('core/api.js');
 const VFS = require('vfs/fs.js');
-const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
 
 /**
@@ -54,11 +53,11 @@ class FileUploadDialog extends DialogWindow {
    * @param  {CallbackDialog}  callback          Callback when done
    */
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {
+    args = Object.assign({}, {
       dest: API.getDefaultPath(),
       progress: {},
       file: null
-    });
+    }, args);
 
     super('FileUploadDialog', {
       title: args.title || API._('DIALOG_UPLOAD_TITLE'),

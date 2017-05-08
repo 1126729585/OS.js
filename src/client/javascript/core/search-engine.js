@@ -259,11 +259,11 @@ const SearchEngine = (function() {
       let result = [];
       let errors = [];
 
-      args = Utils.argumentDefaults(args, {
+      args = Object.assign({}, {
         recursive: false,
         limit: 0,
         dlimit: 0
-      });
+      }, args);
 
       if ( args.limit ) {
         args.dlimit = args.limit;

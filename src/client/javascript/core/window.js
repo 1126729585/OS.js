@@ -32,7 +32,6 @@
 const DOM = require('utils/dom.js');
 const API = require('core/api.js');
 const GUI = require('utils/gui.js');
-const Utils = require('utils/misc.js');
 const Scheme = require('gui/scheme.js');
 const Events = require('utils/events.js');
 const Compability = require('utils/compability.js');
@@ -264,13 +263,13 @@ class Window {
       throw new TypeError('schemeRef given was not instance of GUI.Scheme');
     }
 
-    opts = Utils.argumentDefaults(opts, {
+    opts = Object.assign({}, {
       icon: API.getThemeResource('wm.png', 'wm'),
       width: _DEFAULT_WIDTH,
       height: _DEFAULT_HEIGHT,
       title: name,
       tag: name
-    });
+    }, opts);
 
     console.group('Window::constructor()', _WID, arguments);
 

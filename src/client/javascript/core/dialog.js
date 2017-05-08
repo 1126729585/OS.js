@@ -123,7 +123,7 @@ class DialogWindow extends Window {
       }
 
       this.buttonClicked = true;
-      callback.apply(this, arguments);
+      callback.call(this, ev, button, result);
       this._close();
     };
   }

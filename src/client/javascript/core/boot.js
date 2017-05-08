@@ -617,11 +617,11 @@ function init(opts) {
   try {
     opts = opts || {};
 
-    instanceOptions = OSjs.Utils.argumentDefaults(opts, {
+    instanceOptions = Object.assign({
       mocha: false,
       onInit: function() {},
       onInited: function() {}
-    });
+    }, opts);
   } catch ( e ) {
     console.warn('Invalid options', opts);
   }

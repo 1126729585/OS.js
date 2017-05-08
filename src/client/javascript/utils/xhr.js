@@ -67,7 +67,7 @@ module.exports.ajax = function Utils_ajax(args) {
   /* eslint no-invalid-this: "off" */
 
   let request;
-  args = Utils.argumentDefaults(args, {
+  args = Object.assign({}, {
     onerror: function() {},
     onsuccess: function() {},
     onprogress: function() {},
@@ -84,7 +84,7 @@ module.exports.ajax = function Utils_ajax(args) {
     json: false,
     url: '',
     jsonp: false
-  });
+  }, args);
 
   function onReadyStateChange() {
     let result;

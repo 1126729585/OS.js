@@ -30,7 +30,6 @@
 'use strict';
 
 const API = require('core/api.js');
-const Utils = require('utils/misc.js');
 const DialogWindow = require('core/dialog.js');
 
 /**
@@ -54,7 +53,7 @@ class InputDialog extends DialogWindow {
    * @param  {CallbackDialog}  callback            Callback when done
    */
   constructor(args, callback) {
-    args = Utils.argumentDefaults(args, {});
+    args = Object.assign({}, {}, args);
 
     super('InputDialog', {
       title: args.title || API._('DIALOG_INPUT_TITLE'),
