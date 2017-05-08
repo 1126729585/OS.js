@@ -31,11 +31,9 @@
 /*eslint valid-jsdoc: "off"*/
 'use strict';
 
-// FIXME
-const VFS = OSjs.VFS;
-
 const FS = require('utils/fs.js');
 const API = require('core/api.js');
+const VFS = require('vfs/fs.js');
 
 /////////////////////////////////////////////////////////////////////////////
 // FILE ABSTRACTION

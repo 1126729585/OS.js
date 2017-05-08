@@ -117,7 +117,7 @@ const MountManager = (() => {
 
     const match = new RegExp('^' + (sname + '://').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'));
 
-    const mount = Utils.argumentDefaults(Utils.cloneObject(args, true), {
+    const mount = Object.assign({}, {
       searchable: true,
       readOnly: false,
       visible: true,
@@ -142,7 +142,7 @@ const MountManager = (() => {
       enabled: () => {
         return true;
       }
-    }, true);
+    }, args);
 
     mount.match = args.match || match;
 

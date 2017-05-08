@@ -29,7 +29,6 @@
  */
 'use strict';
 
-const Utils = require('utils/misc.js');
 const Events = require('utils/events.js');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -424,7 +423,7 @@ module.exports.$createJS = function Utils_$createJS(src, onreadystatechange, onl
   res.onerror = onerror || function() {};
   res.onload = onload || function() {};
 
-  attrs = Utils.mergeObject({
+  attrs = Object.assign({}, {
     type: 'text/javascript',
     charset: 'utf-8',
     src: src
